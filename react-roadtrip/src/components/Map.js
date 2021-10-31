@@ -2,12 +2,12 @@ import React, {useRef, useEffect, useState} from 'react';
 
 // Mapbox
 import mapboxgl from 'mapbox-gl';
-import MapboxDirections from '@mapbox/mapbox-gl-directions';
+import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
 
 // Mapbox token
-mapboxgl.accessToken = 'ACCESS_TOKEN';
+mapboxgl.accessToken = 'API_KEY';
 
-export default function Map({ mapVisibility }) {
+function Map({ mapVisibility }) {
     // Defining the map's container, initial state of null, useRef as component re-renders are not needed
     const mapContainer = useRef(null);
     // Defining the map, initial state of null, useRef as component re-renders are not needed
@@ -21,7 +21,7 @@ export default function Map({ mapVisibility }) {
     // being a function to change the latitude
     const [lat, setLat] = useState(42.35);
 
-    // Defining the zoom hook, initial state of 9, with the 2nd element in the array 
+    // Defining the zoom hook, initial state of 7, with the 2nd element in the array 
     // being a function to change the zoom
     const [zoom, setZoom] = useState(7);
 
@@ -30,21 +30,47 @@ export default function Map({ mapVisibility }) {
         if (map.current) {
             return;
         }
+        // Sets the current map state from 'null' to a new 'mapboxgl.Map' object
         map.current = new mapboxgl.Map({
             container: mapContainer.current,
             style: 'mapbox://styles/mapbox/streets-v11',
             center: [lng, lat],
             zoom: zoom
         });
-        map.addControl(
+        map.current.addControl(
             new MapboxDirections({
-                accessToken: mapboxgl.accessToken
+                accessToken: mapboxgl.accessToken,
+                controls: {
+                    profileSwitcher: false
+                },
             }),
             'top-left'
         );
+    });
+
+    useEffect(() => {
+        // Logs the state of the long and lat values in the console
+        function logState() {
+            console.log({
+                'long': lng,
+                'lat': lat
+            });
+        }
+        async function onMove() {
+            // Function to set state of Long, Lat and Zoom value to to the center, updating the values when center changes
+            // toFixed is used for rounding decimal places.
+            map.current.on('move', () => {
+                setLng(map.current.getCenter().lng.toFixed(4));
+                setLat(map.current.getCenter().lat.toFixed(4));
+                setZoom(map.current.getZoom().toFixed(2));
+            })
+            await logState();
+        }
+        onMove();
     });
     return(
         <div ref={mapContainer} className="map-container" style={{display: mapVisibility}} />
     )
 }
 
+export default Map;

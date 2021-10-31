@@ -10,7 +10,7 @@ function App() {
   // Function to display the map once "Create Trip" button is pressed
   const [mapState, setMapState] = useState('none');
   const showMapVisibility = (state) => {
-    setMapState(state)
+    setMapState(state);
   };
   useEffect(() => {
     console.log(mapState);
