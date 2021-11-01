@@ -7,7 +7,7 @@ import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-direct
 // Mapbox token
 mapboxgl.accessToken = 'API_KEY';
 
-function Map({ mapVisibility }) {
+function Map({ state }) {
     // Defining the map's container, initial state of null, useRef as component re-renders are not needed
     const mapContainer = useRef(null);
     // Defining the map, initial state of null, useRef as component re-renders are not needed
@@ -69,7 +69,7 @@ function Map({ mapVisibility }) {
         onMove();
     });
     return(
-        <div ref={mapContainer} className="map-container" style={{display: mapVisibility}} />
+        <div ref={mapContainer} className="map-container" style={{display: state}} />
     )
 }
 

@@ -10,9 +10,9 @@ import {faCarSide} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
 
-function NavigationBar({setMapVisibility}) {
+function NavigationBar({setMapVisibility, state}) {
     return(
-        <Navbar bg="dark" variant="dark" expand="lg">
+        <Navbar bg="dark" variant="dark" expand="lg" style={{display:state}}>
             <Container>
                 <Navbar.Brand>
                     <FontAwesomeIcon icon={faCarSide} /> Road Trip
