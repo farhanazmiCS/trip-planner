@@ -11,5 +11,6 @@ user = views.UserViewSet.as_view({'get': 'retrieve'})
 urlpatterns = [
     path('api/users/', users),
     path('api/user/<int:pk>', user),
+    path('api/login', views.login_view, name="login"),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
