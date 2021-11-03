@@ -55,8 +55,8 @@ def login_view(request):
     except User.DoesNotExist:
         return Response({
             'error': f'User of username {username} does not exist.',
-            'status': 400
-        })
+        },
+        status=400)
     
     # Authenticate user
     user = authenticate(
@@ -69,12 +69,17 @@ def login_view(request):
         login(request, user)
         return Response({
             'success': 'Log in success!',
-            'status': 200
-        })
+        }, 
+        status=200)
     else:
         return Response({
             'error': 'Incorrect password.'
-        })
+        },
+        status=400)
+
+@api_view(['GET'])
+def authenticated_view(request):
+    pass
 
             
 

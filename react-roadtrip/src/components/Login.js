@@ -2,45 +2,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 
-function Login({ props, updateUsername, updatePassword }) {
-    // FOR CSRF TOKEN: src: https://docs.djangoproject.com/en/3.2/ref/csrf/
-    function getCookie(name) {
-        let cookieValue = null;
-        if (document.cookie && document.cookie !== '') {
-            const cookies = document.cookie.split(';');
-            for (let i = 0; i < cookies.length; i++) {
-                const cookie = cookies[i].trim();
-                // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                    break;
-                }
-            }
-        }
-        return cookieValue;
-    }
-    // Declare CSRF Token
-    const csrftoken = getCookie('csrftoken');
-    
-    const submitForm = (e) => {
-        let url = 'http://127.0.0.1:8000/api/login';
-        let request = new Request(
-            url, {
-            headers: {
-                'X-CSRFToken': csrftoken
-            }
-        });
-        fetch(request, {
-            method: 'POST',
-            mode: 'cors',
-            body: JSON.stringify({
-                username: props.username,
-                password: props.password
-            })
-        })
-        .then(res => console.log(res))
-        e.preventDefault();
-    }
+function Login({ props, updateUsername, updatePassword, submitForm }) {
     return(
         <Container >
             <Form style={{display: props.state}} onSubmit={submitForm}>
