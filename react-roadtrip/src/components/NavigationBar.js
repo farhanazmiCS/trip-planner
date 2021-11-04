@@ -10,7 +10,7 @@ import {faCarSide} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
 
-function NavigationBar({setMapVisibility, state}) {
+function NavigationBar({setMapVisibility, state, logoutFunc}) {
     return(
         <Navbar bg="dark" variant="dark" expand="lg" style={{display:state}}>
             <Container>
@@ -26,7 +26,7 @@ function NavigationBar({setMapVisibility, state}) {
                     </Nav>
                     <Nav>
                         <NavDropdown title="User" id="basic-nav-dropdown">
-                            <NavDropdown.Item href="#action/3.4"><FontAwesomeIcon icon={faSignOutAlt} /> Log Out</NavDropdown.Item>
+                            <NavDropdown.Item onClick={logoutFunc}><FontAwesomeIcon icon={faSignOutAlt} /> Log Out</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>

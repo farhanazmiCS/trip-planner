@@ -1,4 +1,4 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 
 // Navigation Bar
 import NavigationBar from './components/NavigationBar';
@@ -7,7 +7,6 @@ import NavigationBar from './components/NavigationBar';
 import Map from './components/Map';
 
 // Register and Login Form
-import Register from './components/Register';
 import Login from './components/Login';
 
 function App() {
@@ -44,13 +43,13 @@ function App() {
   // State of login form, toggles between 'none' and 'block'
   const [loginVisibility, setLoginVisibility] = useState('block');
   const loginFormFunc = () => {
-    setLoginVisibility(loginVisibility ? 'none':'block');
+    setLoginVisibility(loginVisibility === 'block' ? 'none':'block');
   }
 
   // State of NavBar, toggles between 'none' and 'block'
   const [navbarState, setNavbarState] = useState('none');
   const updateNavbarState = () => {
-    setNavbarState(navbarState ? 'none':'block');
+    setNavbarState(navbarState === 'none' ? 'block':'none');
   }
 
   // Handle login submit
@@ -58,10 +57,11 @@ function App() {
     let url = 'http://127.0.0.1:8000/api/login';
     let request = new Request(
       url, {
-      headers: {
+        headers: {
         'X-CSRFToken': csrftoken
+        }
       }
-    });
+    );
     fetch(request, {
       method: 'POST',
       mode: 'cors',
@@ -70,9 +70,40 @@ function App() {
           password: password
       })
     })
-    .then(res => {
-      console.log(res.status);
+    .then(res => res.json())
+    .then(body => {
+      if (body['user'] !== 'AnonymousUser') {
+        loginFormFunc();
+        updateNavbarState();
+      }
+      return body;
     })
+    .then(body => console.log(body));
+    // Prevents reload of page
+    e.preventDefault();
+  }
+
+  const handleLogout = (e) => {
+    let url = 'http://127.0.0.1:8000/api/logout';
+    let request = new Request(
+      url, {
+        headers: {
+          'X-CSRFToken': csrftoken
+        }
+      }
+    );
+    fetch(request)
+    .then((response) => {
+      // Update the state of components
+      updateNavbarState();
+      loginFormFunc();
+      showMapVisibility('none');
+      setUsername('');
+      setPassword('');
+      return response;
+    })
+    .then(res => res.json())
+    .then(message => console.log(message));
     e.preventDefault();
   }
   return (
@@ -91,7 +122,7 @@ function App() {
         updatePassword={setPassword}
         submitForm={submitForm}
       />
-      <NavigationBar state={navbarState} setMapVisibility={showMapVisibility} />
+      <NavigationBar state={navbarState} setMapVisibility={showMapVisibility} logoutFunc={handleLogout} />
       <Map state={mapState} />
     </div>
   )

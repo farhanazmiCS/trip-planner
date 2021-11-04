@@ -9,11 +9,9 @@ from rest_framework.views import APIView
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 
-from django.contrib.auth import authenticate, login
-
-
+from django.contrib.auth import authenticate, login, logout
 
 from .models import User
 from .serializers import UserSerializer
@@ -21,7 +19,6 @@ from roadtrip import serializers
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     # To get all users
     @api_view(['GET'])
@@ -42,44 +39,56 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
         pass
 
-@api_view(['POST'])
+@api_view(['GET', 'POST'])
 @authentication_classes([SessionAuthentication])
 def login_view(request):
-    data = json.loads(request.body)
-    username = data.get('username')
-    password = data.get('password')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        username = data.get('username')
+        password = data.get('password')
+            
+        # Verify username
+        try:
+            User.objects.get(username=username)
+        except User.DoesNotExist:
+            return Response({
+                'error': f'User of username {username} does not exist.',
+            },
+            status=400)
         
-    # Verify username
-    try:
-        User.objects.get(username=username)
-    except User.DoesNotExist:
-        return Response({
-            'error': f'User of username {username} does not exist.',
-        },
-        status=400)
-    
-    # Authenticate user
-    user = authenticate(
-        request, 
-        username=username, 
-        password=password
-    )
+        # Authenticate user
+        user = authenticate(
+            request, 
+            username=username, 
+            password=password
+        )
 
-    if user is not None:
-        login(request, user)
-        return Response({
-            'success': 'Log in success!',
-        }, 
-        status=200)
-    else:
-        return Response({
-            'error': 'Incorrect password.'
-        },
-        status=400)
+        if user is not None:
+            login(request, user)
+            content = {
+                'user': str(request.user),  # `django.contrib.auth.User` instance.
+                'auth': str(request.auth),  # None
+            }
+            return Response(content, 
+            status=200)
+        else:
+            message = 'Incorrect passcode.'
+            content = {
+                'user': str(request.user),  # `django.contrib.auth.User` instance.
+                'auth': str(request.auth),  # None
+                'status': message
+            }
+            return Response(content,
+            status=400)
+            
 
 @api_view(['GET'])
-def authenticated_view(request):
-    pass
+def logout_view(request):
+    logout(request)
+    return Response({
+        'success': 'Log out success!'
+    },
+    status=200)
 
             
 

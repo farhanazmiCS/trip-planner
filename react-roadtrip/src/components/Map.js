@@ -49,24 +49,13 @@ function Map({ state }) {
     });
 
     useEffect(() => {
-        // Logs the state of the long and lat values in the console
-        function logState() {
-            console.log({
-                'long': lng,
-                'lat': lat
-            });
-        }
-        async function onMove() {
-            // Function to set state of Long, Lat and Zoom value to to the center, updating the values when center changes
-            // toFixed is used for rounding decimal places.
-            map.current.on('move', () => {
-                setLng(map.current.getCenter().lng.toFixed(4));
-                setLat(map.current.getCenter().lat.toFixed(4));
-                setZoom(map.current.getZoom().toFixed(2));
-            })
-            await logState();
-        }
-        onMove();
+        // Function to set state of Long, Lat and Zoom value to to the center, updating the values when center changes
+        // toFixed is used for rounding decimal places.
+        map.current.on('move', () => {
+            setLng(map.current.getCenter().lng.toFixed(4));
+            setLat(map.current.getCenter().lat.toFixed(4));
+            setZoom(map.current.getZoom().toFixed(2));
+        })
     });
     return(
         <div ref={mapContainer} className="map-container" style={{display: state}} />
