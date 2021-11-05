@@ -1,5 +1,6 @@
 import json
 from os import error
+from django.contrib import auth
 from django.db.models import query
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
@@ -10,6 +11,7 @@ from rest_framework.authentication import SessionAuthentication, BasicAuthentica
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.reverse import reverse
 
 from django.contrib.auth import authenticate, login, logout
 
@@ -39,6 +41,19 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
         pass
 
+
+@api_view(['GET'])
+def auth_view(request):
+    if request.user.is_authenticated:
+        content = {
+            'user': str(request.user),
+            'auth': str(request.auth)
+        }
+        return Response(content, status=200)
+    else:
+        return Response(reverse(login_view))
+
+
 @api_view(['GET', 'POST'])
 @authentication_classes([SessionAuthentication])
 def login_view(request):
@@ -65,31 +80,22 @@ def login_view(request):
 
         if user is not None:
             login(request, user)
-            content = {
-                'user': str(request.user),  # `django.contrib.auth.User` instance.
-                'auth': str(request.auth),  # None
-            }
-            return Response(content, 
-            status=200)
+            return Response(reverse(auth_view))
         else:
             message = 'Incorrect passcode.'
             content = {
-                'user': str(request.user),  # `django.contrib.auth.User` instance.
+                'user': str(request.user),  # returns AnonymousUser instance if not authenticated
                 'auth': str(request.auth),  # None
                 'status': message
             }
-            return Response(content,
-            status=400)
+            return Response(content, status=400)
+    return Response(status=200)
             
 
 @api_view(['GET'])
 def logout_view(request):
     logout(request)
-    return Response({
-        'success': 'Log out success!'
-    },
-    status=200)
-
+    return Response(reverse(login_view))
             
 
             

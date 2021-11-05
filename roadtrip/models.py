@@ -4,3 +4,18 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class User(AbstractUser):
     pass
+
+class Trip(models.Model):
+    origin = models.ForeignKey('Waypoint', on_delete=models.CASCADE, related_name='destination', null=True)
+    destination = models.ForeignKey('Waypoint', on_delete=models.CASCADE, related_name='origin', null=True)
+    waypoint = models.ManyToManyField('Waypoint', related_name='waypoint')
+    users = models.ManyToManyField(User, related_name='trip')
+
+class Waypoint(models.Model):
+    longitude = models.DecimalField(decimal_places=4, max_digits=10, null=True)
+    latitude = models.DecimalField(decimal_places=4, max_digits=10, null=True)
+    dateTime = models.DateTimeField(default=None, null=True)
+    todo = models.ManyToManyField('Todo')
+
+class Todo(models.Model):
+    task = models.TextField(null=True)

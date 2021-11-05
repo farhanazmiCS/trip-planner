@@ -70,15 +70,14 @@ function App() {
           password: password
       })
     })
-    .then(res => res.json())
-    .then(body => {
-      if (body['user'] !== 'AnonymousUser') {
-        loginFormFunc();
+    .then(res => res.status)
+    .then(status => {
+      if (status === 200) {
         updateNavbarState();
+        loginFormFunc();
       }
-      return body;
+      console.log(status);
     })
-    .then(body => console.log(body));
     // Prevents reload of page
     e.preventDefault();
   }
