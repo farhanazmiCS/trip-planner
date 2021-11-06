@@ -6,8 +6,14 @@ import NavigationBar from './components/NavigationBar';
 // Map
 import Map from './components/Map';
 
-// Register and Login Form
+// Login Form
 import Login from './components/Login';
+
+// Create Trip "Page"
+import CreateTrip from './pages/CreateTrip';
+
+// View Trips "Page"
+import ViewTrip from './pages/ViewTrip';
 
 function App() {
 
@@ -42,18 +48,18 @@ function App() {
 
   // State of login form, toggles between 'none' and 'block'
   const [loginVisibility, setLoginVisibility] = useState('block');
-  const loginFormFunc = () => {
+  const updateLoginform = () => {
     setLoginVisibility(loginVisibility === 'block' ? 'none':'block');
   }
 
   // State of NavBar, toggles between 'none' and 'block'
   const [navbarState, setNavbarState] = useState('none');
-  const updateNavbarState = () => {
+  const updateNavbar = () => {
     setNavbarState(navbarState === 'none' ? 'block':'none');
   }
 
   // Handle login submit
-  const submitForm = (e) => {
+  const handleLogin = (e) => {
     let url = 'http://127.0.0.1:8000/api/login';
     let request = new Request(
       url, {
@@ -73,8 +79,9 @@ function App() {
     .then(res => res.status)
     .then(status => {
       if (status === 200) {
-        updateNavbarState();
-        loginFormFunc();
+        updateNavbar();
+        updateLoginform();
+        showViewTrip();
       }
       console.log(status);
     })
@@ -82,29 +89,45 @@ function App() {
     e.preventDefault();
   }
 
+  // Handle logout
   const handleLogout = (e) => {
     let url = 'http://127.0.0.1:8000/api/logout';
-    let request = new Request(
-      url, {
-        headers: {
-          'X-CSRFToken': csrftoken
-        }
-      }
-    );
+    let request = new Request(url);
     fetch(request)
     .then((response) => {
       // Update the state of components
-      updateNavbarState();
-      loginFormFunc();
+      updateNavbar();
+      updateLoginform();
       showMapVisibility('none');
+      // Empty the fields
       setUsername('');
       setPassword('');
+      // Pass response to next promise
       return response;
     })
     .then(res => res.json())
     .then(message => console.log(message));
     e.preventDefault();
   }
+
+  // Create trip "page" state and handling it's visibility
+  const [createTripState, setCreateTripState] = useState('none');
+  const showCreateTrip = () => {
+    setCreateTripState('block');
+  }
+  const hideCreateTrip = () => {
+    setCreateTripState('none');
+  }
+
+  // View trips "page" state and handling it's visibility
+  const [viewTripState, setViewTripState] = useState('none');
+  const showViewTrip = () => {
+    setViewTripState('block');
+  }
+  const hideViewTrip = () => {
+    setViewTripState('none');
+  }
+
   return (
     // Login component properties:
     // state => visibility state of the login "page"
@@ -119,10 +142,25 @@ function App() {
         }}
         updateUsername={setUsername}
         updatePassword={setPassword}
-        submitForm={submitForm}
+        submitForm={handleLogin}
       />
-      <NavigationBar state={navbarState} setMapVisibility={showMapVisibility} logoutFunc={handleLogout} />
-      <Map state={mapState} />
+      <NavigationBar 
+        state={navbarState} 
+        showCreateTrip={showCreateTrip} 
+        hideCreateTrip={hideCreateTrip}
+        showViewTrip={showViewTrip}
+        hideViewTrip={hideViewTrip}
+        logoutFunc={handleLogout} 
+      />
+      <ViewTrip 
+        state={viewTripState} 
+      />
+      <CreateTrip 
+        state={createTripState} 
+      />
+      <Map 
+        state={mapState} 
+      />
     </div>
   )
 }
