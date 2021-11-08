@@ -96,6 +96,8 @@ class LogoutView(APIView):
         logout(request)
         return Response(reverse('login'))
 
+
+
             
 
             

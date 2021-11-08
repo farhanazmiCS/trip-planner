@@ -8,8 +8,10 @@ import {faPlus} from '@fortawesome/free-solid-svg-icons';
 export default function Todo() {
     return (
         <>  
-            <Form.Control type="text" />
-            <Button variant="primary"><FontAwesomeIcon icon={faPlus} /></Button>
+            <Form.Group>
+                <Form.Control className="mb-3" type="text" />
+                <Button variant="primary"><FontAwesomeIcon icon={faPlus} /></Button>
+            </Form.Group>
         </>
     )
 }
