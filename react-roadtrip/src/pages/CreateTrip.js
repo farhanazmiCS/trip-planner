@@ -17,8 +17,8 @@ export default function CreateTrip({state}) {
             <Container style={{display: state}}>
                 <h1>Create a Trip</h1>
                 <hr />
+                <Button style={{display: state}} onClick={showModal}>Create trip</Button>
             </Container>
-            <Button style={{display: state}} onClick={showModal}>Create trip</Button>
             <Waypoint style={{display: state}} show={show} onHide={hideModal} />
         </>
     )

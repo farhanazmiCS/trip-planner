@@ -4,7 +4,7 @@ import Button from 'react-bootstrap/Button'
 export default function ViewTrip({state}) {
     return (
         <>
-            <Container style={{display: state}}>
+            <Container>
                 <h1>My Trips</h1>
                 <hr />
             </Container>

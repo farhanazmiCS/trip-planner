@@ -31,7 +31,7 @@ export default function Waypoint({show, onHide}) {
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <Button>Done</Button>
+                <Button>Add Point</Button>
             </Modal.Footer>
         </Modal>
     )

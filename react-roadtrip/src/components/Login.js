@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 function Login({ props, updateUsername, updatePassword, submitForm }) {
     return(
         <Container >
-            <Form style={{display: props.state}} onSubmit={submitForm}>
+            <Form onSubmit={submitForm}>
                 <Form.Group className="mb-3" controlId="formBasicText">
                     <Form.Label>Username</Form.Label>
                     <Form.Control type="text" placeholder="Username" value={props.username} onChange={(e) => updateUsername(e.target.value)} />

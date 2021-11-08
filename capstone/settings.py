@@ -26,8 +26,8 @@ SECRET_KEY = str(get_random_secret_key())
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication'
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication'
     ]
 }
 
@@ -35,6 +35,8 @@ REST_FRAMEWORK = {
 DEBUG = True
 
 ALLOWED_HOSTS = []
+
+DJANGO_SETTINGS_MODULE = 'capstone.settings'
 
 AUTH_USER_MODEL = 'roadtrip.User'
 

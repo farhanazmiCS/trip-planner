@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 
 // Navigation Bar
 import NavigationBar from './components/NavigationBar';
@@ -15,59 +15,57 @@ import CreateTrip from './pages/CreateTrip';
 // View Trips "Page"
 import ViewTrip from './pages/ViewTrip';
 
-function App() {
-
-  // FOR CSRF TOKEN: src: https://docs.djangoproject.com/en/3.2/ref/csrf/
-  function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-      const cookies = document.cookie.split(';');
-      for (let i = 0; i < cookies.length; i++) {
-          const cookie = cookies[i].trim();
-          // Does this cookie string begin with the name we want?
-          if (cookie.substring(0, name.length + 1) === (name + '=')) {
-              cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-              break;
-          }
-      }
+// Get CSRF cookie
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+    for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+            break;
+        }
     }
-    return cookieValue;
   }
-  // Initialize CSRF Token
-  const csrftoken = getCookie('csrftoken');
+  return cookieValue;
+}
+// Initialize CSRF Token
+const csrftoken = getCookie('csrftoken');
+
+function App() {
 
   // State of username and password
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
-  // State of map, can set to 
+  // State of map
   const [mapState, setMapState] = useState('none');
   const showMapVisibility = (state) => {
     setMapState(state);
   };
 
   // State of login form, toggles between 'none' and 'block'
-  const [loginVisibility, setLoginVisibility] = useState('block');
+  const [loginVisibility, setLoginVisibility] = useState(false);
   const updateLoginform = () => {
-    setLoginVisibility(loginVisibility === 'block' ? 'none':'block');
+    setLoginVisibility(!loginVisibility);
   }
 
   // State of NavBar, toggles between 'none' and 'block'
-  const [navbarState, setNavbarState] = useState('none');
+  const [navbarState, setNavbarState] = useState(false);
   const updateNavbar = () => {
-    setNavbarState(navbarState === 'none' ? 'block':'none');
+    setNavbarState(!navbarState);
   }
 
-  // Handle login submit
+  // Handle login form submission
   const handleLogin = (e) => {
     let url = 'http://127.0.0.1:8000/api/login';
-    let request = new Request(
-      url, {
-        headers: {
+    let request = new Request(url, {
+      headers: {
         'X-CSRFToken': csrftoken
-        }
       }
-    );
+    });
     fetch(request, {
       method: 'POST',
       mode: 'cors',
@@ -76,20 +74,25 @@ function App() {
           password: password
       })
     })
-    .then(res => res.status)
-    .then(status => {
-      if (status === 200) {
-        updateNavbar();
-        updateLoginform();
-        showViewTrip();
+    .then(response => response.json())
+    .then(content => {
+      if (content.status !== 200) {
+        return
       }
-      console.log(status);
+      const token = content['token'];
+      const username = content['username'];
+      // Update UI
+      updateNavbar();
+      updateLoginform();
+      showViewTrip();
+      // Save username and token to sessionStorage
+      sessionStorage.setItem(username, token);
+      sessionStorage.setItem('username', username);
     })
-    // Prevents reload of page
     e.preventDefault();
   }
 
-  // Handle logout
+  // Handle session logout
   const handleLogout = (e) => {
     let url = 'http://127.0.0.1:8000/api/logout';
     let request = new Request(url);
@@ -99,9 +102,13 @@ function App() {
       updateNavbar();
       updateLoginform();
       showMapVisibility('none');
+      hideCreateTrip();
+      hideViewTrip();
       // Empty the fields
       setUsername('');
       setPassword('');
+      // Clear sessionStorage
+      sessionStorage.clear();
       // Pass response to next promise
       return response;
     })
@@ -110,7 +117,7 @@ function App() {
     e.preventDefault();
   }
 
-  // Create trip "page" state and handling it's visibility
+  // Create Trip "page" state and handling it's visibility
   const [createTripState, setCreateTripState] = useState('none');
   const showCreateTrip = () => {
     setCreateTripState('block');
@@ -119,14 +126,44 @@ function App() {
     setCreateTripState('none');
   }
 
-  // View trips "page" state and handling it's visibility
-  const [viewTripState, setViewTripState] = useState('none');
+  // View Trips "page" state and handling it's visibility
+  const [viewTripState, setViewTripState] = useState(false);
   const showViewTrip = () => {
-    setViewTripState('block');
+    setViewTripState(true);
   }
   const hideViewTrip = () => {
-    setViewTripState('none');
+    setViewTripState(false);
   }
+
+  // On page refresh (user is authenticated)
+  const onRefresh = () => {
+    let user = sessionStorage.getItem('username')
+    if (user) {
+      let url = 'http://127.0.0.1:8000/api/login'
+      let request = new Request(url, {
+        headers: {
+          'Authorization': `Token ${sessionStorage.getItem(user)}`,
+        }
+      });
+      fetch(request)
+      .then(response => response.status)
+      .then(status => {
+        if (status === 200) {
+          // Update UI
+          updateNavbar();
+          showViewTrip();
+        }
+        else {
+          console.log(status);
+        }
+      });
+    }
+    else{
+      updateLoginform();
+    }
+  }
+
+  useEffect(onRefresh, [Login, NavigationBar, ViewTrip])
 
   return (
     // Login component properties:
@@ -134,27 +171,24 @@ function App() {
     // value => values of the username and password fields
     // updaterFunc => functions to update the state of the username and password fields
     <div className="home">
-      <Login
+      { loginVisibility ? <Login
         props={{
-          state: loginVisibility,
           username: username,
           password: password,
         }}
         updateUsername={setUsername}
         updatePassword={setPassword}
         submitForm={handleLogin}
-      />
-      <NavigationBar 
+      /> : null }
+      { navbarState ? <NavigationBar 
         state={navbarState} 
         showCreateTrip={showCreateTrip} 
         hideCreateTrip={hideCreateTrip}
         showViewTrip={showViewTrip}
         hideViewTrip={hideViewTrip}
         logoutFunc={handleLogout} 
-      />
-      <ViewTrip 
-        state={viewTripState} 
-      />
+      /> : null }
+      { viewTripState && <ViewTrip /> }
       <CreateTrip 
         state={createTripState} 
       />
