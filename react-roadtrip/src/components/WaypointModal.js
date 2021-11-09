@@ -1,10 +1,14 @@
 import mapboxgl from 'mapbox-gl';
 
-import {Fragment, useState} from 'react';
+import {Fragment, useState, useRef} from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import {AsyncTypeahead} from 'react-bootstrap-typeahead';
+
+// FontAwesome Icon
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faPlus} from '@fortawesome/free-solid-svg-icons';
 
 import Todo from './Todo'
 
@@ -40,6 +44,11 @@ export default function WaypointModal({show, onHide, props, setLocation, setDate
     // Returns 'true' to bypass client-side filtering, as results are already filtered by API endpoint.
     const filterBy = () => true;
 
+    // Add Todo
+    const addTodo = () => {
+        return <Todo />
+    }
+
     return (
         <Modal show={show} onHide={onHide}>
             <Modal.Header closeButton>
@@ -48,24 +57,25 @@ export default function WaypointModal({show, onHide, props, setLocation, setDate
             <Modal.Body>
                 <Form>
                     <Form.Group>
-                        <Form.Label>Query Location</Form.Label>
+                        <h4>Query Location</h4>
                         <AsyncTypeahead
                             className="mb-3"
                             id="location"
                             filterBy={filterBy}
                             isLoading={isLoading}
                             onSearch={handleSearch}
-                            labelKey="text"
+                            labelKey="place_name"
                             options={options}
                             placeholder="Enter a location"
                             value={(e) => setLocation(e.target.value)}
                             renderMenuItemChildren={(options) => (
                                 <Fragment>
-                                    <p style={{color: 'grey'}}>{options.place_name}</p>
+                                    <p style={{color: 'grey', fontSize: '14px'}}>{options.place_name}</p>
                                 </Fragment>
                             )} 
                         />
                     </Form.Group>
+                    <h4>Period</h4>
                     <Form.Group>
                         <Form.Label>From</Form.Label>
                         <Form.Control className="mb-3" type="date" value={props.dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
@@ -76,7 +86,9 @@ export default function WaypointModal({show, onHide, props, setLocation, setDate
                         <Form.Control className="mb-3" type="date" value={props.dateTo} onChange={(e) => setDateTo(e.target.value)} />
                         <Form.Control className="mb-3" type="time" value={props.timeTo} onChange={(e) => setTimeTo(e.target.value)} />
                     </Form.Group>
-                    <Todo />
+                    <h4>Todo</h4>
+                    {addTodo()}
+                    <Button className="mb-3" variant="primary" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

@@ -9,6 +9,9 @@ import Map from './components/Map';
 // Login Form
 import Login from './components/Login';
 
+// Register Form
+import Register from './components/Register';
+
 // Create Trip "Page"
 import CreateTrip from './pages/CreateTrip';
 
@@ -46,10 +49,16 @@ function App() {
     setMapState(state);
   };
 
-  // State of login form, toggles between 'none' and 'block'
+  // State of login form
   const [loginVisibility, setLoginVisibility] = useState(false);
   const updateLoginform = () => {
     setLoginVisibility(!loginVisibility);
+  }
+
+  // State of register form
+  const [registerVisibility, setRegisterVisibility] = useState(false);
+  const updateRegisterform = () => {
+    setRegisterVisibility(!registerVisibility);
   }
 
   // State of NavBar, toggles between 'none' and 'block'
@@ -118,12 +127,12 @@ function App() {
   }
 
   // Create Trip "page" state and handling it's visibility
-  const [createTripState, setCreateTripState] = useState('none');
+  const [createTripState, setCreateTripState] = useState(false);
   const showCreateTrip = () => {
-    setCreateTripState('block');
+    setCreateTripState(true);
   }
   const hideCreateTrip = () => {
-    setCreateTripState('none');
+    setCreateTripState(false);
   }
 
   // View Trips "page" state and handling it's visibility
@@ -163,7 +172,12 @@ function App() {
     }
   }
 
-  useEffect(onRefresh, [Login, NavigationBar, ViewTrip])
+  const toggleRegisterLogin = () => {
+    updateLoginform();
+    updateRegisterform();
+  }
+
+  useEffect(onRefresh, []);
 
   return (
     // Login component properties:
@@ -171,6 +185,9 @@ function App() {
     // value => values of the username and password fields
     // updaterFunc => functions to update the state of the username and password fields
     <div className="home">
+      { registerVisibility ? <Register 
+        redirectToLogin={toggleRegisterLogin}
+        /> : null}
       { loginVisibility ? <Login
         props={{
           username: username,
@@ -179,6 +196,7 @@ function App() {
         updateUsername={setUsername}
         updatePassword={setPassword}
         submitForm={handleLogin}
+        redirectToRegister={toggleRegisterLogin}
       /> : null }
       { navbarState ? <NavigationBar 
         state={navbarState} 
@@ -189,9 +207,7 @@ function App() {
         logoutFunc={handleLogout} 
       /> : null }
       { viewTripState && <ViewTrip /> }
-      <CreateTrip 
-        state={createTripState} 
-      />
+      { createTripState && <CreateTrip />}
       <Map 
         state={mapState} 
       />

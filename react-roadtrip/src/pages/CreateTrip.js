@@ -7,7 +7,7 @@ import { useState } from 'react';
 // Mapbox
 import mapboxgl from 'mapbox-gl';
 
-export default function CreateTrip({state}) {
+export default function CreateTrip() {
     // Mapbox access token
     const access_token = 'API_KEY';
 
@@ -23,14 +23,21 @@ export default function CreateTrip({state}) {
     // Date
     let today = new Date();
     if (today.getDate().length !== 2) {
-        var date = today.getFullYear() + '-' + today.getMonth() + '-' + 0 + today.getDate();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + 0 + today.getDate();
     }
     else {
-        var date = today.getFullYear() + '-' + today.getMonth() + '-' + today.getDate();
+        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     }
 
-    // Time
-    let now = today.getHours() + ':' + today.getMinutes();
+    if (today.getHours().length !== 2) {
+        var now = 0 + today.getHours() + ':' + today.getMinutes();
+    }
+    else if (today.getMinutes().length !== 2) {
+        var now = today.getHours() + ':' + 0 + today.getMinutes();
+    }
+    else {
+        var now = today.getHours() + ':' + today.getMinutes();
+    }
 
     // Location fields
     const [location, setLocation] = useState('');
@@ -45,13 +52,12 @@ export default function CreateTrip({state}) {
 
     return (
         <>
-            <Container style={{display: state}}>
-                <h1>Create a Trip</h1>
+            <Container>
+                <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>
                 <hr />
                 <Button onClick={showModal}>Create trip</Button>
             </Container>
             <WaypointModal 
-                style={{display: state}} 
                 show={show} 
                 onHide={hideModal} 
                 props={{

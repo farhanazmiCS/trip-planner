@@ -1,17 +1,17 @@
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import InputGroup from 'react-bootstrap/InputGroup';
 
-// FontAwesome Icon
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import {useState} from 'react';
 
 export default function Todo() {
+    // State of input field
+    const [todo, setTodo] = useState('');
+
     return (
         <>  
-            <Form.Group>
-                <Form.Control className="mb-3" type="text" />
-                <Button variant="primary"><FontAwesomeIcon icon={faPlus} /></Button>
-            </Form.Group>
+            <InputGroup>
+                <Form.Control className="mb-3" type="text" placeholder="Any plans here?" value={todo} onChange={(e) => setTodo(e.target.value)} />
+            </InputGroup>
         </>
     )
 }
