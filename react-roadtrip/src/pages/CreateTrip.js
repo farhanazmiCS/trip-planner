@@ -4,7 +4,13 @@ import Button from 'react-bootstrap/Button'
 import WaypointModal from '../components/WaypointModal';
 import { useState } from 'react';
 
+// Mapbox
+import mapboxgl from 'mapbox-gl';
+
 export default function CreateTrip({state}) {
+    // Mapbox access token
+    const access_token = 'API_KEY';
+
     // Modal Control
     const [show, setShow] = useState(false);
     const showModal = () => {
@@ -42,7 +48,7 @@ export default function CreateTrip({state}) {
             <Container style={{display: state}}>
                 <h1>Create a Trip</h1>
                 <hr />
-                <Button style={{display: state}} onClick={showModal}>Create trip</Button>
+                <Button onClick={showModal}>Create trip</Button>
             </Container>
             <WaypointModal 
                 style={{display: state}} 
@@ -53,7 +59,8 @@ export default function CreateTrip({state}) {
                     dateFrom: dateFrom,
                     dateTo: dateTo,
                     timeFrom: timeFrom,
-                    timeTo: timeTo
+                    timeTo: timeTo,
+                    token: access_token
                 }}
                 setLocation={setLocation}
                 setDateFrom={setDateFrom}
