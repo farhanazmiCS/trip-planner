@@ -4,9 +4,6 @@ import Button from 'react-bootstrap/Button'
 import WaypointModal from '../components/WaypointModal';
 import { useState } from 'react';
 
-// Mapbox
-import mapboxgl from 'mapbox-gl';
-
 export default function CreateTrip() {
     // Mapbox access token
     const access_token = 'API_KEY';
@@ -22,22 +19,9 @@ export default function CreateTrip() {
 
     // Date
     let today = new Date();
-    if (today.getDate().length !== 2) {
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + 0 + today.getDate();
-    }
-    else {
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    }
-
-    if (today.getHours().length !== 2) {
-        var now = 0 + today.getHours() + ':' + today.getMinutes();
-    }
-    else if (today.getMinutes().length !== 2) {
-        var now = today.getHours() + ':' + 0 + today.getMinutes();
-    }
-    else {
-        var now = today.getHours() + ':' + today.getMinutes();
-    }
+    
+    const date = today.getFullYear() + '-' + (1 + today.getMonth()) + '-' + today.getDate();
+    const now = today.getHours() + ':' + today.getMinutes();
 
     // Location fields
     const [location, setLocation] = useState('');

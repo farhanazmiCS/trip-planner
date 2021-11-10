@@ -1,6 +1,4 @@
-import mapboxgl from 'mapbox-gl';
-
-import {Fragment, useState, useRef} from 'react';
+import {Fragment, useState} from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
@@ -10,6 +8,7 @@ import {AsyncTypeahead} from 'react-bootstrap-typeahead';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
 
+// Todo component
 import Todo from './Todo'
 
 export default function WaypointModal({show, onHide, props, setLocation, setDateFrom, setDateTo, setTimeFrom, setTimeTo}) {
@@ -44,13 +43,26 @@ export default function WaypointModal({show, onHide, props, setLocation, setDate
     // Returns 'true' to bypass client-side filtering, as results are already filtered by API endpoint.
     const filterBy = () => true;
 
+    const [todoObjects, setTodoObjects] = useState([]);
+    const [todoCount, setTodoCount] = useState(1);
+
+    // For id
+    const addTodoCount = () => {
+        setTodoCount(todoCount + 1);
+    }
+
     // Add Todo
     const addTodo = () => {
-        return <Todo />
+        addTodoCount();
+        setTodoObjects([...todoObjects, <Todo id={todoCount.toString()} removeTodo={removeTodo} />]);
+    }
+
+    const removeTodo = () => {
+        // TODO        
     }
 
     return (
-        <Modal show={show} onHide={onHide}>
+        <Modal scrollable={true} show={show} onHide={onHide}>
             <Modal.Header closeButton>
                 Waypoint
             </Modal.Header>
@@ -87,8 +99,12 @@ export default function WaypointModal({show, onHide, props, setLocation, setDate
                         <Form.Control className="mb-3" type="time" value={props.timeTo} onChange={(e) => setTimeTo(e.target.value)} />
                     </Form.Group>
                     <h4>Todo</h4>
-                    {addTodo()}
-                    <Button className="mb-3" variant="primary" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
+                    <Fragment>
+                        {todoObjects}
+                    </Fragment>
+                    <div className="d-grid gap-2">
+                        <Button className="mb-3" variant="primary" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
+                    </div>
                 </Form>
             </Modal.Body>
             <Modal.Footer>

@@ -7,10 +7,10 @@ import NavigationBar from './components/NavigationBar';
 import Map from './components/Map';
 
 // Login Form
-import Login from './components/Login';
+import Login from './pages/Login';
 
 // Register Form
-import Register from './components/Register';
+import Register from './pages/Register';
 
 // Create Trip "Page"
 import CreateTrip from './pages/CreateTrip';
@@ -172,6 +172,7 @@ function App() {
     }
   }
 
+  // Toggle between Register and Login views
   const toggleRegisterLogin = () => {
     updateLoginform();
     updateRegisterform();
