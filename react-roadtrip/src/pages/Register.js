@@ -2,7 +2,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 
-function Register({redirectToLogin}) {
+export default function Register({redirectToLogin}) {
     return(
         <Container>
             <Form>
@@ -36,5 +36,3 @@ function Register({redirectToLogin}) {
         </Container>
     )
 }
-
-export default Register

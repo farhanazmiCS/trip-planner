@@ -5,16 +5,13 @@ import Button from 'react-bootstrap/Button';
 import {faTimes} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
-import {useState} from 'react';
-
 export default function Todo(props) {
-    // State of input field
-    const [todo, setTodo] = useState('');
+    const id = props.id;
     return (
         <>  
-            <InputGroup>
-                <Form.Control id={props.id} className="mb-3" type="text" placeholder="Any plans here?" value={todo} onChange={(e) => setTodo(e.target.value)} />
-                <Button id={"delete-todo-" + props.id} className="mb-3" variant="outline-secondary" onClick={props.removeTodo}><FontAwesomeIcon icon={faTimes} /></Button>
+            <InputGroup id={id}>
+                <Form.Control id={"todo-" + id} className="mb-3" type="text" placeholder="Enter Plan..." value={props.value} onChange={props.onChange} />
+                <Button id={"delete-todo-" + id} className="mb-3" variant="outline-danger" onClick={() => props.removeTodo(id)}><FontAwesomeIcon icon={faTimes} /></Button>
             </InputGroup>
         </>
     )

@@ -2,7 +2,7 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 
-function Login({ props, updateUsername, updatePassword, submitForm, redirectToRegister }) {
+export default function Login({ props, updateUsername, updatePassword, submitForm, redirectToRegister }) {
     return(
         <Container >
             <Form onSubmit={submitForm}>
@@ -25,5 +25,3 @@ function Login({ props, updateUsername, updatePassword, submitForm, redirectToRe
         </Container>
     )
 }
-
-export default Login

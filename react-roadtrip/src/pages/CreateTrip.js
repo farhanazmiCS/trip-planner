@@ -4,7 +4,6 @@ import Button from 'react-bootstrap/Button'
 import WaypointModal from '../components/WaypointModal';
 import { Fragment, useState } from 'react';
 import Waypoint from '../components/Waypoint';
-import Todo from '../components/Todo';
 
 export default function CreateTrip() {
     // Mapbox access token
@@ -51,23 +50,28 @@ export default function CreateTrip() {
     // Returns 'true' to bypass client-side filtering, as results are already filtered by API endpoint.
     const filterBy = () => true;
 
-    // Todo objects and their corresponding ID
+    // Todo objects
     const [todoObjects, setTodoObjects] = useState([]);
-    const [todoCount, setTodoCount] = useState(1);
-
-    // For setting Todo ID
-    const addTodoCount = () => {
-        setTodoCount(todoCount + 1);
-    }
 
     // Add Todo objects
     const addTodo = () => {
-        addTodoCount();
-        setTodoObjects([...todoObjects, <Todo id={todoCount.toString()} removeTodo={removeTodo} />]);
+        setTodoObjects([...todoObjects, {value: ''}]);
     }
 
-    const removeTodo = () => {
-        // TODO        
+    // Handle Todo input field change
+    // Inspired by https://codesandbox.io/s/o54n9zwnly?file=/src/index.js. @u/jenovs
+    const onTodoChange = (event, index) => {
+        // Set the value to the updated field's value
+        todoObjects[index].value = event.target.value;
+        // Update the todoObjects array
+        setTodoObjects([...todoObjects]);
+    }
+
+    // Remove Todo objects
+    const removeTodo = (key) => {
+        todoObjects.splice(key, 1);
+        setTodoObjects([...todoObjects]);
+        console.log(`Remove button ${key} is clicked!`);
     }
 
     // Location fields input
@@ -77,25 +81,25 @@ export default function CreateTrip() {
     let today = new Date();
 
     // To format dates
-    switch(today.getDate().length) {
+    switch(String(today.getDate()).length) {
         case 1:
-            var day = `0` + today.getDate();
+            var day = '0' + today.getDate();
             break;
         default:
             day = today.getDate();
     }
 
-    switch(today.getMonth().length) {
+    switch(String(today.getMonth()).length) {
         case 1:
-            var month = `0` + (1 + today.getMonth());
+            var month = '0' + (1 + today.getMonth());
             break;
         default:
             month = 1 + today.getMonth();
     }    
 
-    switch(today.getMinutes().length) {
+    switch(String(today.getMinutes()).length) {
         case 1:
-            var minutes = `0` + today.getMinutes();
+            var minutes = '0' + today.getMinutes();
             break;
         default:
             minutes = today.getMinutes();
@@ -152,12 +156,12 @@ export default function CreateTrip() {
                 addWaypoint={addWaypoint}
                 handleSearch={handleSearch}
                 addTodo={addTodo}
-                addTodoCount={addTodoCount}
-                removeTodo={removeTodo}
                 filterBy={filterBy}
                 isLoading={isLoading}
                 options={options}
                 todoObjects={todoObjects}
+                removeTodo={removeTodo}
+                onTodoChange={onTodoChange}
             />
 
         </>

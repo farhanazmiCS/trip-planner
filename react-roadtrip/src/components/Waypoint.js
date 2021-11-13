@@ -30,11 +30,10 @@ export default function Waypoint(props) {
         var minutes = time.slice(3);
         // To determine AM or PM
         if (Number(time.slice(0, 2)) < 12) {
-            var hours = hours;
             var ampm = 'AM';
         }
         else {
-            var hours = Number(hours) - 12;
+            hours = Number(hours) - 12;
             ampm = 'PM';
         }
         

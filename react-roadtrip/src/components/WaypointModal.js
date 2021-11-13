@@ -8,6 +8,8 @@ import {AsyncTypeahead} from 'react-bootstrap-typeahead';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faPlus} from '@fortawesome/free-solid-svg-icons';
 
+import Todo from './Todo';
+
 export default function WaypointModal({
     show, 
     onHide, 
@@ -23,7 +25,9 @@ export default function WaypointModal({
     todoObjects,
     isLoading, 
     options,
-    filterBy
+    filterBy,
+    removeTodo,
+    onTodoChange
 }) {
     return (
         <Modal scrollable={true} show={show} onHide={onHide}>
@@ -46,6 +50,7 @@ export default function WaypointModal({
                             value={(e) => setLocation(e.target.value)}
                             renderMenuItemChildren={(options) => (
                                 <Fragment>
+                                    <h6 style={{color: 'black', fontSize: '16px'}}>{options.text}</h6>
                                     <p style={{color: 'grey', fontSize: '14px'}}>{options.place_name}</p>
                                 </Fragment>
                             )} 
@@ -64,7 +69,9 @@ export default function WaypointModal({
                     </Form.Group>
                     <h4>Todo</h4>
                     <Fragment>
-                        {todoObjects}
+                        {todoObjects.map((todoObject, index) => (
+                            <Todo key={index} id={index} value={todoObject.value} onChange={(event) => onTodoChange(event, index)} removeTodo={removeTodo} />
+                        ))}
                     </Fragment>
                     <div className="d-grid gap-2">
                         <Button className="mb-3" variant="primary" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
