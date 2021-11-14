@@ -31,8 +31,8 @@ export default function WaypointModal({
 }) {
     return (
         <Modal scrollable={true} show={show} onHide={onHide}>
-            <Modal.Header closeButton>
-                Waypoint
+            <Modal.Header style={{fontWeight: 'bold', fontSize: '20px'}} closeButton>
+                Add Point
             </Modal.Header>
             <Modal.Body>
                 <Form>

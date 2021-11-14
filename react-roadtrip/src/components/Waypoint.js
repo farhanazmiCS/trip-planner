@@ -1,7 +1,13 @@
 import Container from 'react-bootstrap/Container';
+import Collapse from 'react-bootstrap/Collapse';
+import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
+import {useState} from 'react';
 
 export default function Waypoint(props) {
+    // Collapse button
+    const [collapse, setCollapse] = useState(false);
+
     // Formats date
     function dateFormatter(date) {
         const monthDict = {
@@ -40,15 +46,31 @@ export default function Waypoint(props) {
         return `${hours}:${minutes} ${ampm}`;
     }
     return(
-        <Container className="mb-4">
+        <Container id={"waypoint-card-" + props.id} className="mb-4">
             <Card style={{width: '100%' }}>
-                <Card.Header style={{color: 'green'}}>Origin</Card.Header>
+                {props.id === 0 && <Card.Header style={{color: 'green'}}>Origin</Card.Header>}
+                {props.id > 0 && <Card.Header style={{color: 'blue'}}>Stopover {props.id}</Card.Header>}
                 <Card.Body>
-                    <Card.Title>{props.text}</Card.Title>
+                    <Card.Title style={{fontWeight: 'bold'}}>{props.text}</Card.Title>
                     <Card.Subtitle style={{color: 'grey'}}>{props.place}</Card.Subtitle>
-                    <p>From {dateFormatter(props.dateFrom)}, {timeFormatter(props.timeFrom)}</p>
-                    <p>To {dateFormatter(props.dateTo)}, {timeFormatter(props.timeTo)}</p>
-
+                    <Card.Text className="mt-2 mb-0">From: {dateFormatter(props.dateFrom)}, {timeFormatter(props.timeFrom)}</Card.Text>
+                    <Card.Text className="mb-2">To: {dateFormatter(props.dateTo)}, {timeFormatter(props.timeTo)}</Card.Text>
+                    <Collapse in={collapse}>
+                        <div id="todo-collapse">
+                            {props.todo.length > 0 && <Card.Title style={{fontWeight: 'bold'}}>Todos</Card.Title>}
+                            <ol>
+                            {props.todo.map(todoItem => (
+                                <li>{todoItem.value}</li>
+                            ))}
+                            </ol>
+                        </div>
+                    </Collapse>
+                    {props.todo.length > 0 && <Container style={{textAlign: 'center'}}>
+                        <Button variant="outline-secondary" onClick={() => setCollapse(!collapse)} aria-controls="todo-collapse" aria-expanded={collapse}>
+                            {collapse === true && 'Hide Todos'}
+                            {collapse === false && 'Show Todos'} 
+                        </Button>
+                    </Container>}
                 </Card.Body>
             </Card>
         </Container>

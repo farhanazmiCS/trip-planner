@@ -5,6 +5,10 @@ import WaypointModal from '../components/WaypointModal';
 import { Fragment, useState } from 'react';
 import Waypoint from '../components/Waypoint';
 
+// FontAwesome Icon
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import {faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
+
 export default function CreateTrip() {
     // Mapbox access token
     const access_token = 'API_KEY';
@@ -71,7 +75,6 @@ export default function CreateTrip() {
     const removeTodo = (key) => {
         todoObjects.splice(key, 1);
         setTodoObjects([...todoObjects]);
-        console.log(`Remove button ${key} is clicked!`);
     }
 
     // Location fields input
@@ -121,8 +124,23 @@ export default function CreateTrip() {
 
     // Create waypoint event handler
     const addWaypoint = () => {
-        setWaypoints([...waypoints, <Waypoint dateFrom={dateFrom} dateTo={dateTo} timeFrom={timeFrom} timeTo={timeTo} text={options[0].text} place={options[0].place_name} />]);
+        const todoForWaypoint = todoObjects;
+        setWaypoints([...waypoints, {
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            timeFrom: timeFrom,
+            timeTo: timeTo,
+            text: options[0].text,
+            place_name: options[0].place_name,
+            todo: todoForWaypoint
+        }]);
         hideModal();
+        // Setting modal fields back to default
+        setTodoObjects([]);
+        setDateFrom(date);
+        setDateTo(date);
+        setTimeFrom(now);
+        setTimeTo(now);
     }
 
     return (
@@ -131,10 +149,25 @@ export default function CreateTrip() {
                 <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>
                 <hr />
                 <Fragment>
-                    {waypoints}
+                    {waypoints.map((waypoint, index) => (
+                        <Waypoint
+                            key={index}
+                            id={index} 
+                            dateFrom={waypoint.dateFrom} 
+                            dateTo={waypoint.dateTo} 
+                            timeFrom={waypoint.timeFrom} 
+                            timeTo={waypoint.timeTo} 
+                            text={waypoint.text} 
+                            place={waypoint.place_name}
+                            todo={waypoint.todo} 
+                        />
+                    ))}
                 </Fragment>
                 <div className="mt-3 mb-3">
-                    <Button onClick={showModal}>Add Waypoint</Button>
+                    <Container className="d-grid gap-2 col-6 mx-auto">
+                        <Button onClick={showModal}>Add Waypoint <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
+                        <Button className="btn-danger">Set Destination</Button>
+                    </Container>
                 </div>
             </Container>
             <WaypointModal 
@@ -163,7 +196,6 @@ export default function CreateTrip() {
                 removeTodo={removeTodo}
                 onTodoChange={onTodoChange}
             />
-
         </>
     )
 }
