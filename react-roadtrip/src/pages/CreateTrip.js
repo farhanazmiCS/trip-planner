@@ -77,9 +77,6 @@ export default function CreateTrip() {
         setTodoObjects([...todoObjects]);
     }
 
-    // Location fields input
-    const [location, setLocation] = useState('');
-
     // Date
     let today = new Date();
 
@@ -119,12 +116,23 @@ export default function CreateTrip() {
     const [timeFrom, setTimeFrom] = useState(now);
     const [timeTo, setTimeTo] = useState(now);
 
+    // Current key
+    const [key, setKey] = useState(null);
+
+    // Edit button state, and functions to show and hide the edit button (Also used to show/hide the add button)
+    const [edit, showEdit] = useState(false);
+    const hideEdit = () => {
+        showEdit(false);
+    }
+    const displayEdit = () => {
+        showEdit(true);
+    }
+
     // State of waypoint(s)
     const [waypoints, setWaypoints] = useState([]);
 
     // Create waypoint event handler
     const addWaypoint = () => {
-        const todoForWaypoint = todoObjects;
         setWaypoints([...waypoints, {
             dateFrom: dateFrom,
             dateTo: dateTo,
@@ -132,7 +140,7 @@ export default function CreateTrip() {
             timeTo: timeTo,
             text: options[0].text,
             place_name: options[0].place_name,
-            todo: todoForWaypoint
+            todo: todoObjects
         }]);
         hideModal();
         // Setting modal fields back to default
@@ -143,6 +151,48 @@ export default function CreateTrip() {
         setTimeTo(now);
     }
 
+    // When the edit button on the WaypointModal is clicked, save the data into the waypoint
+    const modifyWaypoint = (key) => {
+        waypoints[key].dateFrom = dateFrom;
+        waypoints[key].dateTo = dateTo;
+        waypoints[key].timeFrom = timeFrom;
+        waypoints[key].timeTo = timeTo;
+        waypoints[key].todo = todoObjects;
+        waypoints[key].text = options[0].text;
+        waypoints[key].place_name = options[0].place_name;
+        setWaypoints([...waypoints]);
+        hideModal();
+    }
+
+    // For deleting waypoint objects
+    const removeWaypoint = (key) => {
+        waypoints.splice(key, 1);
+        setWaypoints([...waypoints]);
+    }
+
+    // For clicking the edit button on the Waypoint to show the modal
+    const editWaypoint = (key) => {
+        displayEdit();
+        setKey(key);
+        setDateFrom(waypoints[key].dateFrom);
+        setTimeFrom(waypoints[key].timeFrom);
+        setDateTo(waypoints[key].dateTo);
+        setTimeTo(waypoints[key].timeTo);
+        setTodoObjects(waypoints[key].todo);
+        showModal();
+    }
+
+    // For adding a waypoint, displaying a modal and emptying the fields
+    const addWaypointModal = () => {
+        hideEdit();
+        setTodoObjects([]);
+        setDateFrom(date);
+        setDateTo(date);
+        setTimeFrom(now);
+        setTimeTo(now);
+        showModal();
+    }
+
     return (
         <>
             <Container>
@@ -151,7 +201,7 @@ export default function CreateTrip() {
                 <Fragment>
                     {waypoints.map((waypoint, index) => (
                         <Waypoint
-                            key={index}
+                            key={(waypoint.text + '' + waypoint.place_name).toUpperCase()}
                             id={index} 
                             dateFrom={waypoint.dateFrom} 
                             dateTo={waypoint.dateTo} 
@@ -160,41 +210,44 @@ export default function CreateTrip() {
                             text={waypoint.text} 
                             place={waypoint.place_name}
                             todo={waypoint.todo} 
+                            removeWaypoint={removeWaypoint}
+                            editWaypoint={editWaypoint}
                         />
                     ))}
                 </Fragment>
                 <div className="mt-3 mb-3">
-                    <Container className="d-grid gap-2 col-6 mx-auto">
-                        <Button onClick={showModal}>Add Waypoint <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
-                        <Button className="btn-danger">Set Destination</Button>
+                    <Container className="d-flex justify-content-center">
+                        <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Add Waypoint <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
+                        <Button className="btn-danger mx-2">Set Destination</Button>
                     </Container>
                 </div>
             </Container>
-            <WaypointModal 
-                show={show} 
+            <WaypointModal show={show} 
                 onHide={hideModal} 
                 props={{
-                    location: location,
                     dateFrom: dateFrom,
                     dateTo: dateTo,
                     timeFrom: timeFrom,
                     timeTo: timeTo,
                     token: access_token
                 }}
-                setLocation={setLocation}
                 setDateFrom={setDateFrom}
                 setDateTo={setDateTo}
                 setTimeFrom={setTimeFrom}
                 setTimeTo={setTimeTo}
                 addWaypoint={addWaypoint}
-                handleSearch={handleSearch}
+                modifyWaypoint={modifyWaypoint}
                 addTodo={addTodo}
+                removeTodo={removeTodo}
+                onTodoChange={onTodoChange}
+                todoObjects={todoObjects}
+                handleSearch={handleSearch}
                 filterBy={filterBy}
                 isLoading={isLoading}
                 options={options}
-                todoObjects={todoObjects}
-                removeTodo={removeTodo}
-                onTodoChange={onTodoChange}
+                index={key}             
+                modifyWaypoint={modifyWaypoint}   
+                edit={edit}           
             />
         </>
     )

@@ -1,12 +1,13 @@
-import {Fragment} from 'react';
+import { Fragment } from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import {AsyncTypeahead} from 'react-bootstrap-typeahead';
+import { AsyncTypeahead } from 'react-bootstrap-typeahead';
 
 // FontAwesome Icon
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faPlus} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faPen } from '@fortawesome/free-solid-svg-icons';
 
 import Todo from './Todo';
 
@@ -14,7 +15,6 @@ export default function WaypointModal({
     show, 
     onHide, 
     props, 
-    setLocation, 
     setDateFrom, 
     setDateTo, 
     setTimeFrom, 
@@ -27,7 +27,10 @@ export default function WaypointModal({
     options,
     filterBy,
     removeTodo,
-    onTodoChange
+    onTodoChange,
+    index,
+    modifyWaypoint,
+    edit
 }) {
     return (
         <Modal scrollable={true} show={show} onHide={onHide}>
@@ -44,10 +47,9 @@ export default function WaypointModal({
                             filterBy={filterBy}
                             isLoading={isLoading}
                             onSearch={handleSearch}
-                            labelKey="place_name"
+                            labelKey="text"
                             options={options}
-                            placeholder="Enter a location"
-                            value={(e) => setLocation(e.target.value)}
+                            placeholder="Enter a location..."
                             renderMenuItemChildren={(options) => (
                                 <Fragment>
                                     <h6 style={{color: 'black', fontSize: '16px'}}>{options.text}</h6>
@@ -74,13 +76,14 @@ export default function WaypointModal({
                         ))}
                     </Fragment>
                     <div className="d-grid gap-2">
-                        <Button className="mb-3" variant="primary" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
+                        <Button variant="dark" className="mb-3" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
                     </div>
                 </Form>
             </Modal.Body>
             <Modal.Footer>
-                <div className="d-grid gap-2">
-                    <Button variant="primary" onClick={addWaypoint}>Add Point</Button>
+                <div className="d-flex justify-content-evenly">
+                    {!edit && <Button className="mx-1" variant="dark" onClick={addWaypoint}>Add Point</Button>}
+                    {edit && <Button className="mx-1" variant="dark" onClick={() => modifyWaypoint(index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
                 </div>
             </Modal.Footer>
         </Modal>
