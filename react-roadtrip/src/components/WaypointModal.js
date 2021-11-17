@@ -30,12 +30,15 @@ export default function WaypointModal({
     onTodoChange,
     index,
     modifyWaypoint,
-    edit
+    edit,
+    isDestination,
 }) {
     return (
         <Modal scrollable={true} show={show} onHide={onHide}>
             <Modal.Header style={{fontWeight: 'bold', fontSize: '20px'}} closeButton>
-                Add Point
+                {edit && !isDestination && 'Edit Point'}
+                {!edit && !isDestination && 'Add Point'}
+                {!edit && isDestination && 'Set Destination'}
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -82,8 +85,9 @@ export default function WaypointModal({
             </Modal.Body>
             <Modal.Footer>
                 <div className="d-flex justify-content-evenly">
-                    {!edit && <Button className="mx-1" variant="dark" onClick={addWaypoint}>Add Point</Button>}
-                    {edit && <Button className="mx-1" variant="dark" onClick={() => modifyWaypoint(index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
+                    {!edit && isDestination && <Button className="mx-1" variant="dark" onClick={addWaypoint}>Set Destination</Button>}
+                    {!edit && !isDestination && <Button className="mx-1" variant="dark" onClick={addWaypoint}>Add Point</Button>}
+                    {edit && !isDestination &&<Button className="mx-1" variant="dark" onClick={() => modifyWaypoint(index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
                 </div>
             </Modal.Footer>
         </Modal>
