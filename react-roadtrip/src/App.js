@@ -208,7 +208,7 @@ function App() {
         logoutFunc={handleLogout} 
       /> : null }
       { viewTripState && <ViewTrip /> }
-      { createTripState && <CreateTrip />}
+      { createTripState && <CreateTrip token={csrftoken} />}
       <Map 
         state={mapState} 
       />

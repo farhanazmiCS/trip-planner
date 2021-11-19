@@ -9,7 +9,9 @@ import Waypoint from '../components/Waypoint';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
 
-export default function CreateTrip() {
+export default function CreateTrip(props) {
+    const csrftoken = props.token;
+
     // Mapbox access token
     const access_token = 'API_KEY';
 
@@ -44,7 +46,9 @@ export default function CreateTrip() {
             const options = features.map((item) => ({
                 id: item.id,
                 text: item.text,
-                place_name: item.place_name
+                place_name: item.place_name,
+                longitude: item.center[0],
+                latitude: item.center[1]
             }));
             setOptions(options);
             setIsLoading(false);
@@ -153,7 +157,9 @@ export default function CreateTrip() {
                 timeTo: timeTo,
                 text: options[0].text,
                 place_name: options[0].place_name,
-                todo: todoObjects
+                todo: todoObjects,
+                longitude: options[0].longitude,
+                latitude: options[0].latitude
             }]);
         }
         // Stopovers
@@ -165,7 +171,9 @@ export default function CreateTrip() {
                 timeTo: timeTo,
                 text: options[0].text,
                 place_name: options[0].place_name,
-                todo: todoObjects
+                todo: todoObjects,
+                longitude: options[0].longitude,
+                latitude: options[0].latitude
             });
             setWaypoints([...waypoints]);
         }
@@ -187,6 +195,8 @@ export default function CreateTrip() {
         waypoints[key].todo = todoObjects;
         waypoints[key].text = options[0].text;
         waypoints[key].place_name = options[0].place_name;
+        waypoints[key].longitude = options[0].longitude;
+        waypoints[key].latitude = options[0].latitude;
         setWaypoints([...waypoints]);
         hideModal();
     }
@@ -234,6 +244,21 @@ export default function CreateTrip() {
         showModal();
     }
 
+    // Save the trip
+    const saveTrip = () => {
+        let request = new Request(
+            'http://127.0.0.1:8000/api/savetrip',
+            {headers: {'X-CSRFToken': csrftoken}}
+        );
+        fetch(request, {
+            method: 'POST',
+            mode: 'cors',
+            body: JSON.stringify({
+                waypoints: waypoints
+            })
+        })
+    }
+
     return (
         <>
             <Container>
@@ -262,7 +287,7 @@ export default function CreateTrip() {
                         {waypoints.length === 0 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Set Origin <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
                         {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
                         {waypoints.length === 1 && <Button className="btn-danger mx-2" onClick={addDestinationModal}>Set Destination</Button>}
-                        {waypoints.length > 1 && <Button className="mx-2" variant="dark" >Save Trip</Button>}
+                        {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={saveTrip}>Save Trip</Button>}
                     </Container>
                 </div>
             </Container>

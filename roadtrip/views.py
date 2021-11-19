@@ -1,7 +1,9 @@
 import json
 from os import error, stat
+from datetime import datetime
 from django.contrib import auth
 from django.db.models import query
+from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from rest_framework import viewsets
 from rest_framework import permissions
@@ -16,8 +18,8 @@ from rest_framework.authentication import authenticate
 
 from django.contrib.auth import login, logout
 
-from .models import User
-from .serializers import UserSerializer
+from .models import User, Trip, Waypoint, Todo
+from .serializers import UserSerializer, TripSerializer
 from roadtrip import serializers
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
@@ -39,9 +41,55 @@ class UserViewSet(viewsets.ModelViewSet):
     def create(self, request):
         pass
 
-class IndexView(APIView):
-    permission_classes = [IsAuthenticated]
-    def get(self, request):
+class TripViewSet(viewsets.ModelViewSet):
+    # View to list all the trips for the logged on user
+    def list(self, request):
+        try:
+            user = request.user
+            trips = user.trip.all()
+        except Trip.DoesNotExist:
+            return Http404
+        
+        serializer = TripSerializer(trips)
+        return Response(serializer.data)
+       
+    # View to save a trip
+    def create(self, request):
+        data = json.loads(request.body)
+        # Create new trip instance, save it, then add the logged user
+        trip = Trip()
+        trip.save()
+        trip.users.add(request.user.id)
+        for waypoint in enumerate(data['waypoints']):
+            dateTimeFrom = waypoint[1]['dateFrom'] + ' ' + waypoint[1]['timeFrom']
+            dateTimeTo = waypoint[1]['dateTo'] + ' ' + waypoint[1]['timeTo']
+            # Save waypoint object
+            w = Waypoint(
+                text=waypoint[1]['text'],
+                place_name=waypoint[1]['place_name'],
+                longitude=waypoint[1]['longitude'],
+                latitude=waypoint[1]['latitude'],
+                dateTimeFrom=datetime.strptime(dateTimeFrom, '%Y-%m-%d %H:%M'),
+                dateTimeTo=datetime.strptime(dateTimeTo, '%Y-%m-%d %H:%M'),
+            )
+            w.save()
+            # Add the waypoint to their respective classifications (origin, destination, waypoints)
+            if waypoint[0] == 0:
+                trip.origin = w
+            elif waypoint[0] == len(waypoint) - 1:
+                trip.destination = w
+            else:
+                trip.waypoint.add(w)
+            # Query todo items, if any
+            todos = waypoint[1]['todo']
+            if todos == []:
+                pass
+            else:
+                for todo in todos:
+                    t = Todo(task=todo['value'])
+                    t.save()
+                    # Add the todo object into the waypoint object
+                    w.todo.add(t)
         return Response(status=200)
 
 class LoginView(APIView):
@@ -95,18 +143,3 @@ class LogoutView(APIView):
     def get(self, request):
         logout(request)
         return Response(reverse('login'))
-
-
-
-            
-
-            
-
-
-
-            
-
-    
-
-
-
