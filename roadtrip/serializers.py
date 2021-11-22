@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, Trip
+from .models import Todo, User, Trip, Waypoint
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -8,5 +8,15 @@ class UserSerializer(serializers.ModelSerializer):
 
 class TripSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Trip
-        fields = ['id, origin, destination, waypoint, users']
+        model = Trip()
+        fields = ['origin', 'destination', 'users']
+
+class WaypointSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Waypoint
+        fields = ['text', 'place_name', 'longitude', 'latitude', 'dateTimeFrom', 'dateTimeTo', 'todo']
+
+class TodoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Todo
+        fields = ['task']

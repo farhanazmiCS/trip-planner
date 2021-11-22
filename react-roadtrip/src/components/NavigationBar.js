@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCarSide} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
-export default function NavigationBar({showCreateTrip, hideCreateTrip, showViewTrip, hideViewTrip, state, logoutFunc}) {
+export default function NavigationBar({showCreateTrip, hideCreateTrip, showViewTrip, hideViewTrip, state, logoutFunc, username}) {
     // Functions for nav controls
     const createTrip = () => {
         showCreateTrip();
@@ -33,7 +33,7 @@ export default function NavigationBar({showCreateTrip, hideCreateTrip, showViewT
                         <Nav.Link>Invites</Nav.Link>
                     </Nav>
                     <Nav>
-                        <NavDropdown title="User" id="basic-nav-dropdown">
+                        <NavDropdown title={username} id="basic-nav-dropdown">
                             <NavDropdown.Item onClick={logoutFunc}><FontAwesomeIcon icon={faSignOutAlt} /> Log Out</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>

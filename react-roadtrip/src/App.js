@@ -205,7 +205,8 @@ function App() {
         hideCreateTrip={hideCreateTrip}
         showViewTrip={showViewTrip}
         hideViewTrip={hideViewTrip}
-        logoutFunc={handleLogout} 
+        logoutFunc={handleLogout}
+        username={sessionStorage.getItem('username')} 
       /> : null }
       { viewTripState && <ViewTrip /> }
       { createTripState && <CreateTrip token={csrftoken} />}

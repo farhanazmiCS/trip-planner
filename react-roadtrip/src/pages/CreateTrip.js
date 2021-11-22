@@ -10,6 +10,9 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
 
 export default function CreateTrip(props) {
+    // Username and token for auth
+    const username = sessionStorage.getItem('username');
+    const auth_token = sessionStorage.getItem(username);
     const csrftoken = props.token;
 
     // Mapbox access token
@@ -248,13 +251,18 @@ export default function CreateTrip(props) {
     const saveTrip = () => {
         let request = new Request(
             'http://127.0.0.1:8000/api/savetrip',
-            {headers: {'X-CSRFToken': csrftoken}}
+            {
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Authorization': auth_token
+                }
+            }
         );
         fetch(request, {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
-                waypoints: waypoints
+                waypoints: waypoints,
             })
         })
     }

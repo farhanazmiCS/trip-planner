@@ -45,7 +45,7 @@ class TripViewSet(viewsets.ModelViewSet):
     # View to list all the trips for the logged on user
     def list(self, request):
         try:
-            user = request.user
+            user = User.objects.get(user=request.user)
             trips = user.trip.all()
         except Trip.DoesNotExist:
             return Http404
@@ -76,8 +76,10 @@ class TripViewSet(viewsets.ModelViewSet):
             # Add the waypoint to their respective classifications (origin, destination, waypoints)
             if waypoint[0] == 0:
                 trip.origin = w
-            elif waypoint[0] == len(waypoint) - 1:
+                trip.save()
+            elif waypoint[0] == len(data['waypoints']) - 1:
                 trip.destination = w
+                trip.save()
             else:
                 trip.waypoint.add(w)
             # Query todo items, if any
