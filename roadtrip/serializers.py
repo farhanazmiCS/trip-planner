@@ -9,14 +9,14 @@ class UserSerializer(serializers.ModelSerializer):
 class TripSerializer(serializers.ModelSerializer):
     class Meta:
         model = Trip()
-        fields = ['origin', 'destination', 'users']
+        fields = ['id', 'origin', 'destination', 'waypoint', 'users']
 
 class WaypointSerializer(serializers.ModelSerializer):
     class Meta:
         model = Waypoint
-        fields = ['text', 'place_name', 'longitude', 'latitude', 'dateTimeFrom', 'dateTimeTo', 'todo']
+        fields = ['id', 'text', 'place_name', 'longitude', 'latitude', 'dateTimeFrom', 'dateTimeTo', 'todo']
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
-        fields = ['task']
+        fields = ['id', 'task']

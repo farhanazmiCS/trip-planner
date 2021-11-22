@@ -254,7 +254,7 @@ export default function CreateTrip(props) {
             {
                 headers: {
                     'X-CSRFToken': csrftoken,
-                    'Authorization': auth_token
+                    'Authorization': `Token ${auth_token}`
                 }
             }
         );

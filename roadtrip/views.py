@@ -19,7 +19,7 @@ from rest_framework.authentication import authenticate
 from django.contrib.auth import login, logout
 
 from .models import User, Trip, Waypoint, Todo
-from .serializers import UserSerializer, TripSerializer
+from .serializers import TodoSerializer, UserSerializer, TripSerializer, WaypointSerializer
 from roadtrip import serializers
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
@@ -42,16 +42,23 @@ class UserViewSet(viewsets.ModelViewSet):
         pass
 
 class TripViewSet(viewsets.ModelViewSet):
+    queryset = Trip.objects.all()
     # View to list all the trips for the logged on user
     def list(self, request):
         try:
-            user = User.objects.get(user=request.user)
+            user = User.objects.get(username=request.user.username)
             trips = user.trip.all()
         except Trip.DoesNotExist:
             return Http404
         
-        serializer = TripSerializer(trips)
+        serializer = TripSerializer(trips, many=True)
         return Response(serializer.data)
+
+    def retrieve(self, request, pk=None):
+        queryset = self.queryset
+        trip = get_object_or_404(queryset, pk=pk)    
+        serializer = TripSerializer(trip)
+        return Response(serializer.data)        
        
     # View to save a trip
     def create(self, request):
@@ -59,7 +66,7 @@ class TripViewSet(viewsets.ModelViewSet):
         # Create new trip instance, save it, then add the logged user
         trip = Trip()
         trip.save()
-        trip.users.add(request.user.id)
+        trip.users.add(request.user)
         for waypoint in enumerate(data['waypoints']):
             dateTimeFrom = waypoint[1]['dateFrom'] + ' ' + waypoint[1]['timeFrom']
             dateTimeTo = waypoint[1]['dateTo'] + ' ' + waypoint[1]['timeTo']
@@ -93,6 +100,24 @@ class TripViewSet(viewsets.ModelViewSet):
                     # Add the todo object into the waypoint object
                     w.todo.add(t)
         return Response(status=200)
+
+
+class WaypointViewSet(viewsets.ModelViewSet):
+    queryset = Waypoint.objects.all()
+    def retrieve(self, request, pk=None):
+        queryset = self.queryset
+        waypoint = get_object_or_404(queryset, pk=pk)
+        serializer = WaypointSerializer(waypoint)
+        return Response(serializer.data)
+
+
+class TodoViewSet(viewsets.ModelViewSet):
+    queryset = Todo.objects.all()
+    def retrieve(self, request, pk=None):
+        queryset = self.queryset
+        todo = get_object_or_404(queryset, pk=pk)
+        serializer = TodoSerializer(todo)
+        return Response(serializer.data)
 
 class LoginView(APIView):
     def get(self, request):
