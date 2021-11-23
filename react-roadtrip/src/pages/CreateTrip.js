@@ -215,6 +215,7 @@ export default function CreateTrip(props) {
 
     // Display modal for editing waypoints
     const editWaypointModal = (key) => {
+        setSingleOption([waypoints[key]]);
         setIsDestination(false);
         displayEdit();
         setKey(key);
@@ -228,6 +229,7 @@ export default function CreateTrip(props) {
 
     // Display modal for adding waypoints
     const addWaypointModal = () => {
+        setSingleOption([]);
         setIsDestination(false);
         hideEdit();
         setTodoObjects([]);
@@ -240,6 +242,7 @@ export default function CreateTrip(props) {
 
     // Display Waypoints for adding a destination
     const addDestinationModal = () => {
+        setSingleOption([]);
         setIsDestination(true);
         hideEdit();
         setTodoObjects([]);
@@ -305,13 +308,11 @@ export default function CreateTrip(props) {
             <WaypointModal show={show}
                 key={key} 
                 onHide={hideModal} 
-                props={{
-                    dateFrom: dateFrom,
-                    dateTo: dateTo,
-                    timeFrom: timeFrom,
-                    timeTo: timeTo,
-                    token: access_token
-                }}
+                dateFrom={dateFrom}
+                dateTo={dateTo}
+                timeFrom={timeFrom}
+                timeTo={timeTo}
+                token={access_token}
                 setDateFrom={setDateFrom}
                 setDateTo={setDateTo}
                 setTimeFrom={setTimeFrom}
@@ -327,7 +328,6 @@ export default function CreateTrip(props) {
                 isLoading={isLoading}
                 options={options}
                 index={key}             
-                modifyWaypoint={modifyWaypoint}   
                 edit={edit}      
                 isDestination={isDestination}
                 singleOption={singleOption}

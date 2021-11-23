@@ -11,36 +11,13 @@ import { faPen } from '@fortawesome/free-solid-svg-icons';
 
 import Todo from './Todo';
 
-export default function WaypointModal({
-    show, 
-    onHide, 
-    props, 
-    setDateFrom, 
-    setDateTo, 
-    setTimeFrom, 
-    setTimeTo, 
-    addWaypoint, 
-    handleSearch, 
-    addTodo, 
-    todoObjects,
-    isLoading, 
-    options,
-    filterBy,
-    removeTodo,
-    onTodoChange,
-    index,
-    modifyWaypoint,
-    edit,
-    isDestination,
-    singleOption,
-    setSingleOption
-}) {
+export default function WaypointModal(props) {
     return (
-        <Modal scrollable={true} show={show} onHide={onHide}>
+        <Modal scrollable={true} show={props.show} onHide={props.onHide}>
             <Modal.Header style={{fontWeight: 'bold', fontSize: '20px'}} closeButton>
-                {edit && !isDestination && 'Edit Point'}
-                {!edit && !isDestination && 'Add Point'}
-                {!edit && isDestination && 'Set Destination'}
+                {props.edit && !props.isDestination && 'Edit Point'}
+                {!props.edit && !props.isDestination && 'Add Point'}
+                {!props.edit && props.isDestination && 'Set Destination'}
             </Modal.Header>
             <Modal.Body>
                 <Form>
@@ -49,13 +26,13 @@ export default function WaypointModal({
                         <AsyncTypeahead
                             className="mb-3"
                             id="location"
-                            filterBy={filterBy}
-                            isLoading={isLoading}
-                            onSearch={handleSearch}
+                            filterBy={props.filterBy}
+                            isLoading={props.isLoading}
+                            onSearch={props.handleSearch}
                             labelKey="text"
-                            options={options}
-                            onChange={setSingleOption}
-                            selected={singleOption}
+                            options={props.options}
+                            onChange={props.setSingleOption}
+                            selected={props.singleOption}
                             placeholder="Enter a location..."
                             renderMenuItemChildren={(options) => (
                                 <Fragment>
@@ -68,30 +45,30 @@ export default function WaypointModal({
                     <h4>Period</h4>
                     <Form.Group>
                         <Form.Label>From</Form.Label>
-                        <Form.Control className="mb-3" type="date" value={props.dateFrom} onChange={(e) => setDateFrom(e.target.value)} />
-                        <Form.Control className="mb-3" type="time" value={props.timeFrom} onChange={(e) => setTimeFrom(e.target.value)} />
+                        <Form.Control className="mb-3" type="date" value={props.dateFrom} onChange={(e) => props.setDateFrom(e.target.value)} />
+                        <Form.Control className="mb-3" type="time" value={props.timeFrom} onChange={(e) => props.setTimeFrom(e.target.value)} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>To</Form.Label>
-                        <Form.Control className="mb-3" type="date" value={props.dateTo} onChange={(e) => setDateTo(e.target.value)} />
-                        <Form.Control className="mb-3" type="time" value={props.timeTo} onChange={(e) => setTimeTo(e.target.value)} />
+                        <Form.Control className="mb-3" type="date" value={props.dateTo} onChange={(e) => props.setDateTo(e.target.value)} />
+                        <Form.Control className="mb-3" type="time" value={props.timeTo} onChange={(e) => props.setTimeTo(e.target.value)} />
                     </Form.Group>
                     <h4>Todo</h4>
                     <Fragment>
-                        {todoObjects.map((todoObject, index) => (
-                            <Todo key={index} id={index} value={todoObject.value} onChange={(event) => onTodoChange(event, index)} removeTodo={removeTodo} />
+                        {props.todoObjects.map((todoObject, index) => (
+                            <Todo key={index} id={index} value={todoObject.value} onChange={(event) => props.onTodoChange(event, index)} removeTodo={props.removeTodo} />
                         ))}
                     </Fragment>
                     <div className="d-grid gap-2">
-                        <Button variant="dark" className="mb-3" onClick={addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
+                        <Button variant="dark" className="mb-3" onClick={props.addTodo}> Add Plan <FontAwesomeIcon icon={faPlus} /></Button>
                     </div>
                 </Form>
             </Modal.Body>
             <Modal.Footer>
                 <div className="d-flex justify-content-evenly">
-                    {!edit && isDestination && <Button className="mx-1" variant="dark" onClick={addWaypoint}>Set Destination</Button>}
-                    {!edit && !isDestination && <Button className="mx-1" variant="dark" onClick={addWaypoint}>Add Point</Button>}
-                    {edit && !isDestination &&<Button className="mx-1" variant="dark" onClick={() => modifyWaypoint(index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
+                    {!props.edit && props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addWaypoint}>Set Destination</Button>}
+                    {!props.edit && !props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addWaypoint}>Add Point</Button>}
+                    {props.edit && !props.isDestination &&<Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
                 </div>
             </Modal.Footer>
         </Modal>
