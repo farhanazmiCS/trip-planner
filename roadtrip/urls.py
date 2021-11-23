@@ -12,6 +12,7 @@ router.register(r'todos', views.TodoViewSet, basename="todos")
 # Users
 list_users = views.UserViewSet.as_view({'get': 'list'})
 retrieve_user = views.UserViewSet.as_view({'get': 'retrieve'})
+create_user = views.UserViewSet.as_view({'post': 'create'})
 
 # Trips
 list_trips = views.TripViewSet.as_view({'get': 'list'})
@@ -27,6 +28,7 @@ retrieve_todo = views.TodoViewSet.as_view({'get': 'retrieve'})
 urlpatterns = [
     path('api/users/', list_users),
     path('api/user/<int:pk>', retrieve_user),
+    path('api/register', create_user),
     path('api/trips', list_trips),
     path('api/trip/<int:pk>', retrieve_trip),
     path('api/savetrip', create_trip),

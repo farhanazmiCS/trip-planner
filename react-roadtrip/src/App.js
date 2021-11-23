@@ -38,10 +38,18 @@ function getCookie(name) {
 const csrftoken = getCookie('csrftoken');
 
 function App() {
-
-  // State of username and password
+  // State of username and password (for login form)
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // State of username, password and confirm (for register form)
+  const [emailRegister, setEmailRegister] = useState('');
+  const [usernameRegister, setUsernameRegister] = useState('');
+  const [passwordRegister, setPasswordRegister] = useState('');
+  const [confirmRegister, setConfirmRegister] = useState('');
+
+  // State of error message
+  const [error, setError] = useState(null);
 
   // State of map
   const [mapState, setMapState] = useState('none');
@@ -67,6 +75,45 @@ function App() {
     setNavbarState(!navbarState);
   }
 
+  // Handle registering
+  const handleRegister = (e) => {
+    let url = 'http://127.0.0.1:8000/api/register';
+    let request = new Request(url, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    });
+    fetch(request, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        email: emailRegister,
+        username: usernameRegister,
+        password: passwordRegister,
+        confirm: confirmRegister
+      })
+    })
+    .then(response => {
+      if (response.status === 200) {
+        response.json().then(body => {
+          sessionStorage.setItem(body['username'], body['token']);
+          sessionStorage.setItem('username', body['username']);
+        });
+        // Update UI
+        updateRegisterform();
+        updateNavbar();
+        showViewTrip();
+      }
+      else {
+        response.json().then(body => {
+          const error = body['error'];
+          setError(error);
+        })
+      }
+    })
+    e.preventDefault();
+  }
+
   // Handle login form submission
   const handleLogin = (e) => {
     let url = 'http://127.0.0.1:8000/api/login';
@@ -86,7 +133,8 @@ function App() {
     .then(response => response.json())
     .then(content => {
       if (content.status !== 200) {
-        return
+        console.log(content.message);
+        return;
       }
       const token = content['token'];
       const username = content['username'];
@@ -188,6 +236,16 @@ function App() {
     <div className="home">
       { registerVisibility ? <Register 
         redirectToLogin={toggleRegisterLogin}
+        handleRegister={handleRegister}
+        email={emailRegister}
+        username={usernameRegister}
+        password={passwordRegister}
+        confirm={confirmRegister}
+        setEmail={setEmailRegister}
+        setUsername={setUsernameRegister}
+        setPassword={setPasswordRegister}
+        setConfirm={setConfirmRegister}
+        error={error}
         /> : null}
       { loginVisibility ? <Login
         props={{

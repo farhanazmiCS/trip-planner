@@ -2,6 +2,7 @@ import json
 from os import error, stat
 from datetime import datetime
 from django.contrib import auth
+from django.core.exceptions import ValidationError
 from django.db.models import query
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
@@ -22,6 +23,10 @@ from .models import User, Trip, Waypoint, Todo
 from .serializers import TodoSerializer, UserSerializer, TripSerializer, WaypointSerializer
 from roadtrip import serializers
 
+from django.contrib.auth.password_validation import password_validators_help_text_html, validate_password
+from django.db import IntegrityError
+
+
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -39,7 +44,48 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def create(self, request):
-        pass
+        data = json.loads(request.body)
+        # Retrieve fields
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
+        confirm = data.get('confirm')
+        # Check if passwords match
+        if password != confirm:
+            response = {
+                'error': 'Passwords must match!'
+            }
+            return Response(response, status=400)
+        # Validate password
+        try:
+            validate_password(password)
+        except ValidationError:
+            response = {
+                'error': password_validators_help_text_html
+            }
+            return Response(response, status=400)
+        # Create user instance
+        try:
+            user = User.objects.create_user(
+                email=email,
+                username=username,
+                password=password,
+            )
+            user.save()
+        except IntegrityError:
+            response = {
+                'error': f'Username of name {username} already exists!'
+            }
+            return Response(response, status=400)
+        # Create token for user
+        token = Token.objects.create(user=user)
+        # Log the user in
+        login(request, user)
+        response = {
+            'username': request.user.username,
+            'token': token.key
+        }
+        return Response(response, status=200)
 
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.all()
@@ -132,10 +178,11 @@ class LoginView(APIView):
         try:
             User.objects.get(username=username)
         except User.DoesNotExist:
-            return Response({
-                'error': f'User of username {username} does not exist.',
-            },
-            status=400)
+            content = {
+                'message': f'User of username {username} does not exist.',
+                'status': 404
+            }
+            return Response(content, status=404)
         
         # Authenticate user
         user = authenticate(
@@ -151,11 +198,11 @@ class LoginView(APIView):
             # Successful login, return the token
             content = {
                 'token': token.key,
-                'username': str(request.user),
+                'username': request.user.username,
                 'message': 'Authentication success!',
                 'status': 200
             }
-            return Response(content)
+            return Response(content, status=200)
         else:
             message = 'Incorrect passcode.'
             content = {
@@ -164,7 +211,7 @@ class LoginView(APIView):
                 'message': message,
                 'status': 400
             }
-            return Response(content)
+            return Response(content, status=400)
             
 class LogoutView(APIView):
     def get(self, request):
