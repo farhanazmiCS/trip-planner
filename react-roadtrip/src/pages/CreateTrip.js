@@ -32,7 +32,10 @@ export default function CreateTrip(props) {
 
     // State declaration for handling location search
     const [isLoading, setIsLoading] = useState(false);
+
+    // Options for location
     const [options, setOptions] = useState([]);
+    const [singleOption, setSingleOption] = useState([]);
 
     // Handle location search
     const handleSearch = (query) => {
@@ -158,11 +161,11 @@ export default function CreateTrip(props) {
                 dateTo: dateTo,
                 timeFrom: timeFrom,
                 timeTo: timeTo,
-                text: options[0].text,
-                place_name: options[0].place_name,
+                text: singleOption[0].text,
+                place_name: singleOption[0].place_name,
                 todo: todoObjects,
-                longitude: options[0].longitude,
-                latitude: options[0].latitude
+                longitude: singleOption[0].longitude,
+                latitude: singleOption[0].latitude
             }]);
         }
         // Stopovers
@@ -172,11 +175,11 @@ export default function CreateTrip(props) {
                 dateTo: dateTo,
                 timeFrom: timeFrom,
                 timeTo: timeTo,
-                text: options[0].text,
-                place_name: options[0].place_name,
+                text: singleOption[0].text,
+                place_name: singleOption[0].place_name,
                 todo: todoObjects,
-                longitude: options[0].longitude,
-                latitude: options[0].latitude
+                longitude: singleOption[0].longitude,
+                latitude: singleOption[0].latitude
             });
             setWaypoints([...waypoints]);
         }
@@ -196,10 +199,10 @@ export default function CreateTrip(props) {
         waypoints[key].timeFrom = timeFrom;
         waypoints[key].timeTo = timeTo;
         waypoints[key].todo = todoObjects;
-        waypoints[key].text = options[0].text;
-        waypoints[key].place_name = options[0].place_name;
-        waypoints[key].longitude = options[0].longitude;
-        waypoints[key].latitude = options[0].latitude;
+        waypoints[key].text = singleOption[0].text;
+        waypoints[key].place_name = singleOption[0].place_name;
+        waypoints[key].longitude = singleOption[0].longitude;
+        waypoints[key].latitude = singleOption[0].latitude;
         setWaypoints([...waypoints]);
         hideModal();
     }
@@ -326,7 +329,9 @@ export default function CreateTrip(props) {
                 index={key}             
                 modifyWaypoint={modifyWaypoint}   
                 edit={edit}      
-                isDestination={isDestination}  
+                isDestination={isDestination}
+                singleOption={singleOption}
+                setSingleOption={setSingleOption}  
             />
         </>
     )

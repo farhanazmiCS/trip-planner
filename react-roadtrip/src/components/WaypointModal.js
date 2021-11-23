@@ -32,6 +32,8 @@ export default function WaypointModal({
     modifyWaypoint,
     edit,
     isDestination,
+    singleOption,
+    setSingleOption
 }) {
     return (
         <Modal scrollable={true} show={show} onHide={onHide}>
@@ -52,6 +54,8 @@ export default function WaypointModal({
                             onSearch={handleSearch}
                             labelKey="text"
                             options={options}
+                            onChange={setSingleOption}
+                            selected={singleOption}
                             placeholder="Enter a location..."
                             renderMenuItemChildren={(options) => (
                                 <Fragment>
