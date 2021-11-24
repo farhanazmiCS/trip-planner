@@ -6,6 +6,7 @@ class User(AbstractUser):
     pass
 
 class Trip(models.Model):
+    name = models.CharField(max_length=50, unique=True)
     origin = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True, related_name='origin')
     destination = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True, related_name='destination')
     waypoint = models.ManyToManyField('Waypoint', related_name='waypoint')

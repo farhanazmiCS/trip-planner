@@ -110,8 +110,14 @@ class TripViewSet(viewsets.ModelViewSet):
     def create(self, request):
         data = json.loads(request.body)
         # Create new trip instance, save it, then add the logged user
-        trip = Trip()
-        trip.save()
+        try:
+            trip = Trip(name=data['tripName'])
+            trip.save()
+        except IntegrityError:
+            response = {
+                'error': f'''The title '{data["tripName"]}' has already been used.'''
+            }
+            return Response(response, status=400)
         trip.users.add(request.user)
         for waypoint in enumerate(data['waypoints']):
             dateTimeFrom = waypoint[1]['dateFrom'] + ' ' + waypoint[1]['timeFrom']

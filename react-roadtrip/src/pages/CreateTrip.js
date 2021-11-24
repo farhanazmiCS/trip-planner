@@ -1,13 +1,14 @@
 import Container from 'react-bootstrap/Container';
-import Button from 'react-bootstrap/Button'
-
+import Button from 'react-bootstrap/Button';
+import FormControl from 'react-bootstrap/FormControl';
 import WaypointModal from '../components/WaypointModal';
 import { Fragment, useState } from 'react';
 import Waypoint from '../components/Waypoint';
+import { InputGroup } from 'react-bootstrap';
 
 // FontAwesome Icon
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faMapMarkerAlt} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCheck, faMapMarkerAlt, faPen } from '@fortawesome/free-solid-svg-icons';
 
 export default function CreateTrip(props) {
     // Username and token for auth
@@ -152,6 +153,22 @@ export default function CreateTrip(props) {
     // State to identify destination waypoint
     const [isDestination, setIsDestination] = useState(false);
 
+    // Error message
+    const [error, setError] = useState(null);
+
+    // State of trip title
+    const [title, setTitle] = useState('Trip Name');
+    const [titleFieldStyle, setTitleFieldStyle] = useState('border border-dark');
+    
+    // If true, show the editable field, else show a header
+    const [titleField, setTitleField] = useState(false);
+
+    const updateTitle = (e) => {
+        setTitleFieldStyle('border border-dark');
+        setTitle(e.target.value);
+        setError(null);
+    }
+
     // Create waypoint event handler
     const addWaypoint = () => {
         // Origin and Destination
@@ -268,16 +285,40 @@ export default function CreateTrip(props) {
             method: 'POST',
             mode: 'cors',
             body: JSON.stringify({
+                tripName: title,
                 waypoints: waypoints,
             })
+        })
+        .then(response => {
+            if (response.status !== 200) {
+                response.json().then(body => {
+                    setError(body['error']);
+                    setTitleField(true);
+                    setTitleFieldStyle('border border-danger');
+                    return;
+                });
+            }
+            else {
+                return;
+            }
         })
     }
 
     return (
         <>
             <Container>
-                <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>
-                <hr />
+                <Container>
+                    <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>
+                    <hr />
+                </Container>
+                {!titleField && <Container>
+                    <h3 className="mb-3" id="trip-name" style={{display: 'inline-block'}}>{title}</h3><FontAwesomeIcon className="mx-2" style={{display: 'inline-block'}} icon={faPen} onClick={() => setTitleField(true)} />
+                </Container>}
+                {titleField && <Container><InputGroup className="mb-3">
+                    <FormControl size="lg" className={titleFieldStyle} aria-describedby="done" style={{display: 'inline-block'}} type="text" value={title} onChange={updateTitle} />
+                    <Button variant="dark" className={titleFieldStyle} id="done" onClick={() => setTitleField(false)}><FontAwesomeIcon icon={faCheck} /></Button>
+                </InputGroup></Container>}
+                {error && <Container><p style={{color: 'red'}} className="mb-3">{error}</p></Container>}
                 <Fragment>
                     {waypoints.map((waypoint, index) => (
                         <Waypoint
