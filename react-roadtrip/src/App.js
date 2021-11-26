@@ -192,28 +192,67 @@ function App() {
     setViewTripState(false);
   }
 
+  // Trip data (in array format)
+  const [myTrips, setMyTrips] = useState([]);
+
   // On page refresh (user is authenticated)
   const onRefresh = () => {
     let user = sessionStorage.getItem('username')
     if (user) {
       let url = 'http://127.0.0.1:8000/api/login'
+      let urlTrips = 'http://127.0.0.1:8000/api/trips/'
       let request = new Request(url, {
         headers: {
           'Authorization': `Token ${sessionStorage.getItem(user)}`,
+        }
+      });
+      let requestTrips = new Request(urlTrips, {
+        headers: {
+          'Authorization': `Token ${sessionStorage.getItem(user)}`
         }
       });
       fetch(request)
       .then(response => response.status)
       .then(status => {
         if (status === 200) {
-          // Update UI
+          // Fetch data
+          fetch(requestTrips)
+          .then(response => response.json())
+          .then(body => {
+            const t = body.map(trip => ({
+              name: trip.name,
+              origin: {
+                name: trip.origin.text,
+                detail: trip.origin.place_name,
+                dateTimeFrom: trip.origin.dateTimeFrom,
+                dateTimeTo: trip.origin.dateTimeTo,
+                todo: trip.origin.todo.map(t => t.task)
+              },
+              destination: {
+                name: trip.destination.text,
+                detail: trip.destination.place_name,
+                dateTimeFrom: trip.destination.dateTimeFrom,
+                dateTimeTo: trip.destination.dateTimeTo,
+                todo: trip.destination.todo.map(t => t.task)
+              },
+              waypoints: trip.waypoint.map(w => ({
+                id: w.id,
+                name: w.text,
+                detail: w.place_name,
+                dateTimeFrom: w.dateTimeFrom,
+                dateTimeTo: w.dateTimeTo,
+                todo: w.todo.map(t => t.task)
+              })),
+              users: trip.users
+            }))
+            setMyTrips(t);
+          })
+          // Update UI 
           updateNavbar();
           showViewTrip();
-        }
-        else {
-          console.log(status);
-        }
-      });
+      }
+        else console.log(status);
+      })
     }
     else{
       updateLoginform();
@@ -226,7 +265,7 @@ function App() {
     updateRegisterform();
   }
 
-  useEffect(onRefresh, []);
+  useEffect(onRefresh, [setMyTrips]);
 
   return (
     // Login component properties:
@@ -266,7 +305,7 @@ function App() {
         logoutFunc={handleLogout}
         username={sessionStorage.getItem('username')} 
       /> : null }
-      { viewTripState && <ViewTrip /> }
+      { viewTripState && <ViewTrip myTrips={myTrips} /> }
       { createTripState && <CreateTrip token={csrftoken} />}
       <Map 
         state={mapState} 

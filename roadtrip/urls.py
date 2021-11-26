@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/users/', list_users),
     path('api/user/<int:pk>', retrieve_user),
     path('api/register', create_user),
-    path('api/trips', list_trips),
+    path('api/trips/', list_trips),
     path('api/trip/<int:pk>', retrieve_trip),
     path('api/savetrip', create_trip),
     path('api/waypoint/<int:pk>', retrieve_waypoint),
