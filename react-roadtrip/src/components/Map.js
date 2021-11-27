@@ -2,12 +2,12 @@ import React, {useRef, useEffect, useState} from 'react';
 
 // Mapbox
 import mapboxgl from 'mapbox-gl';
-import MapboxDirections from '@mapbox/mapbox-gl-directions/dist/mapbox-gl-directions';
+import { Container } from 'react-bootstrap';
 
 // Mapbox token
 mapboxgl.accessToken = 'API_KEY';
 
-export default function Map({ state }) {
+export default function Map(props) {
     // Defining the map's container, initial state of null, useRef as component re-renders are not needed
     const mapContainer = useRef(null);
     // Defining the map, initial state of null, useRef as component re-renders are not needed
@@ -37,15 +37,6 @@ export default function Map({ state }) {
             center: [lng, lat],
             zoom: zoom
         });
-        map.current.addControl(
-            new MapboxDirections({
-                accessToken: mapboxgl.accessToken,
-                controls: {
-                    profileSwitcher: false
-                },
-            }),
-            'top-left'
-        );
     });
 
     useEffect(() => {
@@ -58,6 +49,8 @@ export default function Map({ state }) {
         })
     });
     return(
-        <div ref={mapContainer} className="map-container" style={{display: state}} />
+        <Container ref={mapContainer}>
+            {props.state && <div className="map-container" />}
+        </Container>
     )
 }

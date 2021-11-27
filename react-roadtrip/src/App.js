@@ -3,9 +3,6 @@ import React, {useState, useEffect} from 'react';
 // Navigation Bar
 import NavigationBar from './components/NavigationBar';
 
-// Map
-import Map from './components/Map';
-
 // Login Form
 import Login from './pages/Login';
 
@@ -16,7 +13,10 @@ import Register from './pages/Register';
 import CreateTrip from './pages/CreateTrip';
 
 // View Trips "Page"
-import ViewTrip from './pages/ViewTrip';
+import Trips from './pages/Trips';
+
+// Trip
+import Trip from './pages/Trip';
 
 // Get CSRF cookie
 function getCookie(name) {
@@ -42,6 +42,9 @@ function App() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+  // View Trip Index Key
+  const [key, setKey] = useState(null);
+
   // State of username, password and confirm (for register form)
   const [emailRegister, setEmailRegister] = useState('');
   const [usernameRegister, setUsernameRegister] = useState('');
@@ -52,27 +55,57 @@ function App() {
   const [error, setError] = useState(null);
 
   // State of map
-  const [mapState, setMapState] = useState('none');
-  const showMapVisibility = (state) => {
-    setMapState(state);
-  };
+  const [mapState, setMapState] = useState(false);
+  const showMapVisibility = () => setMapState(true);
+  const hideMapVisibility = () => setMapState(false);
 
   // State of login form
   const [loginVisibility, setLoginVisibility] = useState(false);
-  const updateLoginform = () => {
-    setLoginVisibility(!loginVisibility);
-  }
+  const updateLoginform = () => setLoginVisibility(!loginVisibility);
 
   // State of register form
   const [registerVisibility, setRegisterVisibility] = useState(false);
-  const updateRegisterform = () => {
-    setRegisterVisibility(!registerVisibility);
-  }
+  const updateRegisterform = () => setRegisterVisibility(!registerVisibility);
 
   // State of NavBar, toggles between 'none' and 'block'
   const [navbarState, setNavbarState] = useState(false);
-  const updateNavbar = () => {
-    setNavbarState(!navbarState);
+  const updateNavbar = () => setNavbarState(!navbarState);
+
+  // Specific trip state
+  const [trip, setTrip] = useState(false);
+  const showTrip = () => setTrip(true);
+  const hideTrip = () => setTrip(false);
+
+  // Create Trip "page" state and handling it's visibility
+  const [createTripState, setCreateTripState] = useState(false);
+  const showCreateTrip = () => {
+    setCreateTripState(true);
+    hideMapVisibility();
+    hideTrip();
+  }
+  const hideCreateTrip = () => setCreateTripState(false);
+
+  // View Trips "page" state and handling it's visibility
+  const [viewTripState, setViewTripState] = useState(false);
+  const showViewTrip = () => {
+    setViewTripState(true);
+    hideMapVisibility();
+    hideTrip();
+  }
+  const hideViewTrip = () => setViewTripState(false);
+
+  // Toggle between Register and Login views
+  const toggleRegisterLogin = () => {
+    updateLoginform();
+    updateRegisterform();
+  }
+
+  // To view specific trip
+  const viewSpecificTrip = (key) => {
+    hideViewTrip();
+    showTrip();
+    showMapVisibility();
+    setKey(key);
   }
 
   // Handle registering
@@ -158,9 +191,10 @@ function App() {
       // Update the state of components
       updateNavbar();
       updateLoginform();
-      showMapVisibility('none');
+      hideMapVisibility();
       hideCreateTrip();
       hideViewTrip();
+      hideTrip();
       // Empty the fields
       setUsername('');
       setPassword('');
@@ -174,22 +208,23 @@ function App() {
     e.preventDefault();
   }
 
-  // Create Trip "page" state and handling it's visibility
-  const [createTripState, setCreateTripState] = useState(false);
-  const showCreateTrip = () => {
-    setCreateTripState(true);
-  }
-  const hideCreateTrip = () => {
-    setCreateTripState(false);
-  }
-
-  // View Trips "page" state and handling it's visibility
-  const [viewTripState, setViewTripState] = useState(false);
-  const showViewTrip = () => {
-    setViewTripState(true);
-  }
-  const hideViewTrip = () => {
-    setViewTripState(false);
+  const formatDateTime = (dateTime) => {
+    let year = dateTime.slice(0, 4);
+    let month = dateTime.slice(5, 7);
+    let day = dateTime.slice(8, 10);
+    let hour = dateTime.slice(11, 13);
+    let minute = dateTime.slice(14, 16);
+    if (Number(hour) > 12) {
+      var ampm = 'pm';
+      hour = Number(hour) - 12;
+      return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+    }
+    else if (Number(hour) === 12) {
+      ampm = 'pm';
+      return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+    }
+    ampm = 'am';
+    return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
   }
 
   // Trip data (in array format)
@@ -219,32 +254,37 @@ function App() {
           fetch(requestTrips)
           .then(response => response.json())
           .then(body => {
-            const t = body.map(trip => ({
-              name: trip.name,
-              origin: {
-                name: trip.origin.text,
-                detail: trip.origin.place_name,
-                dateTimeFrom: trip.origin.dateTimeFrom,
-                dateTimeTo: trip.origin.dateTimeTo,
-                todo: trip.origin.todo.map(t => t.task)
-              },
-              destination: {
-                name: trip.destination.text,
-                detail: trip.destination.place_name,
-                dateTimeFrom: trip.destination.dateTimeFrom,
-                dateTimeTo: trip.destination.dateTimeTo,
-                todo: trip.destination.todo.map(t => t.task)
-              },
-              waypoints: trip.waypoint.map(w => ({
-                id: w.id,
-                name: w.text,
-                detail: w.place_name,
-                dateTimeFrom: w.dateTimeFrom,
-                dateTimeTo: w.dateTimeTo,
-                todo: w.todo.map(t => t.task)
-              })),
-              users: trip.users
-            }))
+            const t = body.map(trip => {
+              return {
+                id: trip.id,
+                name: trip.name,
+                origin: {
+                  name: trip.origin.text,
+                  detail: trip.origin.place_name,
+                  dateTimeFrom: formatDateTime(trip.origin.dateTimeFrom),
+                  dateTimeTo: formatDateTime(trip.origin.dateTimeTo),
+                  todo: trip.origin.todo.map(t => t.task)
+                },
+                destination: {
+                  name: trip.destination.text,
+                  detail: trip.destination.place_name,
+                  dateTimeFrom: formatDateTime(trip.destination.dateTimeFrom),
+                  dateTimeTo: formatDateTime(trip.destination.dateTimeTo),
+                  todo: trip.destination.todo.map(t => t.task)
+                },
+                waypoints: trip.waypoint.map(w => {
+                  return {
+                    id: w.id,
+                    name: w.text,
+                    detail: w.place_name,
+                    dateTimeFrom: formatDateTime(w.dateTimeFrom),
+                    dateTimeTo: formatDateTime(w.dateTimeTo),
+                    todo: w.todo.map(t => t.task)
+                  }
+                }),
+                users: trip.users
+              }
+            })
             setMyTrips(t);
           })
           // Update UI 
@@ -259,13 +299,7 @@ function App() {
     }
   }
 
-  // Toggle between Register and Login views
-  const toggleRegisterLogin = () => {
-    updateLoginform();
-    updateRegisterform();
-  }
-
-  useEffect(onRefresh, [setMyTrips]);
+  useEffect(onRefresh, []);
 
   return (
     // Login component properties:
@@ -285,7 +319,7 @@ function App() {
         setPassword={setPasswordRegister}
         setConfirm={setConfirmRegister}
         error={error}
-        /> : null}
+        /> : null }
       { loginVisibility ? <Login
         props={{
           username: username,
@@ -305,11 +339,9 @@ function App() {
         logoutFunc={handleLogout}
         username={sessionStorage.getItem('username')} 
       /> : null }
-      { viewTripState && <ViewTrip myTrips={myTrips} /> }
-      { createTripState && <CreateTrip token={csrftoken} />}
-      <Map 
-        state={mapState} 
-      />
+      { viewTripState && <Trips myTrips={myTrips} viewSpecificTrip={viewSpecificTrip} /> }
+      { createTripState && <CreateTrip token={csrftoken} /> }
+      { trip && <Trip trip={myTrips[key]} mapState={mapState} /> }
     </div>
   )
 }
