@@ -7,7 +7,7 @@ import { Container } from 'react-bootstrap';
 // Mapbox token
 mapboxgl.accessToken = 'API_KEY';
 
-export default function Map(props) {
+export default function Map() {
     // Defining the map's container, initial state of null, useRef as component re-renders are not needed
     const mapContainer = useRef(null);
     // Defining the map, initial state of null, useRef as component re-renders are not needed
@@ -50,7 +50,7 @@ export default function Map(props) {
     });
     return(
         <Container ref={mapContainer}>
-            {props.state && <div className="map-container" />}
+            <div className="map-container" />
         </Container>
     )
 }

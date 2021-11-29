@@ -9,6 +9,7 @@ import { InputGroup } from 'react-bootstrap';
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faMapMarkerAlt, faPen } from '@fortawesome/free-solid-svg-icons';
+import NavigationBar from '../components/NavigationBar';
 
 export default function CreateTrip(props) {
     // Username and token for auth
@@ -306,6 +307,7 @@ export default function CreateTrip(props) {
 
     return (
         <>
+            <NavigationBar />
             <Container>
                 <Container>
                     <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>

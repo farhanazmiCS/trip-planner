@@ -2,6 +2,7 @@ import json
 from os import error, stat
 from datetime import datetime
 from django.contrib import auth
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db.models import query
 from django.http.response import Http404
@@ -173,6 +174,9 @@ class TodoViewSet(viewsets.ModelViewSet):
 
 class LoginView(APIView):
     def get(self, request):
+        user = request.user
+        if user.is_anonymous:
+            return Response(status=400)
         return Response(status=200)
 
     def post(self, request):
