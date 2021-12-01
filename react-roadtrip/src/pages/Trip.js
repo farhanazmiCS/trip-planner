@@ -1,7 +1,7 @@
 import { Container } from 'react-bootstrap';
 import Map from '../components/Map';
 import { useParams } from 'react-router-dom';
-import {getTrip} from '../App';
+import {getTrip} from '../pages/Home';
 
 export default function Trip() {
     let params = useParams();
@@ -14,5 +14,3 @@ export default function Trip() {
         </Container>
     )
 }
-
-getTrip

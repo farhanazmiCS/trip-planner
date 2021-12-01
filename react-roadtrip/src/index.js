@@ -2,17 +2,12 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
-import CreateTrip from './pages/CreateTrip';
-import Login from './pages/Login';
-import Register from './pages/Register';
 
 import reportWebVitals from './reportWebVitals';
-import { Route, Routes, BrowserRouter } from 'react-router-dom';
+import {BrowserRouter } from 'react-router-dom';
 
 // Bootstrap CSS
 import 'bootstrap/dist/css/bootstrap.min.css';
-import Trips from './pages/Trips';
-import Trip from './pages/Trip';
 
 // CSRF cookie function
 function getCookie(name) {
@@ -30,20 +25,12 @@ function getCookie(name) {
   }
   return cookieValue;
 }
+const csrftoken = getCookie('csrftoken');
 
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route path="trips" element={<Trips />}>
-            <Route path=":tripId" element={<Trip />} />
-          </Route>
-          <Route path="createtrip" element={<CreateTrip token={getCookie('csrftoken')} />} />
-          <Route path="login" element={<Login token={getCookie('csrftoken')} />} />
-          <Route path="register" element={<Register token={getCookie('csrftoken')} />} /> 
-        </Route>
-      </Routes>
+      <App token={csrftoken} />
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')

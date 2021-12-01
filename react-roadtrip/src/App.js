@@ -1,53 +1,159 @@
-import {Route, Navigate, Routes} from 'react-router-dom';
 import {useEffect, useState} from 'react';
+import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
+import NavigationBar from './components/NavigationBar';
+import CreateTrip from './pages/CreateTrip';
+import Home from './pages/Home';
+import Register from './pages/Register';
+import Login from './pages/Login';
 
-// To format the date and time
-function formatDateTime(dateTime) {
-  let year = dateTime.slice(0, 4);
-  let month = dateTime.slice(5, 7);
-  let day = dateTime.slice(8, 10);
-  let hour = dateTime.slice(11, 13);
-  let minute = dateTime.slice(14, 16);
-  if (Number(hour) > 12) {
-    var ampm = 'pm';
-    hour = Number(hour) - 12;
-    return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
-  }
-  else if (Number(hour) === 12) {
-    ampm = 'pm';
-    return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
-  }
-  ampm = 'am';
-  return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
-}
+export default function App(props) {
+  // Redirects
+  var navigateToLogin = useNavigate();
+  var navigateToHome = useNavigate();
+  
+  // State of username and password fields for login form
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
-// To export the trip data
-export var tripDataExport = [];
+  // State of fields form register form
+  const [emailRegister, setEmailRegister] = useState('');
+  const [usernameRegister, setUsernameRegister] = useState('');
+  const [passwordRegister, setPasswordRegister] = useState('');
+  const [confirmRegister, setConfirmRegister] = useState('');
 
-export function getTrip(id) {
-    return tripDataExport.find(
-        trip => trip.id === id
-    );
-}
-
-export default function App() {
+  // State of error message during register, if any
+  const [error, setError] = useState(null);
+  
+  // Auth status
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  
+  // User's trips and counter (used for component lifecycle)
   const [myTrips, setMyTrips] = useState([]);
-  // Function that fetches from endpoint, only once.
+  const [tripCounter, setTripCounter] = useState(myTrips.length);
+  
+  // To export Trips to other components
+  var tripData = [];
+  
+  // Array to store the requests
+  var requests = [];
+  
+  // To format the date and time
+  function formatDateTime(dateTime) {
+    let year = dateTime.slice(0, 4);
+    let month = dateTime.slice(5, 7);
+    let day = dateTime.slice(8, 10);
+    let hour = dateTime.slice(11, 13);
+    let minute = dateTime.slice(14, 16);
+    if (Number(hour) > 12) {
+      var ampm = 'pm';
+      hour = Number(hour) - 12;
+      return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+    }
+    else if (Number(hour) === 12) {
+      ampm = 'pm';
+      return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+    }
+    ampm = 'am';
+    return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+  }
+  
+  // Handle Login
+  function handleLogin(e) {
+    // To clear previous user's session
+    let url = 'http://127.0.0.1:8000/api/login';
+    let request = new Request(url, {
+        headers: {
+            'X-CSRFToken': props.token
+        }
+    });
+    fetch(request, {
+        method: 'POST',
+        mode: 'cors',
+        body: JSON.stringify({
+            username: username,
+            password: password
+        })
+    })
+    .then(response => response.json())
+    .then(content => {
+        if (content.status !== 200) {
+            return;
+        }
+        const token = content['token'];
+        const username = content['username'];
+        // Save username and token to sessionStorage
+        sessionStorage.setItem(username, token);
+        sessionStorage.setItem('username', username);
+        // Set isLoggedIn to true
+        setIsLoggedIn(true);
+        // Redirect to home page
+        navigateToHome('/trips');
+    })
+    e.preventDefault();
+  }
+  
+  // Function to handle logout
+  function handleLogout(e) {
+    let url = 'http://127.0.0.1:8000/api/logout';
+    let request = new Request(url);
+    fetch(request)
+    .then(() => {
+      // Clear session
+      sessionStorage.clear();
+      setIsLoggedIn(false);
+      setMyTrips([]);
+      setUsername('');
+      setPassword('');
+      navigateToLogin('/login');
+    })
+    e.preventDefault();
+  }
+
+  // Handle registering
+  const handleRegister = (e) => {
+    let url = 'http://127.0.0.1:8000/api/register';
+    let request = new Request(url, {
+      headers: {
+        'X-CSRFToken': props.csrftoken
+      }
+    });
+    fetch(request, {
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        email: emailRegister,
+        username: usernameRegister,
+        password: passwordRegister,
+        confirm: confirmRegister
+      })
+    })
+    .then(response => {
+      if (response.status === 200) {
+        response.json().then(body => {
+          sessionStorage.setItem(body['username'], body['token']);
+          sessionStorage.setItem('username', body['username']);
+          setIsLoggedIn(true);
+        });
+        navigateToHome('/trips');
+      }
+      else {
+        response.json().then(body => {
+          const error = body['error'];
+          setError(error);
+        })
+      }
+    })
+    e.preventDefault();
+  }
+
+  // Function to handle onLoad/onRefresh
   function onLoadOrRefresh() {
     // Retrieves the username, if any, from the session storage
     let user = sessionStorage.getItem('username');
-    if (!user) {
-      return (
-        <Routes>
-          <Route render={() => <Navigate to="login" />} />
-        </Routes>
-      )
-    }
+    if (!user) return;
     // Defining the url endpoints to fetch auth status and data
-    let url = 'http://127.0.0.1/api/login';
-    let urlTrips = 'http://127.0.0.1/api/trips';
-    // Declare an array to store the requests
-    let requests = [];
+    let url = 'http://127.0.0.1:8000/api/login';
+    let urlTrips = 'http://127.0.0.1:8000/api/trips';
     // Initialize requests (For auth status and data)
     let request = new Request(url, {
       headers: {
@@ -58,69 +164,136 @@ export default function App() {
     requests.push(request);
     let requestTrips = new Request(urlTrips, {
       headers: {
-        headers: {
-          'Authorization': `Token ${sessionStorage.getItem(user)}`
-        }
+        'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
     })
     // Add to requests array
-    requests.push(request);
     requests.push(requestTrips);
     // Fetch auth status
+    fetchAuthStatus();
+  }
+  
+  // Fetch auth status
+  function fetchAuthStatus() {
     fetch(requests[0])
-    .then(res => res.status)
-    .then(status => {
-      if (status !== 200) {
-        return (
-          <Routes>
-            <Route render={() => <Navigate to="login" />} />
-          </Routes>
-        );
-      }
-      else {
-        fetch(requests[1])
-        .then(res => res.json())
-        .then(body => {
-          const trip = body.map(t => {
-            return {
-              id: t.id,
-              name: t.name,
-              origin: {
-                name: t.origin.text,
-                detail: t.origin.place_name,
-                dateTimeFrom: formatDateTime(t.origin.dateTimeFrom),
-                dateTimeTo: formatDateTime(t.origin.dateTimeTo),
-                todo: t.origin.todo.map(t => t.task)
-              },
-              destination: {
-                name: t.destination.text,
-                detail: t.destination.place_name,
-                dateTimeFrom: formatDateTime(t.destination.dateTimeFrom),
-                dateTimeTo: formatDateTime(t.destination.dateTimeTo),
-                todo: t.destination.todo.map(t => t.task)
-              },
-              waypoints: t.waypoint.map(w => {
-                return {
-                  id: w.id,
-                  name: w.text,
-                  detail: w.place_name,
-                  dateTimeFrom: formatDateTime(w.dateTimeFrom),
-                  dateTimeTo: formatDateTime(w.dateTimeTo),
-                  todo: w.todo.map(t => t.task)
-                }
-              }),
-            }
-          })
-          setMyTrips(trip);
-          tripDataExport = myTrips;
-        })
+    .then(res => {
+      switch(res.status) {
+        case 302:
+          let redirectURL = res.json();
+          redirectURL = redirectURL.url;
+          window.location.replace(redirectURL);
+          break;
+        case 400:
+          break;
+        default:
+          setIsLoggedIn(true);
+          // Fetch Trip(s) from endpoint
+          fetchTrips();
       }
     })
   }
-  useEffect(onLoadOrRefresh, [myTrips]);
+  
+  // Fetch trips
+  function fetchTrips() {
+    fetch(requests[1])
+    .then(res => res.json())
+    .then(body => {
+      const trip = body.map(t => {
+        return {
+          id: t.id,
+          name: t.name,
+          origin: {
+            name: t.origin.text,
+            detail: t.origin.place_name,
+            dateTimeFrom: formatDateTime(t.origin.dateTimeFrom),
+            dateTimeTo: formatDateTime(t.origin.dateTimeTo),
+            todo: t.origin.todo.map(t => t.task)
+          },
+          destination: {
+            name: t.destination.text,
+            detail: t.destination.place_name,
+            dateTimeFrom: formatDateTime(t.destination.dateTimeFrom),
+            dateTimeTo: formatDateTime(t.destination.dateTimeTo),
+            todo: t.destination.todo.map(t => t.task)
+          },
+          waypoints: t.waypoint.map(w => {
+            return {
+              id: w.id,
+              name: w.text,
+              detail: w.place_name,
+              dateTimeFrom: formatDateTime(w.dateTimeFrom),
+              dateTimeTo: formatDateTime(w.dateTimeTo),
+              todo: w.todo.map(t => t.task)
+            }
+          }),
+        }
+      })
+      setMyTrips(trip);
+      tripData = trip;
+    })
+  }
+  useEffect(onLoadOrRefresh, [isLoggedIn, tripCounter]);
   return (
-    <Routes>
-      <Route render={() => <Navigate to="trips" />} />
-    </Routes>
+    <>
+      {isLoggedIn && <NavigationBar user={sessionStorage.getItem('username')} handleLogout={handleLogout} />}
+      <Routes>
+        <Route path="/create-trip" 
+          element={<CreateTrip 
+            tripCounter={tripCounter}
+            setTripCounter={setTripCounter}
+            navigateToHome={navigateToHome}
+            isLoggedIn={isLoggedIn} 
+            setIsLoggedIn={setIsLoggedIn} 
+            username={username} 
+            setUsername={setUsername} 
+            password={password} 
+            setPassword={setPassword} 
+            token={props.token} 
+            handleLogin={handleLogin} 
+          />} 
+        />
+        <Route path="/trips" 
+          element={<Home 
+            isLoggedIn={isLoggedIn} 
+            setIsLoggedIn={setIsLoggedIn} 
+            username={username} 
+            setUsername={setUsername} 
+            password={password} 
+            setPassword={setPassword} 
+            token={props.token} 
+            handleLogin={handleLogin} 
+            myTrips={myTrips} 
+            setMyTrips={setMyTrips} 
+            tripData={tripData} 
+          />} 
+        />
+        <Route path="/login" 
+          element={<Login 
+            username={username} 
+            password={password} 
+            setUsername={setUsername} 
+            setPassword={setPassword} 
+            handleLogin={handleLogin} 
+          />} 
+        />
+        <Route path="/register" 
+          element={<Register 
+            token={props.token} 
+            username={usernameRegister} 
+            setUsernameRegister={setUsernameRegister} 
+            email={emailRegister} 
+            setEmailRegister={setEmailRegister} 
+            password={passwordRegister} 
+            setPasswordRegister={setPasswordRegister} 
+            confirm={confirmRegister} 
+            setConfirmRegister={setConfirmRegister} 
+            error={error} 
+            handleRegister={handleRegister} 
+          />} 
+        />
+        <Route path="/logout" element={<Navigate replace to="/login" />} />
+        <Route path="*" />
+      </Routes>
+    </>
   )
 }

@@ -9,7 +9,6 @@ import { InputGroup } from 'react-bootstrap';
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faMapMarkerAlt, faPen } from '@fortawesome/free-solid-svg-icons';
-import NavigationBar from '../components/NavigationBar';
 
 export default function CreateTrip(props) {
     // Username and token for auth
@@ -272,7 +271,7 @@ export default function CreateTrip(props) {
     }
 
     // Save the trip
-    const saveTrip = () => {
+    const saveTrip = (e) => {
         let request = new Request(
             'http://127.0.0.1:8000/api/savetrip',
             {
@@ -299,83 +298,87 @@ export default function CreateTrip(props) {
                     return;
                 });
             }
-            else {
-                return;
-            }
+            props.setTripCounter(props.tripCounter + 1);
         })
+        .then(() => {
+            props.navigateToHome('/trips');
+        })
+        e.preventDefault();
     }
-
     return (
         <>
-            <NavigationBar />
-            <Container>
-                <Container>
-                    <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>
-                    <hr />
-                </Container>
-                {!titleField && <Container>
-                    <h3 className="mb-3" id="trip-name" style={{display: 'inline-block'}}>{title}</h3><FontAwesomeIcon className="mx-2" style={{display: 'inline-block'}} icon={faPen} onClick={() => setTitleField(true)} />
-                </Container>}
-                {titleField && <Container><InputGroup className="mb-3">
-                    <FormControl size="lg" className={titleFieldStyle} aria-describedby="done" style={{display: 'inline-block'}} type="text" value={title} onChange={updateTitle} />
-                    <Button variant="dark" className={titleFieldStyle} id="done" onClick={() => setTitleField(false)}><FontAwesomeIcon icon={faCheck} /></Button>
-                </InputGroup></Container>}
-                {error && <Container><p style={{color: 'red'}} className="mb-3">{error}</p></Container>}
-                <Fragment>
-                    {waypoints.map((waypoint, index) => (
-                        <Waypoint
-                            key={(waypoint.text + waypoint.place_name).toUpperCase()}
-                            id={index} 
-                            dateFrom={waypoint.dateFrom} 
-                            dateTo={waypoint.dateTo} 
-                            timeFrom={waypoint.timeFrom} 
-                            timeTo={waypoint.timeTo} 
-                            text={waypoint.text} 
-                            place={waypoint.place_name}
-                            todo={waypoint.todo} 
-                            removeWaypoint={removeWaypoint}
-                            editWaypoint={editWaypointModal}
-                            waypointLength={waypoints.length}
-                        />
-                    ))}
-                </Fragment>
-                <div className="mt-3 mb-3">
-                    <Container className="d-flex justify-content-center">
-                        {waypoints.length === 0 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Set Origin <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
-                        {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
-                        {waypoints.length === 1 && <Button className="btn-danger mx-2" onClick={addDestinationModal}>Set Destination</Button>}
-                        {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={saveTrip}>Save Trip</Button>}
+            {props.isLoggedIn && 
+                <>
+                    <Container>
+                        <Container>
+                            <h1 style={{fontWeight: 'bolder'}} className="mt-2">Create a Trip</h1>
+                            <hr />
+                        </Container>
+                        {!titleField && <Container>
+                            <h3 className="mb-3" id="trip-name" style={{display: 'inline-block'}}>{title}</h3><FontAwesomeIcon className="mx-2" style={{display: 'inline-block'}} icon={faPen} onClick={() => setTitleField(true)} />
+                        </Container>}
+                        {titleField && <Container><InputGroup className="mb-3">
+                            <FormControl size="lg" className={titleFieldStyle} aria-describedby="done" style={{display: 'inline-block'}} type="text" value={title} onChange={updateTitle} />
+                            <Button variant="dark" className={titleFieldStyle} id="done" onClick={() => setTitleField(false)}><FontAwesomeIcon icon={faCheck} /></Button>
+                        </InputGroup></Container>}
+                        {error && <Container><p style={{color: 'red'}} className="mb-3">{error}</p></Container>}
+                        <Fragment>
+                            {waypoints.map((waypoint, index) => (
+                                <Waypoint
+                                    key={(waypoint.text + waypoint.place_name).toUpperCase()}
+                                    id={index} 
+                                    dateFrom={waypoint.dateFrom} 
+                                    dateTo={waypoint.dateTo} 
+                                    timeFrom={waypoint.timeFrom} 
+                                    timeTo={waypoint.timeTo} 
+                                    text={waypoint.text} 
+                                    place={waypoint.place_name}
+                                    todo={waypoint.todo} 
+                                    removeWaypoint={removeWaypoint}
+                                    editWaypoint={editWaypointModal}
+                                    waypointLength={waypoints.length}
+                                />
+                            ))}
+                        </Fragment>
+                        <div className="mt-3 mb-3">
+                            <Container className="d-flex justify-content-center">
+                                {waypoints.length === 0 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Set Origin <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
+                                {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
+                                {waypoints.length === 1 && <Button className="btn-danger mx-2" onClick={addDestinationModal}>Set Destination</Button>}
+                                {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={saveTrip}>Save Trip</Button>}
+                            </Container>
+                        </div>
                     </Container>
-                </div>
-            </Container>
-            <WaypointModal show={show}
-                key={key} 
-                onHide={hideModal} 
-                dateFrom={dateFrom}
-                dateTo={dateTo}
-                timeFrom={timeFrom}
-                timeTo={timeTo}
-                token={access_token}
-                setDateFrom={setDateFrom}
-                setDateTo={setDateTo}
-                setTimeFrom={setTimeFrom}
-                setTimeTo={setTimeTo}
-                addWaypoint={addWaypoint}
-                modifyWaypoint={modifyWaypoint}
-                addTodo={addTodo}
-                removeTodo={removeTodo}
-                onTodoChange={onTodoChange}
-                todoObjects={todoObjects}
-                handleSearch={handleSearch}
-                filterBy={filterBy}
-                isLoading={isLoading}
-                options={options}
-                index={key}             
-                edit={edit}      
-                isDestination={isDestination}
-                singleOption={singleOption}
-                setSingleOption={setSingleOption}  
-            />
+                    <WaypointModal show={show}
+                        key={key} 
+                        onHide={hideModal} 
+                        dateFrom={dateFrom}
+                        dateTo={dateTo}
+                        timeFrom={timeFrom}
+                        timeTo={timeTo}
+                        token={access_token}
+                        setDateFrom={setDateFrom}
+                        setDateTo={setDateTo}
+                        setTimeFrom={setTimeFrom}
+                        setTimeTo={setTimeTo}
+                        addWaypoint={addWaypoint}
+                        modifyWaypoint={modifyWaypoint}
+                        addTodo={addTodo}
+                        removeTodo={removeTodo}
+                        onTodoChange={onTodoChange}
+                        todoObjects={todoObjects}
+                        handleSearch={handleSearch}
+                        filterBy={filterBy}
+                        isLoading={isLoading}
+                        options={options}
+                        index={key}             
+                        edit={edit}      
+                        isDestination={isDestination}
+                        singleOption={singleOption}
+                        setSingleOption={setSingleOption}  
+                    />
+                </>
+            }
         </>
     )
 }

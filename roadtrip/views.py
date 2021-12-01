@@ -174,10 +174,13 @@ class TodoViewSet(viewsets.ModelViewSet):
 
 class LoginView(APIView):
     def get(self, request):
-        user = request.user
-        if user.is_anonymous:
-            return Response(status=400)
-        return Response(status=200)
+        if not request.user.is_authenticated:
+            data = {
+                'url': 'http://localhost:3000/login'
+            }
+            return Response(data, status=302)
+        else:
+            return Response(status=200)
 
     def post(self, request):
         data = json.loads(request.body)
