@@ -9,7 +9,7 @@ import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {faCarSide} from '@fortawesome/free-solid-svg-icons';
 import {faSignOutAlt} from '@fortawesome/free-solid-svg-icons';
 
-import {Link} from 'react-router-dom';
+import {NavLink} from 'react-router-dom';
 
 export default function NavigationBar(props) {
     return(
@@ -21,9 +21,9 @@ export default function NavigationBar(props) {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <Nav className="mb-2 mt-2 mx-2"><Link to="/trips" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>My Trips</Link></Nav>
-                        <Nav className="mb-2 mt-2 mx-2"><Link to="/create-trip" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Create Trip</Link></Nav>
-                        <Nav className="mb-2 mt-2 mx-2"><Link to="#" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Invites</Link></Nav>
+                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/trips" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>My Trips</NavLink>
+                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/create-trip" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Create Trip</NavLink>
+                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/invites" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Invites</NavLink>
                     </Nav>
                     <Nav>
                         <NavDropdown style={{fontSize: '20px', fontWeight: 'bold'}} title={props.user[0].toUpperCase() + props.user.slice(1)} className="mx-2" id="basic-nav-dropdown">

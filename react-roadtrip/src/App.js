@@ -3,13 +3,17 @@ import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import CreateTrip from './pages/CreateTrip';
 import Home from './pages/Home';
+import Trip from './pages/Trip';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import Trips from './pages/Trips';
+
+// For exporting the trips
+export var tripData = [];
 
 export default function App(props) {
   // Redirects
-  var navigateToLogin = useNavigate();
-  var navigateToHome = useNavigate();
+  var navigate = useNavigate();
   
   // State of username and password fields for login form
   const [username, setUsername] = useState('');
@@ -30,9 +34,6 @@ export default function App(props) {
   // User's trips and counter (used for component lifecycle)
   const [myTrips, setMyTrips] = useState([]);
   const [tripCounter, setTripCounter] = useState(myTrips.length);
-  
-  // To export Trips to other components
-  var tripData = [];
   
   // Array to store the requests
   var requests = [];
@@ -62,32 +63,29 @@ export default function App(props) {
     // To clear previous user's session
     let url = 'http://127.0.0.1:8000/api/login';
     let request = new Request(url, {
-        headers: {
-            'X-CSRFToken': props.token
-        }
+      headers: {
+        'X-CSRFToken': props.token
+      }
     });
     fetch(request, {
-        method: 'POST',
-        mode: 'cors',
-        body: JSON.stringify({
-            username: username,
-            password: password
-        })
+      method: 'POST',
+      mode: 'cors',
+      body: JSON.stringify({
+        username: username,
+        password: password
+      })
     })
     .then(response => response.json())
     .then(content => {
-        if (content.status !== 200) {
-            return;
-        }
-        const token = content['token'];
-        const username = content['username'];
-        // Save username and token to sessionStorage
-        sessionStorage.setItem(username, token);
-        sessionStorage.setItem('username', username);
-        // Set isLoggedIn to true
-        setIsLoggedIn(true);
-        // Redirect to home page
-        navigateToHome('/trips');
+      if (content.status !== 200) return;
+      const token = content['token'];
+      const username = content['username'];
+      // Save username and token to sessionStorage
+      sessionStorage.setItem(username, token);
+      sessionStorage.setItem('username', username);
+      // Set isLoggedIn to true
+      setIsLoggedIn(true);
+      navigate('/trips');
     })
     e.preventDefault();
   }
@@ -104,7 +102,7 @@ export default function App(props) {
       setMyTrips([]);
       setUsername('');
       setPassword('');
-      navigateToLogin('/login');
+      navigate('/login');
     })
     e.preventDefault();
   }
@@ -134,7 +132,7 @@ export default function App(props) {
           sessionStorage.setItem('username', body['username']);
           setIsLoggedIn(true);
         });
-        navigateToHome('/trips');
+        navigate('/trips');
       }
       else {
         response.json().then(body => {
@@ -178,17 +176,13 @@ export default function App(props) {
     fetch(requests[0])
     .then(res => {
       switch(res.status) {
-        case 302:
-          let redirectURL = res.json();
-          redirectURL = redirectURL.url;
-          window.location.replace(redirectURL);
-          break;
-        case 400:
-          break;
-        default:
+        case 200:
           setIsLoggedIn(true);
           // Fetch Trip(s) from endpoint
           fetchTrips();
+          break;
+        default:
+          console.log(res.status);
       }
     })
   }
@@ -229,19 +223,21 @@ export default function App(props) {
         }
       })
       setMyTrips(trip);
-      tripData = trip;
     })
   }
-  useEffect(onLoadOrRefresh, [isLoggedIn, tripCounter]);
+  
+  // Call the onLoadOrRefresh function once the states of isLoggedIn and tripCounter are changed.
+  useEffect(() => onLoadOrRefresh(), [isLoggedIn, tripCounter]);
   return (
     <>
       {isLoggedIn && <NavigationBar user={sessionStorage.getItem('username')} handleLogout={handleLogout} />}
       <Routes>
+        <Route path="/" element={<Home isLoggedIn={isLoggedIn}/>} />
         <Route path="/create-trip" 
           element={<CreateTrip 
             tripCounter={tripCounter}
             setTripCounter={setTripCounter}
-            navigateToHome={navigateToHome}
+            navigate={navigate}
             isLoggedIn={isLoggedIn} 
             setIsLoggedIn={setIsLoggedIn} 
             username={username} 
@@ -253,20 +249,13 @@ export default function App(props) {
           />} 
         />
         <Route path="/trips" 
-          element={<Home 
+          element={<Trips 
             isLoggedIn={isLoggedIn} 
-            setIsLoggedIn={setIsLoggedIn} 
-            username={username} 
-            setUsername={setUsername} 
-            password={password} 
-            setPassword={setPassword} 
             token={props.token} 
-            handleLogin={handleLogin} 
             myTrips={myTrips} 
-            setMyTrips={setMyTrips} 
-            tripData={tripData} 
           />} 
         />
+        <Route path="trips/:tripId" element={<Trip myTrips={myTrips} />} />
         <Route path="/login" 
           element={<Login 
             username={username} 

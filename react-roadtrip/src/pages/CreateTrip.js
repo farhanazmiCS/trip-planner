@@ -301,7 +301,7 @@ export default function CreateTrip(props) {
             props.setTripCounter(props.tripCounter + 1);
         })
         .then(() => {
-            props.navigateToHome('/trips');
+            props.navigate('/trips');
         })
         e.preventDefault();
     }
