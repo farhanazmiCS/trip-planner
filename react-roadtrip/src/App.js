@@ -197,29 +197,45 @@ export default function App(props) {
           id: t.id,
           name: t.name,
           origin: {
+            role: 'Origin',
             name: t.origin.text,
             detail: t.origin.place_name,
+            longitude: t.origin.longitude,
+            latitude: t.origin.latitude,
             dateTimeFrom: formatDateTime(t.origin.dateTimeFrom),
             dateTimeTo: formatDateTime(t.origin.dateTimeTo),
             todo: t.origin.todo.map(t => t.task)
           },
           destination: {
+            role: 'Destination',
             name: t.destination.text,
             detail: t.destination.place_name,
+            longitude: t.destination.longitude,
+            latitude: t.destination.latitude,
             dateTimeFrom: formatDateTime(t.destination.dateTimeFrom),
             dateTimeTo: formatDateTime(t.destination.dateTimeTo),
             todo: t.destination.todo.map(t => t.task)
           },
-          waypoints: t.waypoint.map(w => {
+          waypoints: t.waypoint.map((w, index) => {
             return {
               id: w.id,
+              role: `Stopover ${index + 1}`,
               name: w.text,
               detail: w.place_name,
+              longitude: w.longitude,
+              latitude: w.latitude,
               dateTimeFrom: formatDateTime(w.dateTimeFrom),
               dateTimeTo: formatDateTime(w.dateTimeTo),
               todo: w.todo.map(t => t.task)
             }
           }),
+          users: t.users.map(user => {
+            return {
+              id: user.id,
+              username: user.username,
+              email: user.email
+            }
+          })
         }
       })
       setMyTrips(trip);
