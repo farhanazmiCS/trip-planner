@@ -101,6 +101,17 @@ class TripViewSet(viewsets.ModelViewSet):
         serializer = TripSerializer(trips, many=True)
         return Response(serializer.data)
 
+    # View to list all the trips for other users
+    def listOther(self, request, pk=None):
+        try:
+            user = User.objects.get(pk=pk)
+            trips = user.trip.all()
+        except Trip.DoesNotExist:
+            return Http404
+        
+        serializer = TripSerializer(trips, many=True)
+        return Response(serializer.data)
+
     def retrieve(self, request, pk=None):
         queryset = self.queryset
         trip = get_object_or_404(queryset, pk=pk)    
@@ -174,10 +185,7 @@ class TodoViewSet(viewsets.ModelViewSet):
 
 class LoginView(APIView):
     def get(self, request):
-        if not request.user.is_authenticated:
-            return Response(status=302)
-        else:
-            return Response(status=200)
+        return Response(status=200)
 
     def post(self, request):
         data = json.loads(request.body)

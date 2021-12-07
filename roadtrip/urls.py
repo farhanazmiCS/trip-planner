@@ -16,6 +16,7 @@ create_user = views.UserViewSet.as_view({'post': 'create'})
 
 # Trips
 list_trips = views.TripViewSet.as_view({'get': 'list'})
+list_trips_other = views.TripViewSet.as_view({'get': 'listOther'})
 retrieve_trip = views.TripViewSet.as_view({'get': 'retrieve'})
 create_trip = views.TripViewSet.as_view({'post': 'create'})
 
@@ -30,6 +31,7 @@ urlpatterns = [
     path('api/user/<int:pk>', retrieve_user),
     path('api/register', create_user),
     path('api/trips/', list_trips),
+    path('api/trips/<int:pk>', list_trips_other),
     path('api/trip/<int:pk>', retrieve_trip),
     path('api/savetrip', create_trip),
     path('api/waypoint/<int:pk>', retrieve_waypoint),

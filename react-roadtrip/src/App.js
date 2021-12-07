@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react';
-import {Routes, Route, Navigate, useNavigate} from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import NavigationBar from './components/NavigationBar';
 import CreateTrip from './pages/CreateTrip';
 import Home from './pages/Home';
@@ -7,13 +7,16 @@ import Trip from './pages/Trip';
 import Register from './pages/Register';
 import Login from './pages/Login';
 import Trips from './pages/Trips';
-
-// For exporting the trips
-export var tripData = [];
+import Profile from './pages/Profile';
 
 export default function App(props) {
   // Redirects
   var navigate = useNavigate();
+
+  // Typeahead search field, only must be an array of one
+  const [userQuery, setUserQuery] = useState([]);
+  // Typeahead user options
+  const [users, setUsers] = useState([]);
   
   // State of username and password fields for login form
   const [username, setUsername] = useState('');
@@ -149,9 +152,10 @@ export default function App(props) {
     // Retrieves the username, if any, from the session storage
     let user = sessionStorage.getItem('username');
     if (!user) return;
-    // Defining the url endpoints to fetch auth status and data
+    // Defining the url endpoints to fetch auth status, data, and users
     let url = 'http://127.0.0.1:8000/api/login';
     let urlTrips = 'http://127.0.0.1:8000/api/trips';
+    let urlUsers = 'http://127.0.0.1:8000/api/users';
     // Initialize requests (For auth status and data)
     let request = new Request(url, {
       headers: {
@@ -167,6 +171,13 @@ export default function App(props) {
     })
     // Add to requests array
     requests.push(requestTrips);
+    let requestUsers = new Request(urlUsers, {
+      headers: {
+        'Authorization': `Token ${sessionStorage.getItem(user)}`
+      }
+    })
+    // Add to requests array
+    requests.push(requestUsers);
     // Fetch auth status
     fetchAuthStatus();
   }
@@ -180,6 +191,8 @@ export default function App(props) {
           setIsLoggedIn(true);
           // Fetch Trip(s) from endpoint
           fetchTrips();
+          // Fetch User(s) from endpoint
+          fetchUsers();
           break;
         default:
           console.log(res.status);
@@ -241,12 +254,36 @@ export default function App(props) {
       setMyTrips(trip);
     })
   }
+
+  // Fetch users
+  function fetchUsers() {
+    fetch(requests[2])
+    .then(res => res.json())
+    .then(body => {
+      const user = body.map(u => {
+        return {
+          id: u.id,
+          username: u.username[0].toUpperCase() + u.username.slice(1),
+          email: u.email
+        }
+      })
+      setUsers(user);
+    })
+  }
   
   // Call the onLoadOrRefresh function once the states of isLoggedIn and tripCounter are changed.
   useEffect(() => onLoadOrRefresh(), [isLoggedIn, tripCounter]);
   return (
     <>
-      {isLoggedIn && <NavigationBar user={sessionStorage.getItem('username')} handleLogout={handleLogout} />}
+      {isLoggedIn && <NavigationBar 
+        navigate={navigate}
+        user={sessionStorage.getItem('username')} 
+        users={users}
+        setUsers={setUsers}
+        userQuery={userQuery}
+        setUserQuery={setUserQuery}
+        handleLogout={handleLogout} 
+      />}
       <Routes>
         <Route path="/" element={<Home isLoggedIn={isLoggedIn}/>} />
         <Route path="/create-trip" 
@@ -272,6 +309,8 @@ export default function App(props) {
           />} 
         />
         <Route path="trips/:tripId" element={<Trip myTrips={myTrips} />} />
+        {/* TODO */}
+        <Route path="profile/:userId" element={<Profile />} />
         <Route path="/login" 
           element={<Login 
             username={username} 

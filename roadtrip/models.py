@@ -3,7 +3,8 @@ from django.contrib.auth.models import AbstractUser
 
 # Create your models here.
 class User(AbstractUser):
-    pass
+    friends = models.ManyToManyField('User', related_name='friend')
+    notifications = models.ManyToManyField('Notification', related_name='notification')
 
 class Trip(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -23,3 +24,9 @@ class Waypoint(models.Model):
 
 class Todo(models.Model):
     task = models.TextField(null=True)
+
+class Notification(models.Model):
+    frm = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requester')
+    to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipient')
+    is_addFriend = models.BooleanField(default=False)
+    is_inviteToTrip = models.BooleanField(default=False)

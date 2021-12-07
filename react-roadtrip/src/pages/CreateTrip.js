@@ -42,7 +42,7 @@ export default function CreateTrip(props) {
     const handleSearch = (query) => {
         setIsLoading(true);
 
-        fetch(`${endpoint}/${query}.json?limit=5&access_token=${access_token}`)
+        fetch(`${endpoint}/${query}.json?limit=10&access_token=${access_token}`)
         .then(response => response.json())
         .then(result => {
             // Contains id, text and place_name

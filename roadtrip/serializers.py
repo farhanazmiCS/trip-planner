@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Todo, User, Trip, Waypoint
+from .models import Notification, Todo, User, Trip, Waypoint
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -39,4 +39,15 @@ class TripSerializer(serializers.ModelSerializer):
             'destination',
             'waypoint',
             'users'
+        ]
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification()
+        fields = [
+            'id',
+            'frm',
+            'to',
+            'is_addFriend',
+            'is_inviteToTrip'
         ]
