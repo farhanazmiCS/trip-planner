@@ -4,7 +4,14 @@ from .models import Notification, Todo, User, Trip, Waypoint
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email']
+        fields = [
+            'id', 
+            'username', 
+            'email', 
+            'friends', 
+            'friendCounter', 
+            'tripCounter'
+        ]
 
 class TodoSerializer(serializers.ModelSerializer):
     class Meta:

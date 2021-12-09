@@ -93,7 +93,7 @@ class TripViewSet(viewsets.ModelViewSet):
     # View to list all the trips for the logged on user
     def list(self, request):
         try:
-            user = User.objects.get(username=request.user.username)
+            user = request.user
             trips = user.trip.all()
         except Trip.DoesNotExist:
             return Http404
@@ -121,6 +121,9 @@ class TripViewSet(viewsets.ModelViewSet):
     # View to save a trip
     def create(self, request):
         data = json.loads(request.body)
+        # User and trip length
+        user = request.user
+        tripLength = len(user.trip.all())
         # Create new trip instance, save it, then add the logged user
         try:
             trip = Trip(name=data['tripName'])
@@ -163,6 +166,8 @@ class TripViewSet(viewsets.ModelViewSet):
                     t.save()
                     # Add the todo object into the waypoint object
                     w.todo.add(t)
+        user.tripCounter = tripLength
+        user.save()
         return Response(status=200)
 
 

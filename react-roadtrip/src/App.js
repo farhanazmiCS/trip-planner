@@ -264,7 +264,10 @@ export default function App(props) {
         return {
           id: u.id,
           username: u.username[0].toUpperCase() + u.username.slice(1),
-          email: u.email
+          email: u.email,
+          friends: u.friends,
+          friendCounter: u.friendCounter,
+          tripCounter: u.tripCounter
         }
       })
       setUsers(user);
@@ -310,7 +313,14 @@ export default function App(props) {
         />
         <Route path="trips/:tripId" element={<Trip myTrips={myTrips} />} />
         {/* TODO */}
-        <Route path="profile/:userId" element={<Profile />} />
+        <Route path="/profile/:userId" 
+          element={<Profile 
+            users={users} 
+            isLoggedIn={isLoggedIn}
+            token={props.token}
+            myTrips={myTrips}
+          />} 
+        />
         <Route path="/login" 
           element={<Login 
             username={username} 

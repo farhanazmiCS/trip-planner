@@ -1,13 +1,12 @@
 // Bootstrap Components
-import {Container} from 'react-bootstrap';
-import {Navbar} from 'react-bootstrap';
-import {NavDropdown} from 'react-bootstrap';
-import {Nav} from 'react-bootstrap';
+import { Container, Dropdown } from 'react-bootstrap';
+import { Navbar } from 'react-bootstrap';
+import { NavDropdown } from 'react-bootstrap';
+import { Nav } from 'react-bootstrap';
 
 // FontAwesome Icons
-import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
-import {faCarSide} from '@fortawesome/free-solid-svg-icons';
-import {faSignOutAlt, faUserFriends, faBell} from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCarSide, faUser, faSignOutAlt, faBell } from '@fortawesome/free-solid-svg-icons';
 
 // NavLink is used to add styling on a link
 import {NavLink} from 'react-router-dom';
@@ -16,6 +15,17 @@ import {NavLink} from 'react-router-dom';
 import { Typeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 
 export default function NavigationBar(props) {
+    // Make a copy of the users array
+    const users = [...props.users];
+    // To store the userId
+    var userId = null;
+    // To exclude the logged on user
+    for (let i = 0; i < users.length; i++) {
+        if (users[i].username === sessionStorage.getItem('username')[0].toUpperCase() + sessionStorage.getItem('username').slice(1)) {
+            userId = users[i].id;
+            users.splice(i, 1);
+        }
+    }
     return(
         <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
@@ -41,7 +51,7 @@ export default function NavigationBar(props) {
                                             key={index}
                                             option={result}
                                             position={index}
-                                            onClick={() => props.navigate(`/profiles/${result.id}`)}
+                                            onClick={() => props.navigate(`/profile/${result.id}`)}
                                         >
                                             <h6>{result.username}</h6>
                                         </MenuItem>
@@ -50,13 +60,13 @@ export default function NavigationBar(props) {
                             )}
                             labelKey="username"
                             onChange={props.setUserQuery}
-                            options={props.users}
+                            options={users}
                             placeholder="Search for a user..."
                             selected={props.userQuery}
                         />
                         <NavDropdown style={{fontSize: '20px', fontWeight: 'bold'}} title={props.user[0].toUpperCase() + props.user.slice(1)} className="mx-2" id="basic-nav-dropdown">
-                            <NavDropdown.Item className="mb-1 mt-1" href="/notifications" style={{fontSize: '18px'}}><FontAwesomeIcon icon={faBell} /> Notifications</NavDropdown.Item>
-                            <NavDropdown.Item className="mb-1 mt-1" href="/addfriends" style={{fontSize: '18px'}}><FontAwesomeIcon icon={faUserFriends} /> Add Friends</NavDropdown.Item>
+                            <Dropdown.Item><NavLink className="mb-1 mt-1" to="/notifications" style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faBell} /> Notifications</NavLink></Dropdown.Item>
+                            <Dropdown.Item><NavLink className="mb-1 mt-1" to={`/profile/${userId}`} style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faUser} /> My Profile</NavLink></Dropdown.Item>
                             <NavDropdown.Item className="mb-1 mt-1" onClick={props.handleLogout} style={{fontSize: '18px'}}><FontAwesomeIcon icon={faSignOutAlt} /> Log Out</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>

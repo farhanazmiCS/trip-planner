@@ -4,6 +4,8 @@ from django.contrib.auth.models import AbstractUser
 # Create your models here.
 class User(AbstractUser):
     friends = models.ManyToManyField('User', related_name='friend')
+    friendCounter = models.IntegerField(default=0)
+    tripCounter = models.IntegerField(default=0)
     notifications = models.ManyToManyField('Notification', related_name='notification')
 
 class Trip(models.Model):
