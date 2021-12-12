@@ -20,8 +20,8 @@ from rest_framework.authentication import authenticate
 
 from django.contrib.auth import login, logout
 
-from .models import User, Trip, Waypoint, Todo
-from .serializers import TodoSerializer, UserSerializer, TripSerializer, WaypointSerializer
+from .models import Notification, User, Trip, Waypoint, Todo
+from .serializers import NotificationSerializer, TodoSerializer, UserSerializer, TripSerializer, WaypointSerializer
 from roadtrip import serializers
 
 from django.contrib.auth.password_validation import password_validators_help_text_html, validate_password
@@ -188,6 +188,50 @@ class TodoViewSet(viewsets.ModelViewSet):
         serializer = TodoSerializer(todo)
         return Response(serializer.data)
 
+class NotificationViewSet(viewsets.ModelViewSet):
+    queryset = Notification.objects.all()
+    # List the notifications of logged on user
+    def list(self, request):
+        user = request.user 
+        try:
+            notifications = user.my_notifications.all()
+        except Notification.DoesNotExist:
+            return Http404
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+    # List the notification requests made by the user
+    def listRequestsMadeByMe(self, request):
+        user = request.user
+        try:
+            my_requests = user.my_requests.all()
+        except Notification.DoesNotExist:
+            return Http404
+        serializer = NotificationSerializer(my_requests, many=True)
+        return Response(serializer.data)
+
+    # Sending notification to other user
+    def create(self, request):
+        data = json.loads(request.body)
+        # Retrieve user objects
+        user = User.objects.get(username=data.get('username'))
+        userToAdd = User.objects.get(username=data.get('toAddUsername'))
+        if data.get('is_addFriend') is not None:
+            new_notification = Notification(
+                frm=user,
+                to=userToAdd,
+                is_addFriend=True
+            )
+            new_notification.save()
+        elif data.get('is_inviteToTrip') is not None:
+            new_notification = Notification(
+                frm=user,
+                to=userToAdd,
+                is_inviteToTrip=True
+            )
+            new_notification.save()
+        return Response(status=200)
+        
 class LoginView(APIView):
     def get(self, request):
         return Response(status=200)

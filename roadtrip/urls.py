@@ -14,6 +14,11 @@ list_users = views.UserViewSet.as_view({'get': 'list'})
 retrieve_user = views.UserViewSet.as_view({'get': 'retrieve'})
 create_user = views.UserViewSet.as_view({'post': 'create'})
 
+# Notifications
+list_requests = views.NotificationViewSet.as_view({'get': 'listRequestsMadeByMe'})
+list_notifications = views.NotificationViewSet.as_view({'get': 'list'})
+create_notification = views.NotificationViewSet.as_view({'post': 'create'})
+
 # Trips
 list_trips = views.TripViewSet.as_view({'get': 'list'})
 list_trips_other = views.TripViewSet.as_view({'get': 'listOther'})
@@ -29,6 +34,9 @@ retrieve_todo = views.TodoViewSet.as_view({'get': 'retrieve'})
 urlpatterns = [
     path('api/users/', list_users),
     path('api/user/<int:pk>', retrieve_user),
+    path('api/requests/', list_requests),
+    path('api/notifications/', list_notifications),
+    path('api/savenotification', create_notification),
     path('api/register', create_user),
     path('api/trips/', list_trips),
     path('api/trips/<int:pk>', list_trips_other),

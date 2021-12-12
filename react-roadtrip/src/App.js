@@ -37,6 +37,12 @@ export default function App(props) {
   // User's trips and counter (used for component lifecycle)
   const [myTrips, setMyTrips] = useState([]);
   const [tripCounter, setTripCounter] = useState(myTrips.length);
+
+  // To store notifications
+  const [notifications, setNotifications] = useState([]);
+
+  // To store my requests
+  const [myFriendRequests, setMyFriendRequests] = useState([]);
   
   // Array to store the requests
   var requests = [];
@@ -152,10 +158,12 @@ export default function App(props) {
     // Retrieves the username, if any, from the session storage
     let user = sessionStorage.getItem('username');
     if (!user) return;
-    // Defining the url endpoints to fetch auth status, data, and users
+    // Defining the url endpoints to fetch auth status, data, users, and notifications
     let url = 'http://127.0.0.1:8000/api/login';
     let urlTrips = 'http://127.0.0.1:8000/api/trips';
     let urlUsers = 'http://127.0.0.1:8000/api/users';
+    let urlNotifications = 'http://127.0.0.1:8000/api/notifications';
+    let urlMyRequests = 'http://127.0.0.1:8000/api/requests';
     // Initialize requests (For auth status and data)
     let request = new Request(url, {
       headers: {
@@ -168,16 +176,29 @@ export default function App(props) {
       headers: {
         'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
-    })
+    });
     // Add to requests array
     requests.push(requestTrips);
     let requestUsers = new Request(urlUsers, {
       headers: {
         'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
-    })
+    });
     // Add to requests array
     requests.push(requestUsers);
+    let requestNotifications = new Request(urlNotifications, {
+      headers: {
+        'Authorization': `Token ${sessionStorage.getItem(user)}`
+      }
+    });
+    // Add to requests array
+    requests.push(requestNotifications);
+    let requestMyRequests = new Request(urlMyRequests, {
+      headers: {
+        'Authorization': `Token ${sessionStorage.getItem(user)}`
+      }
+    });
+    requests.push(requestMyRequests);
     // Fetch auth status
     fetchAuthStatus();
   }
@@ -193,6 +214,10 @@ export default function App(props) {
           fetchTrips();
           // Fetch User(s) from endpoint
           fetchUsers();
+          // Fetch Notification(s) from endpoint
+          fetchNotifications();
+          // Fetch Request(s) from endpoint
+          fetchMyRequests();
           break;
         default:
           console.log(res.status);
@@ -250,7 +275,7 @@ export default function App(props) {
             }
           })
         }
-      })
+      });
       setMyTrips(trip);
     })
   }
@@ -265,12 +290,64 @@ export default function App(props) {
           id: u.id,
           username: u.username[0].toUpperCase() + u.username.slice(1),
           email: u.email,
-          friends: u.friends,
+          friends: u.friends.map(friend => {
+            return {
+              id: friend.id,
+              username: friend.username
+            }
+          }),
           friendCounter: u.friendCounter,
           tripCounter: u.tripCounter
         }
-      })
+      });
       setUsers(user);
+    })
+  }
+
+  // Fetch notifications
+  function fetchNotifications() {
+    fetch(requests[3])
+    .then(res => res.json())
+    .then(body => {
+      const notifications = body.map(n => {
+        return {
+          id: n.id,
+          frm: {
+            id: n.frm.id,
+            username: n.frm.username
+          },
+          to: {
+            id: n.to.id,
+            username: n.to.username
+          },
+          is_addFriend: n.is_addFriend,
+          is_inviteToTrip: n.is_inviteToTrip
+        }
+      });
+      setNotifications(notifications);
+    })
+  }
+
+  // Fetch requests made by user
+  function fetchMyRequests() {
+    fetch(requests[4])
+    .then(res => res.json())
+    .then(body => {
+      const myFriendRequests = body.map(m => {
+        if (m.is_addFriend === true) {
+          return {
+            user: {
+              id: m.to.id,
+              username: m.to.username
+            }
+          }
+        }
+        else {
+          return [];
+        }
+      });
+      setMyFriendRequests(myFriendRequests);
+      console.log(myFriendRequests.length);
     })
   }
   
@@ -319,6 +396,8 @@ export default function App(props) {
             isLoggedIn={isLoggedIn}
             token={props.token}
             myTrips={myTrips}
+            navigate={navigate}
+            myFriendRequests={myFriendRequests}
           />} 
         />
         <Route path="/login" 

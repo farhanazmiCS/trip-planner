@@ -19,7 +19,7 @@ export default function Trip({myTrips}) {
             <hr />
             <h1 className="mt-2 mb-2" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name}</h1>
             <h6 className="mt-0 mb-1">Who's coming:</h6>
-            { trip.users.length !== 0 && 
+            {trip.users.length !== 0 && 
                 <>
                     {trip.users.map(user => (
                         <>

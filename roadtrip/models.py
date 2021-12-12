@@ -6,7 +6,6 @@ class User(AbstractUser):
     friends = models.ManyToManyField('User', related_name='friend')
     friendCounter = models.IntegerField(default=0)
     tripCounter = models.IntegerField(default=0)
-    notifications = models.ManyToManyField('Notification', related_name='notification')
 
 class Trip(models.Model):
     name = models.CharField(max_length=50, unique=True)
@@ -28,7 +27,7 @@ class Todo(models.Model):
     task = models.TextField(null=True)
 
 class Notification(models.Model):
-    frm = models.ForeignKey(User, on_delete=models.CASCADE, related_name='requester')
-    to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='recipient')
+    frm = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_requests')
+    to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_notifications')
     is_addFriend = models.BooleanField(default=False)
     is_inviteToTrip = models.BooleanField(default=False)

@@ -1,5 +1,6 @@
 import { faLock } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useState } from "react";
 import { Container, Button } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
 
@@ -10,11 +11,57 @@ function getUser(users, id) {
 }
 
 export default function Profile(props) {
+    // State of "Add Friend" button
+    const [buttonVariant, setButtonVariant] = useState('dark');
+    const [buttonContent, setButtonContent] = useState('Add Friend');
+    
+    // Get profile data
+    const username = sessionStorage.getItem('username');
     let params = useParams();
     let profile = getUser(props.users, parseInt(params.userId));
+    
     // Returns an array, if the 'friends' array includes the logged on user's username
-    const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'))
-    if (friends.length === 0 && profile.username.toLowerCase() !== sessionStorage.getItem('username')) {
+    const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'));
+
+    // For loop to check if this profile has a friend request sent
+    for (let i = 0; i < props.myFriendRequests.length; i++) {
+        if (profile.username.toLowerCase() === props.myFriendRequests[i].user.username) {
+            var is_requested = true;
+        }
+        else {
+            is_requested = false;
+        }
+    }
+    
+    // Add Friend button handler
+    function addFriend(e) {
+        let url = 'http://127.0.0.1:8000/api/savenotification';
+        let request = new Request(url, {
+            'headers': {
+                'X-CSRFToken': props.token,
+                'Authorization': `Token ${sessionStorage.getItem(username)}`
+            }
+        });
+        fetch(request, {
+            method: 'POST',
+            body: JSON.stringify({
+                username: username,
+                toAddUsername: profile.username.toLowerCase(),
+                is_addFriend: 'True'
+            })
+        })
+        .then(res => res.status)
+        .then(status => {
+            if (status === 200) {
+                setButtonContent('Requested');
+                setButtonVariant('outline-dark');
+            }
+        })
+        .catch(error => console.log(error));
+        e.preventDefault();
+    }
+    // Viewing other profiles
+    if (profile.username.toLowerCase() !== sessionStorage.getItem('username')) {
         return (
             <Container>
                 <Container>
@@ -37,9 +84,12 @@ export default function Profile(props) {
                             <h4 style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
                         </div>
                     </div>
-                    <div className="row">
-                        <Button variant="dark">Add Friend</Button>
-                    </div>
+                    {is_requested && <div className="row">
+                        <Button variant="outline-dark">Requested</Button>
+                    </div>}
+                    {friends.length === 0 && !is_requested && <div className="row">
+                        <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
+                    </div>}
                     <hr />
                     <div className="row">
                         <h1 style={{textAlign: 'center'}}><FontAwesomeIcon icon={faLock} style={{textAlign: 'center'}} /></h1>
@@ -49,6 +99,7 @@ export default function Profile(props) {
             </Container>
         )
     }
+    // Logged user's profile
     else {
         return (
             <Container>
