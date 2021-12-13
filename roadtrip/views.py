@@ -88,6 +88,11 @@ class UserViewSet(viewsets.ModelViewSet):
         }
         return Response(response, status=200)
 
+    # Adding friends
+    def update(self, request, pk=None):
+        pass
+
+
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.all()
     # View to list all the trips for the logged on user

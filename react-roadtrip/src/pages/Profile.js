@@ -90,6 +90,9 @@ export default function Profile(props) {
                     {friends.length === 0 && !is_requested && <div className="row">
                         <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
                     </div>}
+                    {friends.length === 1 && <div className="row">
+                        <Button variant="outline-dark">Unfriend</Button>
+                    </div>}
                     <hr />
                     <div className="row">
                         <h1 style={{textAlign: 'center'}}><FontAwesomeIcon icon={faLock} style={{textAlign: 'center'}} /></h1>

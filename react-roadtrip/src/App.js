@@ -8,6 +8,7 @@ import Register from './pages/Register';
 import Login from './pages/Login';
 import Trips from './pages/Trips';
 import Profile from './pages/Profile';
+import Notifications from './pages/Notifications'
 
 export default function App(props) {
   // Redirects
@@ -309,21 +310,7 @@ export default function App(props) {
     fetch(requests[3])
     .then(res => res.json())
     .then(body => {
-      const notifications = body.map(n => {
-        return {
-          id: n.id,
-          frm: {
-            id: n.frm.id,
-            username: n.frm.username
-          },
-          to: {
-            id: n.to.id,
-            username: n.to.username
-          },
-          is_addFriend: n.is_addFriend,
-          is_inviteToTrip: n.is_inviteToTrip
-        }
-      });
+      const notifications = body.map(n => n);
       setNotifications(notifications);
     })
   }
@@ -347,7 +334,6 @@ export default function App(props) {
         }
       });
       setMyFriendRequests(myFriendRequests);
-      console.log(myFriendRequests.length);
     })
   }
   
@@ -389,7 +375,6 @@ export default function App(props) {
           />} 
         />
         <Route path="trips/:tripId" element={<Trip myTrips={myTrips} />} />
-        {/* TODO */}
         <Route path="/profile/:userId" 
           element={<Profile 
             users={users} 
@@ -400,6 +385,7 @@ export default function App(props) {
             myFriendRequests={myFriendRequests}
           />} 
         />
+        <Route path="/notifications" element={<Notifications notifications={notifications} />} />
         <Route path="/login" 
           element={<Login 
             username={username} 
