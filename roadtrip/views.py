@@ -39,7 +39,7 @@ class UserViewSet(viewsets.ModelViewSet):
     
     # To get an individual user
     def retrieve(self, request, pk=None):
-        queryset = self.queryset
+        queryset = User.objects.all()
         user = get_object_or_404(queryset, pk=pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
@@ -90,12 +90,13 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # Adding friends
     def addFriend(self, request, pk=None):
-        queryset = self.queryset
+        queryset = User.objects.all()
         user = get_object_or_404(queryset, pk=pk)
         data = json.loads(request.body)
         friend = data.get('friend')
         user.friends.add(friend['id'])
         user.friendCounter = len(user.friends.all())
+        user.save()
         return Response(status=200)
 
 
@@ -124,7 +125,7 @@ class TripViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        queryset = self.queryset
+        queryset = Trip.objects.all()
         trip = get_object_or_404(queryset, pk=pk)    
         serializer = TripSerializer(trip)
         return Response(serializer.data)        
@@ -185,7 +186,7 @@ class TripViewSet(viewsets.ModelViewSet):
 class WaypointViewSet(viewsets.ModelViewSet):
     queryset = Waypoint.objects.all()
     def retrieve(self, request, pk=None):
-        queryset = self.queryset
+        queryset = Waypoint.objects.all()
         waypoint = get_object_or_404(queryset, pk=pk)
         serializer = WaypointSerializer(waypoint)
         return Response(serializer.data)
@@ -194,7 +195,7 @@ class WaypointViewSet(viewsets.ModelViewSet):
 class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     def retrieve(self, request, pk=None):
-        queryset = self.queryset
+        queryset = Todo.objects.all()
         todo = get_object_or_404(queryset, pk=pk)
         serializer = TodoSerializer(todo)
         return Response(serializer.data)
@@ -244,7 +245,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Response(status=200)
 
     def delete(self, request, pk=None):
-        queryset = self.queryset
+        queryset = Notification.objects.all()
         notification = get_object_or_404(queryset, pk=pk)
         notification.delete()
         return Response(status=200)

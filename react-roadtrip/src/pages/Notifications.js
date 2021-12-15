@@ -53,7 +53,14 @@ export default function Notifications({friendRequests, setFriendRequests, setTri
             })
         )
         .catch(error => console.log(error));
-
+        // Get index of the notification to delete
+        for (let i = 0; i < friendRequests.length; i++) {
+            if (friendRequests[i].id === request.id) {
+                var index = i;
+            }
+        }
+        friendRequestCopy.splice(index, 1);
+        setFriendRequests(friendRequestCopy);
     }
     function declineFriendRequest(request) {
         // For declining friend request, simply delete the notification object.
@@ -76,8 +83,6 @@ export default function Notifications({friendRequests, setFriendRequests, setTri
         }
         friendRequestCopy.splice(index, 1)
         setFriendRequests(friendRequestCopy);
-        // Placeholder
-        setTripRequests([...tripRequests]);
     }
     return (
         <Container>

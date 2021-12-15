@@ -298,9 +298,7 @@ export default function App(props) {
     .then(res => res.json())
     .then(body => {
       body.map(n => {
-        if (n.is_addFriend === true) {
-          setFriendRequests([...friendRequests, n])
-        }
+        if (n.is_addFriend === true) setFriendRequests([...friendRequests, n]);
         else setTripRequests([...tripRequests, n])
       });
     })

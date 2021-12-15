@@ -123,6 +123,10 @@ export default function Profile(props) {
         .catch(error => console.log(error));
         e.preventDefault();
     }
+    // Remove Friend
+    function removeFriend(e) {
+        // Todo
+    }
     // Viewing other profiles
     if (profile.username !== sessionStorage.getItem('username')) {
         return (

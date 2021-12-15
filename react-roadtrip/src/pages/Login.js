@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
 
 // React redirect router
-import {Link} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export default function Login(props) {
     return(
