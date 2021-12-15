@@ -21,7 +21,7 @@ export default function NavigationBar(props) {
     var userId = null;
     // To exclude the logged on user
     for (let i = 0; i < users.length; i++) {
-        if (users[i].username === sessionStorage.getItem('username')[0].toUpperCase() + sessionStorage.getItem('username').slice(1)) {
+        if (users[i].username === sessionStorage.getItem('username')) {
             userId = users[i].id;
             users.splice(i, 1);
         }

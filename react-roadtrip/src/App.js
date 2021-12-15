@@ -39,15 +39,16 @@ export default function App(props) {
   const [myTrips, setMyTrips] = useState([]);
   const [tripCounter, setTripCounter] = useState(myTrips.length);
 
-  // To store notifications
-  const [notifications, setNotifications] = useState([]);
-
-  // To store my requests
+  // To store friend requests made by me
   const [myFriendRequests, setMyFriendRequests] = useState([]);
+
+  // Friend Requests and Trip Requests made from other users to me
+  const [friendRequests, setFriendRequests] = useState([]);
+  const [tripRequests, setTripRequests] = useState([]);
   
   // Array to store the requests
   var requests = [];
-  
+
   // To format the date and time
   function formatDateTime(dateTime) {
     let year = dateTime.slice(0, 4);
@@ -286,21 +287,7 @@ export default function App(props) {
     fetch(requests[2])
     .then(res => res.json())
     .then(body => {
-      const user = body.map(u => {
-        return {
-          id: u.id,
-          username: u.username[0].toUpperCase() + u.username.slice(1),
-          email: u.email,
-          friends: u.friends.map(friend => {
-            return {
-              id: friend.id,
-              username: friend.username
-            }
-          }),
-          friendCounter: u.friendCounter,
-          tripCounter: u.tripCounter
-        }
-      });
+      const user = body.map(u => u)
       setUsers(user);
     })
   }
@@ -310,8 +297,12 @@ export default function App(props) {
     fetch(requests[3])
     .then(res => res.json())
     .then(body => {
-      const notifications = body.map(n => n);
-      setNotifications(notifications);
+      body.map(n => {
+        if (n.is_addFriend === true) {
+          setFriendRequests([...friendRequests, n])
+        }
+        else setTripRequests([...tripRequests, n])
+      });
     })
   }
 
@@ -374,7 +365,7 @@ export default function App(props) {
             myTrips={myTrips} 
           />} 
         />
-        <Route path="trips/:tripId" element={<Trip myTrips={myTrips} />} />
+        <Route path="trips/:tripId" element={<Trip myTrips={myTrips} users={users} csrftoken={props.token} />} />
         <Route path="/profile/:userId" 
           element={<Profile 
             users={users} 
@@ -383,9 +374,10 @@ export default function App(props) {
             myTrips={myTrips}
             navigate={navigate}
             myFriendRequests={myFriendRequests}
+            formatDateTime={formatDateTime}
           />} 
         />
-        <Route path="/notifications" element={<Notifications notifications={notifications} />} />
+        <Route path="/notifications" element={<Notifications friendRequests={friendRequests} setFriendRequests={setFriendRequests} setTripRequests={setTripRequests} tripRequests={tripRequests} users={users} csrftoken={props.token}  />} />
         <Route path="/login" 
           element={<Login 
             username={username} 

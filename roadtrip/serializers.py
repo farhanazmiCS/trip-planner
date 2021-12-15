@@ -1,7 +1,18 @@
 from rest_framework import serializers
 from .models import Notification, Todo, User, Trip, Waypoint
 
+
+class FriendSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            'id', 
+            'username', 
+            'email'
+        ]
+
 class UserSerializer(serializers.ModelSerializer):
+    friends = FriendSerializer(many=True, read_only=True)
     class Meta:
         model = User
         fields = [

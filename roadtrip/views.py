@@ -33,7 +33,7 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     # To get all users
     def list(self, request):
-        queryset = self.queryset
+        queryset = User.objects.all()
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
     
@@ -89,8 +89,14 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(response, status=200)
 
     # Adding friends
-    def update(self, request, pk=None):
-        pass
+    def addFriend(self, request, pk=None):
+        queryset = self.queryset
+        user = get_object_or_404(queryset, pk=pk)
+        data = json.loads(request.body)
+        friend = data.get('friend')
+        user.friends.add(friend['id'])
+        user.friendCounter = len(user.friends.all())
+        return Response(status=200)
 
 
 class TripViewSet(viewsets.ModelViewSet):
@@ -235,6 +241,12 @@ class NotificationViewSet(viewsets.ModelViewSet):
                 is_inviteToTrip=True
             )
             new_notification.save()
+        return Response(status=200)
+
+    def delete(self, request, pk=None):
+        queryset = self.queryset
+        notification = get_object_or_404(queryset, pk=pk)
+        notification.delete()
         return Response(status=200)
         
 class LoginView(APIView):
