@@ -2,7 +2,7 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, ButtonGroup, Container } from "react-bootstrap";
 
-export default function Notifications({friendRequests, setFriendRequests, setTripRequests, tripRequests, users, csrftoken}) {
+export default function Notifications({friendRequests, setFriendRequests, tripRequests, users, setUsers, csrftoken}) {
     var friendRequestCopy = [...friendRequests];
     // Function to accept/decline request
     function acceptFriendRequest(request) {
@@ -52,6 +52,16 @@ export default function Notifications({friendRequests, setFriendRequests, setTri
                 method: 'DELETE'
             })
         )
+        .then(() => {
+            let urlUpdateUsers = 'http://127.0.0.1:8000/api/users';
+            let requestUpdateUsers = new Request(urlUpdateUsers);
+            fetch(requestUpdateUsers)
+            .then(res => res.json())
+            .then(body => {
+                const users = body.map(user => user)
+                setUsers(users);
+            })
+        })
         .catch(error => console.log(error));
         // Get index of the notification to delete
         for (let i = 0; i < friendRequests.length; i++) {

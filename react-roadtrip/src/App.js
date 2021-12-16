@@ -297,7 +297,7 @@ export default function App(props) {
     fetch(requests[3])
     .then(res => res.json())
     .then(body => {
-      body.map(n => {
+      body.forEach(n => {
         if (n.is_addFriend === true) setFriendRequests([...friendRequests, n]);
         else setTripRequests([...tripRequests, n])
       });
@@ -318,9 +318,7 @@ export default function App(props) {
             }
           }
         }
-        else {
-          return [];
-        }
+        return undefined;
       });
       setMyFriendRequests(myFriendRequests);
     })
@@ -375,7 +373,17 @@ export default function App(props) {
             formatDateTime={formatDateTime}
           />} 
         />
-        <Route path="/notifications" element={<Notifications friendRequests={friendRequests} setFriendRequests={setFriendRequests} setTripRequests={setTripRequests} tripRequests={tripRequests} users={users} csrftoken={props.token}  />} />
+        <Route path="/notifications" 
+          element={<Notifications 
+            friendRequests={friendRequests} 
+            setFriendRequests={setFriendRequests} 
+            setTripRequests={setTripRequests} 
+            tripRequests={tripRequests} 
+            users={users} 
+            setUsers={setUsers} 
+            csrftoken={props.token} 
+          />} 
+        />
         <Route path="/login" 
           element={<Login 
             username={username} 

@@ -35,7 +35,7 @@ export default function Profile(props) {
         }
     }
     useEffect(() => {
-        if (friends === undefined) return;
+        if (friends.find(friend => friend) === undefined) return;
         else {
             let profileTripsUrl = `http://127.0.0.1:8000/api/trips/${profile.id}`;
             let requestProfileTrips = new Request(profileTripsUrl, {
@@ -163,7 +163,7 @@ export default function Profile(props) {
                             </div>
                         </>
                     }
-                    {!friends[0] && !is_requested && 
+                    {friends.find(friend => friend) === undefined && !is_requested && 
                         <>
                             <div className="row">
                                 <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
@@ -175,7 +175,7 @@ export default function Profile(props) {
                             </div>
                         </>
                     }
-                    {friends[0] && 
+                    {friends.find(friend => friend) === true && 
                         <>
                             <div className="row">
                                 <Button variant="outline-dark">Unfriend</Button>
