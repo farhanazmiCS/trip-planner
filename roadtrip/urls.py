@@ -14,6 +14,7 @@ list_users = views.UserViewSet.as_view({'get': 'list'})
 retrieve_user = views.UserViewSet.as_view({'get': 'retrieve'})
 create_user = views.UserViewSet.as_view({'post': 'create'})
 add_friend = views.UserViewSet.as_view({'put': 'addFriend'})
+unFriend = views.UserViewSet.as_view({'delete': 'unFriend'})
 
 # Notifications
 list_requests = views.NotificationViewSet.as_view({'get': 'listRequestsMadeByMe'})
@@ -36,7 +37,8 @@ retrieve_todo = views.TodoViewSet.as_view({'get': 'retrieve'})
 urlpatterns = [
     path('api/users/', list_users),
     path('api/user/<int:pk>', retrieve_user),
-    path('api/updateuser/<int:pk>', add_friend),
+    path('api/addFriend/<int:pk>', add_friend),
+    path('api/unFriend/<int:pk>', unFriend),
     path('api/requests/', list_requests),
     path('api/notifications/', list_notifications),
     path('api/savenotification', create_notification),

@@ -10,8 +10,8 @@ export default function Notifications({friendRequests, setFriendRequests, tripRe
         let accepter = users.find(user => user.username === request.to.username);
         let requester = users.find(user => user.username === request.frm.username);
         // Url endpoints for amending accepter and requester friends list
-        let urlAccepter = `http://127.0.0.1:8000/api/updateuser/${accepter.id}`;
-        let urlRequester = `http://127.0.0.1:8000/api/updateuser/${requester.id}`;
+        let urlAccepter = `http://127.0.0.1:8000/api/addFriend/${accepter.id}`;
+        let urlRequester = `http://127.0.0.1:8000/api/addFriend/${requester.id}`;
         // Url endpoint for deleting the notification
         let urlDeleteNotification = `http://127.0.0.1:8000/api/deletenotification/${request.id}`;
         // Initialising new Requests

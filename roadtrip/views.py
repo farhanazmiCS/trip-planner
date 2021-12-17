@@ -98,7 +98,22 @@ class UserViewSet(viewsets.ModelViewSet):
         user.friendCounter = len(user.friends.all())
         user.save()
         return Response(status=200)
-
+    
+    def unFriend(self, request, pk=None):
+        queryset = User.objects.all()
+        # User objects
+        user1 = request.user
+        user2 = get_object_or_404(queryset, pk=pk)
+        # Remove the user objects from both users
+        user1.friends.remove(user2)
+        user2.friends.remove(user1)
+        # Update friendCounter
+        user1.friendCounter = len(user1.friends.all())
+        user2.friendCounter = len(user2.friends.all())
+        # Save changes
+        user1.save()
+        user2.save()
+        return Response(status=200)
 
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.all()

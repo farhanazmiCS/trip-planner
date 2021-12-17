@@ -124,8 +124,28 @@ export default function Profile(props) {
         e.preventDefault();
     }
     // Remove Friend
-    function removeFriend(e) {
-        // Todo
+    function unFriend(e, user) {
+        let url = `http://127.0.0.1:8000/api/unFriend/${user.id}`;
+        let request = new Request(url, {
+            headers: {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
+            }
+        })
+        fetch(request, {
+            method: 'DELETE'
+        })
+        .then(() => {
+            let urlUpdateUsers = 'http://127.0.0.1:8000/api/users';
+            let requestUpdateUsers = new Request(urlUpdateUsers);
+            fetch(requestUpdateUsers)
+            .then(res => res.json())
+            .then(body => {
+                const users = body.map(user => user)
+                props.setUsers(users);
+            })
+        })
+        .catch(error => console.log(error));
+        e.preventDefault();
     }
     // Viewing other profiles
     if (profile.username !== sessionStorage.getItem('username')) {
@@ -178,7 +198,7 @@ export default function Profile(props) {
                     {friends.find(friend => friend) === true && 
                         <>
                             <div className="row">
-                                <Button variant="outline-dark">Unfriend</Button>
+                                <Button onClick={e => unFriend(e, profile)} variant="outline-dark">Unfriend</Button>
                             </div>
                             <hr />
                             {profileTrips.map(trip => (

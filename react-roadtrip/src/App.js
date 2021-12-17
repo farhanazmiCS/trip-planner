@@ -365,6 +365,7 @@ export default function App(props) {
         <Route path="/profile/:userId" 
           element={<Profile 
             users={users} 
+            setUsers={setUsers}
             isLoggedIn={isLoggedIn}
             token={props.token}
             myTrips={myTrips}
