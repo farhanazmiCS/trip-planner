@@ -31,3 +31,4 @@ class Notification(models.Model):
     to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_notifications')
     is_addFriend = models.BooleanField(default=False)
     is_inviteToTrip = models.BooleanField(default=False)
+    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, null=True, related_name='trip')

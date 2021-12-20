@@ -27,7 +27,6 @@ from roadtrip import serializers
 from django.contrib.auth.password_validation import password_validators_help_text_html, validate_password
 from django.db import IntegrityError
 
-
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -114,7 +113,6 @@ class UserViewSet(viewsets.ModelViewSet):
         user1.save()
         user2.save()
         return Response(status=200)
-
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.all()
     # View to list all the trips for the logged on user
@@ -196,8 +194,6 @@ class TripViewSet(viewsets.ModelViewSet):
         user.tripCounter = tripLength
         user.save()
         return Response(status=200)
-
-
 class WaypointViewSet(viewsets.ModelViewSet):
     queryset = Waypoint.objects.all()
     def retrieve(self, request, pk=None):
@@ -205,8 +201,6 @@ class WaypointViewSet(viewsets.ModelViewSet):
         waypoint = get_object_or_404(queryset, pk=pk)
         serializer = WaypointSerializer(waypoint)
         return Response(serializer.data)
-
-
 class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     def retrieve(self, request, pk=None):
@@ -214,7 +208,6 @@ class TodoViewSet(viewsets.ModelViewSet):
         todo = get_object_or_404(queryset, pk=pk)
         serializer = TodoSerializer(todo)
         return Response(serializer.data)
-
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     # List the notifications of logged on user
@@ -251,10 +244,13 @@ class NotificationViewSet(viewsets.ModelViewSet):
             )
             new_notification.save()
         elif data.get('is_inviteToTrip') is not None:
+            # Retrieve trip id
+            trip = data['trip']
             new_notification = Notification(
                 frm=user,
                 to=userToAdd,
-                is_inviteToTrip=True
+                is_inviteToTrip=True,
+                trip=Trip.objects.get(id=trip)
             )
             new_notification.save()
         return Response(status=200)
@@ -263,8 +259,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         queryset = Notification.objects.all()
         notification = get_object_or_404(queryset, pk=pk)
         notification.delete()
-        return Response(status=200)
-        
+        return Response(status=200)       
 class LoginView(APIView):
     def get(self, request):
         return Response(status=200)
@@ -311,8 +306,7 @@ class LoginView(APIView):
                 'message': message,
                 'status': 400
             }
-            return Response(content, status=400)
-            
+            return Response(content, status=400)       
 class LogoutView(APIView):
     def get(self, request):
         logout(request)

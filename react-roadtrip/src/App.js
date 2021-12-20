@@ -39,8 +39,9 @@ export default function App(props) {
   const [myTrips, setMyTrips] = useState([]);
   const [tripCounter, setTripCounter] = useState(myTrips.length);
 
-  // To store friend requests made by me
+  // To store friend requests and trip requests to other users made by me
   const [myFriendRequests, setMyFriendRequests] = useState([]);
+  const [myTripInviteRequests, setMyTripInviteRequests] = useState([]);
 
   // Friend Requests and Trip Requests made from other users to me
   const [friendRequests, setFriendRequests] = useState([]);
@@ -286,10 +287,7 @@ export default function App(props) {
   function fetchUsers() {
     fetch(requests[2])
     .then(res => res.json())
-    .then(body => {
-      const user = body.map(u => u)
-      setUsers(user);
-    })
+    .then(body => setUsers(body))
   }
 
   // Fetch notifications
@@ -309,18 +307,23 @@ export default function App(props) {
     fetch(requests[4])
     .then(res => res.json())
     .then(body => {
+      // My friend requests array
       const myFriendRequests = body.map(m => {
         if (m.is_addFriend === true) {
-          return {
-            user: {
-              id: m.to.id,
-              username: m.to.username
-            }
-          }
+          return m;
         }
         return undefined;
       });
       setMyFriendRequests(myFriendRequests);
+      // My trip requests array
+      const myTripInviteRequests = body.map(m => {
+        if (m.is_inviteToTrip === true) {
+          // Returns the request object
+          return m;
+        }
+        return undefined;
+      });
+      setMyTripInviteRequests(myTripInviteRequests);
     })
   }
   
@@ -361,7 +364,15 @@ export default function App(props) {
             myTrips={myTrips} 
           />} 
         />
-        <Route path="trips/:tripId" element={<Trip myTrips={myTrips} users={users} csrftoken={props.token} />} />
+        <Route path="/trips/:tripId" 
+          element={<Trip 
+            myTrips={myTrips} 
+            users={users} 
+            myTripInviteRequests={myTripInviteRequests}
+            setMyTripInviteRequests={setMyTripInviteRequests}
+            csrftoken={props.token} 
+          />} 
+        />
         <Route path="/profile/:userId" 
           element={<Profile 
             users={users} 

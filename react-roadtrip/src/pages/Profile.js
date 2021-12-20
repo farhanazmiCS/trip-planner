@@ -27,12 +27,10 @@ export default function Profile(props) {
     
     // For loop to check if this profile has a friend request sent
     for (let i = 0; i < props.myFriendRequests.length; i++) {
-        if (profile.username === props.myFriendRequests[i].user.username) {
+        if (profile.username === props.myFriendRequests[i].to.username) {
             var is_requested = true;
         }
-        else {
-            is_requested = false;
-        }
+        else is_requested = false;
     }
     useEffect(() => {
         if (friends.find(friend => friend) === undefined) return;
@@ -100,8 +98,7 @@ export default function Profile(props) {
     function addFriend(e) {
         let url = 'http://127.0.0.1:8000/api/savenotification';
         let request = new Request(url, {
-            'headers': {
-                'X-CSRFToken': props.token,
+            headers: {
                 'Authorization': `Token ${sessionStorage.getItem(username)}`
             }
         });
@@ -109,7 +106,7 @@ export default function Profile(props) {
             method: 'POST',
             body: JSON.stringify({
                 username: username,
-                toAddUsername: profile.username.toLowerCase(),
+                toAddUsername: profile.username,
                 is_addFriend: 'True'
             })
         })

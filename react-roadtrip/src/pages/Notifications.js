@@ -2,7 +2,7 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, ButtonGroup, Container } from "react-bootstrap";
 
-export default function Notifications({friendRequests, setFriendRequests, tripRequests, users, setUsers, csrftoken}) {
+export default function Notifications({ friendRequests, setFriendRequests, tripRequests, users, setUsers, csrftoken }) {
     var friendRequestCopy = [...friendRequests];
     // Function to accept/decline request
     function acceptFriendRequest(request) {
@@ -115,7 +115,7 @@ export default function Notifications({friendRequests, setFriendRequests, tripRe
             ))}
             {tripRequests.map(request => (
                 <Container>
-                    <h1>Trip request from {request.id}</h1>
+                    <h1>Trip request from {request.frm.username}</h1>
                     <hr />
                 </Container>
             ))}

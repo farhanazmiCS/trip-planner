@@ -62,6 +62,7 @@ class TripSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     frm = UserSerializer(read_only=True)
     to = UserSerializer(read_only=True)
+    trip = TripSerializer(read_only=True)
     class Meta:
         model = Notification()
         fields = [
@@ -69,5 +70,6 @@ class NotificationSerializer(serializers.ModelSerializer):
             'frm',
             'to',
             'is_addFriend',
-            'is_inviteToTrip'
+            'is_inviteToTrip',
+            'trip'
         ]
