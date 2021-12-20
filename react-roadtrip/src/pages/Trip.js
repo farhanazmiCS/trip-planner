@@ -22,7 +22,7 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
     function initialiseButtons() {
         var buttonProps = user.friends.map(friend => {
             for (let i = 0; i < myTripInviteRequests.length; i++) {
-                if (friend.id === myTripInviteRequests[i].to.id && trip.id === myTripInviteRequests[i].trip.id) {
+                if (friend.id === myTripInviteRequests[i].user.id && trip.id === myTripInviteRequests[i].trip.id) {
                     return {
                         content: `${friend.username[0].toUpperCase() + friend.username.slice(1)} invited!`,
                         variant: 'outline-dark'
@@ -68,7 +68,6 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
             setInviteBtnVar(inviteBtnVarCopy);
         })
         .catch(error => console.log(error));
-        setMyTripInviteRequests()
         e.preventDefault();
     }
     useEffect(initialiseButtons, [user.friends, myTripInviteRequests, trip.id])

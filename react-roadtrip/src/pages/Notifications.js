@@ -1,8 +1,8 @@
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Button, ButtonGroup, Container } from "react-bootstrap";
+import { Button, ButtonGroup, Container, Card } from "react-bootstrap";
 
-export default function Notifications({ friendRequests, setFriendRequests, tripRequests, users, setUsers, csrftoken }) {
+export default function Notifications({ friendRequests, setFriendRequests, tripRequests, users, setUsers }) {
     var friendRequestCopy = [...friendRequests];
     // Function to accept/decline request
     function acceptFriendRequest(request) {
@@ -18,19 +18,16 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
         let requestAddFriendToAccepterFriendList = new Request(urlAccepter, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
-                'X-CSRFToken': csrftoken
             }
         });
         let requestAddFriendToRequesterFriendList = new Request(urlRequester, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
-                'X-CSRFToken': csrftoken
             }
         })
         let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
-                'X-CSRFToken': csrftoken
             }
         });
         // Fetching
@@ -78,7 +75,6 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
         let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
-                'X-CSRFToken': csrftoken
             }
         });
         fetch(deleteNotificationObjectAfterAction, {
@@ -93,6 +89,14 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
         }
         friendRequestCopy.splice(index, 1)
         setFriendRequests(friendRequestCopy);
+    }
+    // eslint-disable-next-line
+    function acceptTripRequest() {
+        // Todo
+    }
+    // eslint-disable-next-line
+    function declineTripRequest() {
+        // Todo
     }
     return (
         <Container>
@@ -114,8 +118,21 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                 </Container>
             ))}
             {tripRequests.map(request => (
-                <Container>
-                    <h1>Trip request from {request.frm.username}</h1>
+                <Container className="mt-1" key={request.id}>
+                    <h3 className="mt-0 mb-1" style={{fontWeight: 'bold'}}>Trip Invite</h3>
+                    <p className="mb-2" style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to invite to a trip.</p>
+                    <Card bg="dark" text="light" className="mb-3">
+                        <Card.Body>
+                            <Card.Title style={{fontSize: '24px'}}>{request.trip.name}</Card.Title>
+                            <Card.Text style={{fontSize: '18px'}}>From {request.trip.origin.text} to {request.trip.destination.text}</Card.Text>
+                        </Card.Body>
+                    </Card>
+                    <div style={{textAlign: 'right'}}>
+                        <ButtonGroup aria-label="accept-reject">
+                            <Button onClick={acceptTripRequest} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
+                            <Button onClick={declineTripRequest} variant="dark"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
+                        </ButtonGroup>
+                    </div>
                     <hr />
                 </Container>
             ))}

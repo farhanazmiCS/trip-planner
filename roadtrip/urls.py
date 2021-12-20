@@ -17,7 +17,8 @@ add_friend = views.UserViewSet.as_view({'put': 'addFriend'})
 unFriend = views.UserViewSet.as_view({'delete': 'unFriend'})
 
 # Notifications
-list_requests = views.NotificationViewSet.as_view({'get': 'listRequestsMadeByMe'})
+list_requests_friend = views.NotificationViewSet.as_view({'get': 'listRequestsMadeByMe_friend_request'})
+list_requests_trips = views.NotificationViewSet.as_view({'get': 'listRequestsMadeByMe_trip_request'})
 list_notifications = views.NotificationViewSet.as_view({'get': 'list'})
 create_notification = views.NotificationViewSet.as_view({'post': 'create'})
 delete_notification = views.NotificationViewSet.as_view({'delete': 'delete'})
@@ -39,7 +40,8 @@ urlpatterns = [
     path('api/user/<int:pk>', retrieve_user),
     path('api/addFriend/<int:pk>', add_friend),
     path('api/unFriend/<int:pk>', unFriend),
-    path('api/requests/', list_requests),
+    path('api/requests/friends/', list_requests_friend),
+    path('api/requests/trips', list_requests_trips),
     path('api/notifications/', list_notifications),
     path('api/savenotification', create_notification),
     path('api/deletenotification/<int:pk>', delete_notification),

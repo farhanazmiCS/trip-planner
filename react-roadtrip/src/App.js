@@ -10,7 +10,7 @@ import Trips from './pages/Trips';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications'
 
-export default function App(props) {
+export default function App() {
   // Redirects
   var navigate = useNavigate();
 
@@ -74,11 +74,7 @@ export default function App(props) {
   function handleLogin(e) {
     // To clear previous user's session
     let url = 'http://127.0.0.1:8000/api/login';
-    let request = new Request(url, {
-      headers: {
-        'X-CSRFToken': props.token
-      }
-    });
+    let request = new Request(url);
     fetch(request, {
       method: 'POST',
       mode: 'cors',
@@ -112,6 +108,10 @@ export default function App(props) {
       sessionStorage.clear();
       setIsLoggedIn(false);
       setMyTrips([]);
+      setMyFriendRequests([]);
+      setMyTripInviteRequests([]);
+      setFriendRequests([]);
+      setTripRequests([]);
       setUsername('');
       setPassword('');
       navigate('/login');
@@ -122,11 +122,7 @@ export default function App(props) {
   // Handle registering
   const handleRegister = (e) => {
     let url = 'http://127.0.0.1:8000/api/register';
-    let request = new Request(url, {
-      headers: {
-        'X-CSRFToken': props.csrftoken
-      }
-    });
+    let request = new Request(url);
     fetch(request, {
       method: 'POST',
       mode: 'cors',
@@ -166,7 +162,8 @@ export default function App(props) {
     let urlTrips = 'http://127.0.0.1:8000/api/trips';
     let urlUsers = 'http://127.0.0.1:8000/api/users';
     let urlNotifications = 'http://127.0.0.1:8000/api/notifications';
-    let urlMyRequests = 'http://127.0.0.1:8000/api/requests';
+    let urlMyRequestsFriends = 'http://127.0.0.1:8000/api/requests/friends';
+    let urlMyRequestsTrips = 'http://127.0.0.1:8000/api/requests/trips';
     // Initialize requests (For auth status and data)
     let request = new Request(url, {
       headers: {
@@ -180,28 +177,31 @@ export default function App(props) {
         'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
     });
-    // Add to requests array
     requests.push(requestTrips);
     let requestUsers = new Request(urlUsers, {
       headers: {
         'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
     });
-    // Add to requests array
     requests.push(requestUsers);
     let requestNotifications = new Request(urlNotifications, {
       headers: {
         'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
     });
-    // Add to requests array
     requests.push(requestNotifications);
-    let requestMyRequests = new Request(urlMyRequests, {
+    let requestMyRequestsFriends = new Request(urlMyRequestsFriends, {
       headers: {
         'Authorization': `Token ${sessionStorage.getItem(user)}`
       }
     });
-    requests.push(requestMyRequests);
+    requests.push(requestMyRequestsFriends);
+    let requestMyRequestsTrips = new Request(urlMyRequestsTrips, {
+      headers: {
+        'Authorization': `Token ${sessionStorage.getItem(user)}`
+      }
+    });
+    requests.push(requestMyRequestsTrips);
     // Fetch auth status
     fetchAuthStatus();
   }
@@ -219,8 +219,10 @@ export default function App(props) {
           fetchUsers();
           // Fetch Notification(s) from endpoint
           fetchNotifications();
-          // Fetch Request(s) from endpoint
-          fetchMyRequests();
+          // Fetch Friend Requests from endpoint
+          fetchMyRequestsFriends();
+          // Fetch Trip Requests from endpoint
+          fetchMyRequestsTrips();
           break;
         default:
           console.log(res.status);
@@ -303,27 +305,39 @@ export default function App(props) {
   }
 
   // Fetch requests made by user
-  function fetchMyRequests() {
+  function fetchMyRequestsFriends() {
     fetch(requests[4])
     .then(res => res.json())
     .then(body => {
       // My friend requests array
       const myFriendRequests = body.map(m => {
-        if (m.is_addFriend === true) {
-          return m;
+        return {
+          user: {
+            id: m.to.id,
+            username: m.to.username
+          }
         }
-        return undefined;
       });
       setMyFriendRequests(myFriendRequests);
-      // My trip requests array
-      const myTripInviteRequests = body.map(m => {
-        if (m.is_inviteToTrip === true) {
-          // Returns the request object
-          return m;
+    });
+  }
+
+  function fetchMyRequestsTrips() {
+    fetch(requests[5])
+    .then(res => res.json())
+    .then(body => {
+      const myTripRequests = body.map(m => {
+        return {
+          user: {
+            id: m.to.id,
+            username: m.to.username,
+          },
+          trip: {
+            id: m.trip.id
+          }
         }
-        return undefined;
-      });
-      setMyTripInviteRequests(myTripInviteRequests);
+      })
+      setMyTripInviteRequests(myTripRequests);
     })
   }
   
@@ -353,14 +367,12 @@ export default function App(props) {
             setUsername={setUsername} 
             password={password} 
             setPassword={setPassword} 
-            token={props.token} 
             handleLogin={handleLogin} 
           />} 
         />
         <Route path="/trips" 
           element={<Trips 
             isLoggedIn={isLoggedIn} 
-            token={props.token} 
             myTrips={myTrips} 
           />} 
         />
@@ -370,7 +382,6 @@ export default function App(props) {
             users={users} 
             myTripInviteRequests={myTripInviteRequests}
             setMyTripInviteRequests={setMyTripInviteRequests}
-            csrftoken={props.token} 
           />} 
         />
         <Route path="/profile/:userId" 
@@ -378,7 +389,6 @@ export default function App(props) {
             users={users} 
             setUsers={setUsers}
             isLoggedIn={isLoggedIn}
-            token={props.token}
             myTrips={myTrips}
             navigate={navigate}
             myFriendRequests={myFriendRequests}
@@ -393,7 +403,6 @@ export default function App(props) {
             tripRequests={tripRequests} 
             users={users} 
             setUsers={setUsers} 
-            csrftoken={props.token} 
           />} 
         />
         <Route path="/login" 
@@ -407,7 +416,6 @@ export default function App(props) {
         />
         <Route path="/register" 
           element={<Register 
-            token={props.token} 
             username={usernameRegister} 
             setUsernameRegister={setUsernameRegister} 
             email={emailRegister} 

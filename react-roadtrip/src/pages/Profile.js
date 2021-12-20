@@ -27,7 +27,7 @@ export default function Profile(props) {
     
     // For loop to check if this profile has a friend request sent
     for (let i = 0; i < props.myFriendRequests.length; i++) {
-        if (profile.username === props.myFriendRequests[i].to.username) {
+        if (profile.username === props.myFriendRequests[i].user.username) {
             var is_requested = true;
         }
         else is_requested = false;

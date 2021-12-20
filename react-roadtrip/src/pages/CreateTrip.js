@@ -14,7 +14,6 @@ export default function CreateTrip(props) {
     // Username and token for auth
     const username = sessionStorage.getItem('username');
     const auth_token = sessionStorage.getItem(username);
-    const csrftoken = props.token;
 
     // Mapbox access token
     const access_token = 'API_KEY';
@@ -276,7 +275,6 @@ export default function CreateTrip(props) {
             'http://127.0.0.1:8000/api/savetrip',
             {
                 headers: {
-                    'X-CSRFToken': csrftoken,
                     'Authorization': `Token ${auth_token}`
                 }
             }

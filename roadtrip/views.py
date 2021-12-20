@@ -194,6 +194,10 @@ class TripViewSet(viewsets.ModelViewSet):
         user.tripCounter = tripLength
         user.save()
         return Response(status=200)
+
+    def addFriendToTrip(self, request):
+        pass
+
 class WaypointViewSet(viewsets.ModelViewSet):
     queryset = Waypoint.objects.all()
     def retrieve(self, request, pk=None):
@@ -221,13 +225,22 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     # List the notification requests made by the user
-    def listRequestsMadeByMe(self, request):
+    def listRequestsMadeByMe_friend_request(self, request):
         user = request.user
         try:
-            my_requests = user.my_requests.all()
+            friend_requests = user.my_requests.filter(is_addFriend=True)
         except Notification.DoesNotExist:
             return Http404
-        serializer = NotificationSerializer(my_requests, many=True)
+        serializer = NotificationSerializer(friend_requests, many=True)
+        return Response(serializer.data)
+
+    def listRequestsMadeByMe_trip_request(self, request):
+        user = request.user
+        try:
+            trip_requests = user.my_requests.filter(is_inviteToTrip=True)
+        except Notification.DoesNotExist:
+            return Http404
+        serializer = NotificationSerializer(trip_requests, many=True)
         return Response(serializer.data)
 
     # Sending notification to other user
