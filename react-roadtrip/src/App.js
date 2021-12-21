@@ -403,6 +403,8 @@ export default function App() {
             tripRequests={tripRequests} 
             users={users} 
             setUsers={setUsers} 
+            setMyTrips={setMyTrips}
+            formatDateTime={formatDateTime}
           />} 
         />
         <Route path="/login" 

@@ -2,8 +2,9 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, ButtonGroup, Container, Card } from "react-bootstrap";
 
-export default function Notifications({ friendRequests, setFriendRequests, tripRequests, users, setUsers }) {
+export default function Notifications({ friendRequests, setFriendRequests, tripRequests, setTripRequests, users, setUsers, setMyTrips, formatDateTime }) {
     var friendRequestCopy = [...friendRequests];
+    var tripRequestCopy = [...tripRequests];
     // Function to accept/decline request
     function acceptFriendRequest(request) {
         // Find the user objects of accepter and requester
@@ -91,8 +92,109 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
         setFriendRequests(friendRequestCopy);
     }
     // eslint-disable-next-line
-    function acceptTripRequest() {
-        // Todo
+    function acceptTripRequest(request) {
+        // To add user in the trip object
+        let url = `http://127.0.0.1:8000/api/addfriendtotrip/${request.trip.id}`;
+        let addUserToTrip = new Request(url, {
+            headers: {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
+            }
+        })
+        // To delete the notification object
+        let urlDeleteNotification = `http://127.0.0.1:8000/api/deletenotification/${request.id}`;
+        let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
+            headers: {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
+            }
+        });
+        // To update the user count, set the users array
+        let urlFetchUser = `http://127.0.0.1:8000/api/users`;
+        let fetchUserRequest = new Request(urlFetchUser, {
+            headers: {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
+            }
+        })
+        // To update myTrips
+        let urlFetchTrips = `http://127.0.0.1:8000/api/trips`;
+        let fetchTripsRequest = new Request(urlFetchTrips, {
+            headers: {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
+            }
+        })
+        // Operation to insert the user's object into the users list in the trip object
+        fetch(addUserToTrip, {
+            method: 'PUT'
+        })
+        // Delete notification object, remove from the state array
+        .then(() => {
+            fetch(deleteNotificationObjectAfterAction, {
+                method: 'DELETE'
+            });
+            for (let i = 0; i < tripRequests.length; i++) {
+                if (tripRequests[i].id === request.id) {
+                    var index = i;
+                }
+            };
+            tripRequestCopy.splice(index, 1);
+            // Update trip requests array, to remove the notification object
+            setTripRequests(tripRequestCopy);
+        })
+        // Set users
+        .then(() => {
+            fetch(fetchUserRequest).then(res => res.json()).then(body => setUsers(body));
+        })
+        // Set trips
+        .then(() => {
+            fetch(fetchTripsRequest).then(res => res.json()).then(body => {
+                const trips = body.map(t => {
+                    return {
+                        id: t.id,
+                        name: t.name,
+                        origin: {
+                            role: 'Origin',
+                            name: t.origin.text,
+                            detail: t.origin.place_name,
+                            longitude: t.origin.longitude,
+                            latitude: t.origin.latitude,
+                            dateTimeFrom: formatDateTime(t.origin.dateTimeFrom),
+                            dateTimeTo: formatDateTime(t.origin.dateTimeTo),
+                            todo: t.origin.todo.map(t => t.task)
+                        },
+                        destination: {
+                            role: 'Destination',
+                            name: t.destination.text,
+                            detail: t.destination.place_name,
+                            longitude: t.destination.longitude,
+                            latitude: t.destination.latitude,
+                            dateTimeFrom: formatDateTime(t.destination.dateTimeFrom),
+                            dateTimeTo: formatDateTime(t.destination.dateTimeTo),
+                            todo: t.destination.todo.map(t => t.task)
+                        },
+                        waypoints: t.waypoint.map((w, index) => {
+                            return {
+                            id: w.id,
+                            role: `Stopover ${index + 1}`,
+                            name: w.text,
+                            detail: w.place_name,
+                            longitude: w.longitude,
+                            latitude: w.latitude,
+                            dateTimeFrom: formatDateTime(w.dateTimeFrom),
+                            dateTimeTo: formatDateTime(w.dateTimeTo),
+                            todo: w.todo.map(t => t.task)
+                            }
+                        }),
+                        users: t.users.map(user => {
+                            return {
+                            id: user.id,
+                            username: user.username,
+                            email: user.email
+                            }
+                        })
+                    }
+                })
+                setMyTrips(trips);
+            });
+        })
     }
     // eslint-disable-next-line
     function declineTripRequest() {
@@ -110,7 +212,7 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                     <div style={{textAlign: 'right'}}>
                         <ButtonGroup aria-label="accept-reject">
                             <Button onClick={() => acceptFriendRequest(request)} variant="dark"><FontAwesomeIcon icon={faCheck} /></Button>
-                            <Button onClick={() => declineFriendRequest(request)} variant="dark"><FontAwesomeIcon icon={faTimes} /></Button>
+                            <Button onClick={() => declineFriendRequest(request)} variant="danger"><FontAwesomeIcon icon={faTimes} /></Button>
                         </ButtonGroup>
                     </div>
                     <p style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to add you as a friend.</p>
@@ -120,7 +222,7 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
             {tripRequests.map(request => (
                 <Container className="mt-1" key={request.id}>
                     <h3 className="mt-0 mb-1" style={{fontWeight: 'bold'}}>Trip Invite</h3>
-                    <p className="mb-2" style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to invite to a trip.</p>
+                    <p className="mb-2" style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to invite you to a trip.</p>
                     <Card bg="dark" text="light" className="mb-3">
                         <Card.Body>
                             <Card.Title style={{fontSize: '24px'}}>{request.trip.name}</Card.Title>
@@ -129,8 +231,8 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                     </Card>
                     <div style={{textAlign: 'right'}}>
                         <ButtonGroup aria-label="accept-reject">
-                            <Button onClick={acceptTripRequest} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
-                            <Button onClick={declineTripRequest} variant="dark"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
+                            <Button onClick={() => acceptTripRequest(request)} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
+                            <Button onClick={declineTripRequest} variant="danger"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
                         </ButtonGroup>
                     </div>
                     <hr />

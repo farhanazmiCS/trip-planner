@@ -7,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.db.models import query
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
+from django.utils import translation
 from rest_framework import viewsets
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -148,7 +149,6 @@ class TripViewSet(viewsets.ModelViewSet):
         data = json.loads(request.body)
         # User and trip length
         user = request.user
-        tripLength = len(user.trip.all())
         # Create new trip instance, save it, then add the logged user
         try:
             trip = Trip(name=data['tripName'])
@@ -191,13 +191,20 @@ class TripViewSet(viewsets.ModelViewSet):
                     t.save()
                     # Add the todo object into the waypoint object
                     w.todo.add(t)
-        user.tripCounter = tripLength
+        user.tripCounter = len(user.trip.all())
         user.save()
         return Response(status=200)
 
-    def addFriendToTrip(self, request):
-        pass
-
+    def addFriendToTrip(self, request, pk=None):
+        queryset = Trip.objects.all()
+        user = request.user
+        trip = get_object_or_404(queryset, pk=pk)
+        # Add user into the trip
+        trip.users.add(user)
+        # Update user trip counter
+        user.tripCounter = len(user.trip.all())
+        user.save()
+        return Response(status=200)
 class WaypointViewSet(viewsets.ModelViewSet):
     queryset = Waypoint.objects.all()
     def retrieve(self, request, pk=None):

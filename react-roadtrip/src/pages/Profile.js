@@ -93,7 +93,7 @@ export default function Profile(props) {
                 setProfileTrips(trip);
             })
         }
-    }, [props, profile.id])
+    }, [props, profile.id, props.users])
     // Add Friend button handler
     function addFriend(e) {
         let url = 'http://127.0.0.1:8000/api/savenotification';
