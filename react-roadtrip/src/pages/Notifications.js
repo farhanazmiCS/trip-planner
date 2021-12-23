@@ -2,14 +2,14 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, ButtonGroup, Container, Card } from "react-bootstrap";
 
-export default function Notifications({ friendRequests, setFriendRequests, tripRequests, setTripRequests, users, setUsers, setMyTrips, formatDateTime }) {
-    var friendRequestCopy = [...friendRequests];
-    var tripRequestCopy = [...tripRequests];
+export default function Notifications(props) {
+    var friendRequestCopy = [...props.friendRequests];
+    var tripRequestCopy = [...props.tripRequests];
     // Function to accept/decline request
-    function acceptFriendRequest(request) {
+    function acceptFriendRequest(request, index) {
         // Find the user objects of accepter and requester
-        let accepter = users.find(user => user.username === request.to.username);
-        let requester = users.find(user => user.username === request.frm.username);
+        let accepter = props.users.find(user => user.username === request.to.username);
+        let requester = props.users.find(user => user.username === request.frm.username);
         // Url endpoints for amending accepter and requester friends list
         let urlAccepter = `http://127.0.0.1:8000/api/addFriend/${accepter.id}`;
         let urlRequester = `http://127.0.0.1:8000/api/addFriend/${requester.id}`;
@@ -57,20 +57,14 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
             .then(res => res.json())
             .then(body => {
                 const users = body.map(user => user)
-                setUsers(users);
+                props.setUsers(users);
             })
         })
         .catch(error => console.log(error));
-        // Get index of the notification to delete
-        for (let i = 0; i < friendRequests.length; i++) {
-            if (friendRequests[i].id === request.id) {
-                var index = i;
-            }
-        }
         friendRequestCopy.splice(index, 1);
-        setFriendRequests(friendRequestCopy);
+        props.setFriendRequests(friendRequestCopy);
     }
-    function declineFriendRequest(request) {
+    function declineFriendRequest(request, index) {
         // For declining friend request, simply delete the notification object.
         let urlDeleteNotification = `http://127.0.0.1:8000/api/deletenotification/${request.id}`;
         let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
@@ -82,17 +76,10 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
             method: 'DELETE'
         })
         .catch(error => console.log(error));
-        // Get index of the notification to delete
-        for (let i = 0; i < friendRequests.length; i++) {
-            if (friendRequests[i].id === request.id) {
-                var index = i;
-            }
-        }
         friendRequestCopy.splice(index, 1)
-        setFriendRequests(friendRequestCopy);
+        props.setFriendRequests(friendRequestCopy);
     }
-    // eslint-disable-next-line
-    function acceptTripRequest(request) {
+    function acceptTripRequest(request, index) {
         // To add user in the trip object
         let url = `http://127.0.0.1:8000/api/addfriendtotrip/${request.trip.id}`;
         let addUserToTrip = new Request(url, {
@@ -130,18 +117,13 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
             fetch(deleteNotificationObjectAfterAction, {
                 method: 'DELETE'
             });
-            for (let i = 0; i < tripRequests.length; i++) {
-                if (tripRequests[i].id === request.id) {
-                    var index = i;
-                }
-            };
             tripRequestCopy.splice(index, 1);
             // Update trip requests array, to remove the notification object
-            setTripRequests(tripRequestCopy);
+            props.setTripRequests(tripRequestCopy);
         })
         // Set users
         .then(() => {
-            fetch(fetchUserRequest).then(res => res.json()).then(body => setUsers(body));
+            fetch(fetchUserRequest).then(res => res.json()).then(body => props.setUsers(body));
         })
         // Set trips
         .then(() => {
@@ -156,8 +138,8 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                             detail: t.origin.place_name,
                             longitude: t.origin.longitude,
                             latitude: t.origin.latitude,
-                            dateTimeFrom: formatDateTime(t.origin.dateTimeFrom),
-                            dateTimeTo: formatDateTime(t.origin.dateTimeTo),
+                            dateTimeFrom: props.formatDateTime(t.origin.dateTimeFrom),
+                            dateTimeTo: props.formatDateTime(t.origin.dateTimeTo),
                             todo: t.origin.todo.map(t => t.task)
                         },
                         destination: {
@@ -166,8 +148,8 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                             detail: t.destination.place_name,
                             longitude: t.destination.longitude,
                             latitude: t.destination.latitude,
-                            dateTimeFrom: formatDateTime(t.destination.dateTimeFrom),
-                            dateTimeTo: formatDateTime(t.destination.dateTimeTo),
+                            dateTimeFrom: props.formatDateTime(t.destination.dateTimeFrom),
+                            dateTimeTo: props.formatDateTime(t.destination.dateTimeTo),
                             todo: t.destination.todo.map(t => t.task)
                         },
                         waypoints: t.waypoint.map((w, index) => {
@@ -178,8 +160,8 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                             detail: w.place_name,
                             longitude: w.longitude,
                             latitude: w.latitude,
-                            dateTimeFrom: formatDateTime(w.dateTimeFrom),
-                            dateTimeTo: formatDateTime(w.dateTimeTo),
+                            dateTimeFrom: props.formatDateTime(w.dateTimeFrom),
+                            dateTimeTo: props.formatDateTime(w.dateTimeTo),
                             todo: w.todo.map(t => t.task)
                             }
                         }),
@@ -192,13 +174,23 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                         })
                     }
                 })
-                setMyTrips(trips);
+                props.setMyTrips(trips);
             });
         })
     }
-    // eslint-disable-next-line
-    function declineTripRequest() {
-        // Todo
+    function declineTripRequest(request, index) {
+        let urlDeleteNotification = `http://127.0.0.1:8000/api/deletenotification/${request.id}`;
+        let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
+            headers: {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
+            }
+        });
+        fetch(deleteNotificationObjectAfterAction, {
+            method: 'DELETE'
+        })
+        .catch(error => console.log(error));
+        tripRequestCopy.splice(index, 1);
+        props.setTripRequests(tripRequestCopy);
     }
     return (
         <Container>
@@ -206,20 +198,20 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                 <h1 className="mt-2" style={{fontWeight: 'bolder', textAlign: 'center'}}>Notifications</h1>
                 <hr className="mb-3 mt-0" />
             </Container>
-            {friendRequests.map(request => (
+            {props.friendRequests.map((request, index) => (
                 <Container className="mt-1" key={request.id}>
                     <h3 className="mt-0 mb-1" style={{fontWeight: 'bold'}}>Friend Request</h3>
                     <div style={{textAlign: 'right'}}>
                         <ButtonGroup aria-label="accept-reject">
-                            <Button onClick={() => acceptFriendRequest(request)} variant="dark"><FontAwesomeIcon icon={faCheck} /></Button>
-                            <Button onClick={() => declineFriendRequest(request)} variant="danger"><FontAwesomeIcon icon={faTimes} /></Button>
+                            <Button onClick={() => acceptFriendRequest(request, index)} variant="dark"><FontAwesomeIcon icon={faCheck} /></Button>
+                            <Button onClick={() => declineFriendRequest(request, index)} variant="danger"><FontAwesomeIcon icon={faTimes} /></Button>
                         </ButtonGroup>
                     </div>
                     <p style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to add you as a friend.</p>
                     <hr />
                 </Container>
             ))}
-            {tripRequests.map(request => (
+            {props.tripRequests.map((request, index) => (
                 <Container className="mt-1" key={request.id}>
                     <h3 className="mt-0 mb-1" style={{fontWeight: 'bold'}}>Trip Invite</h3>
                     <p className="mb-2" style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to invite you to a trip.</p>
@@ -231,8 +223,8 @@ export default function Notifications({ friendRequests, setFriendRequests, tripR
                     </Card>
                     <div style={{textAlign: 'right'}}>
                         <ButtonGroup aria-label="accept-reject">
-                            <Button onClick={() => acceptTripRequest(request)} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
-                            <Button onClick={declineTripRequest} variant="danger"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
+                            <Button onClick={() => acceptTripRequest(request, index)} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
+                            <Button onClick={() => declineTripRequest(request, index)} variant="danger"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
                         </ButtonGroup>
                     </div>
                     <hr />

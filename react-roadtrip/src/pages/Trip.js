@@ -19,8 +19,17 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
     for (let i = 0; i < users.length; i++) {
         if (users[i].username === sessionStorage.getItem('username')) var user = users[i];
     }
+    // Friends that are yet to be invited
+    var toInvite = [...user.friends];
+    toInvite.forEach((friend, index) => {
+        trip.users.find(user => {
+            if (user.id === friend.id) {
+                toInvite.splice(index, 1);
+            }
+        })
+    })
     function initialiseButtons() {
-        var buttonProps = user.friends.map(friend => {
+        var buttonProps = toInvite.map(friend => {
             for (let i = 0; i < myTripInviteRequests.length; i++) {
                 if (friend.id === myTripInviteRequests[i].user.id && trip.id === myTripInviteRequests[i].trip.id) {
                     return {
@@ -38,7 +47,7 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
         setInviteBtnContent(buttonProps.map(button => button.content));
     }
     // Function to invite friends to the trip
-    function inviteFriend(e, friend, index) {
+    function inviteFriend(friend, index) {
         let url = `http://127.0.0.1:8000/api/savenotification`;
         let request = new Request(url, {
             'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
@@ -68,9 +77,8 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
             setInviteBtnVar(inviteBtnVarCopy);
         })
         .catch(error => console.log(error));
-        e.preventDefault();
     }
-    useEffect(initialiseButtons, [user.friends, myTripInviteRequests, trip.id])
+    useEffect(initialiseButtons, [user.friends, myTripInviteRequests, trip.id]);
     return (
         <Container key={trip.id}>
             <div className="d-flex justify-content-between" style={{paddingTop: '10px', paddingBottom: '0px'}}>
@@ -82,8 +90,8 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
             <Collapse in={collapse}>
                 <div id="my-friends">
                     <h6 className="m-1">Select friends to invite:</h6>
-                    {user.friends.map((friend, index) => (
-                        <Button key={friend.id} onClick={(e) => inviteFriend(e, friend, index)} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
+                    {toInvite.map((friend, index) => (
+                        <Button key={friend.id} onClick={() => inviteFriend(friend, index)} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
                     ))}
                 </div>
             </Collapse>
