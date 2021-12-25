@@ -10,6 +10,9 @@ function getUser(users, id) {
     )
 }
 
+// All of the profile's trips
+export var trips = [];
+
 export default function Profile(props) {
     // State of "Add Friend" button
     const [buttonVariant, setButtonVariant] = useState('dark');
@@ -91,6 +94,8 @@ export default function Profile(props) {
                     }
                 });
                 setProfileTrips(trip);
+                // To export
+                trips = [...trip];
             })
         }
     }, [props, profile.id, props.users])

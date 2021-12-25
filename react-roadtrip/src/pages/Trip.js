@@ -6,6 +6,8 @@ import { getTrip } from '../pages/Trips';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 
+import { trips } from './Profile';
+
 export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripInviteRequests }) {
     // State of collapse
     const [collapse, setCollapse] = useState(false);
@@ -13,8 +15,9 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
     const [inviteBtnContent, setInviteBtnContent] = useState([]);
     // State of variant of friend invite buttons
     const [inviteBtnVar, setInviteBtnVar] = useState([]);
+    // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
-    let trip = getTrip(myTrips, parseInt(params.tripId))
+    let trip = getTrip(trips, parseInt(params.tripId));
     // Retrieve the user
     for (let i = 0; i < users.length; i++) {
         if (users[i].username === sessionStorage.getItem('username')) var user = users[i];
@@ -26,6 +29,7 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
             if (user.id === friend.id) {
                 toInvite.splice(index, 1);
             }
+            return null;
         })
     })
     function initialiseButtons() {
@@ -37,11 +41,17 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
                         variant: 'outline-dark'
                     }
                 }
+                else {
+                    return {
+                        content: friend.username[0].toUpperCase() + friend.username.slice(1),
+                        variant: 'dark'
+                    }
+                }
             }
             return {
-                content: friend.username[0].toUpperCase() + friend.username.slice(1),
-                variant: 'dark'
-            }
+                content: null,
+                variant: null
+            };
         });
         setInviteBtnVar(buttonProps.map(button => button.variant));
         setInviteBtnContent(buttonProps.map(button => button.content));
@@ -93,6 +103,10 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
                     {toInvite.map((friend, index) => (
                         <Button key={friend.id} onClick={() => inviteFriend(friend, index)} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
                     ))}
+                    {toInvite.length === 0 && 
+                    <>
+                        <p className="m-1" style={{color: 'grey', fontSize: '16px'}}>No one to invite to this trip.</p>
+                    </>}
                 </div>
             </Collapse>
             <hr />
@@ -103,7 +117,7 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
                     {trip.users.map(user => (
                         <>
                             {user.username === sessionStorage.getItem('username') && <p style={{fontWeight: 'bold', marginBottom: '20px'}} key={user.username}>Me</p>}
-                            {user.username !== sessionStorage.getItem('username') && <p style={{fontWeight: 'bold', marginBottom: '20px'}} key={user.username}>{user.username}</p>}
+                            {user.username !== sessionStorage.getItem('username') && <p style={{fontWeight: 'bold', marginBottom: '20px'}} key={user.username}>{user.username[0].toUpperCase() + user.username.slice(1)}</p>}
                         </>
                     ))}
                 </>

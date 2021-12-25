@@ -4,8 +4,11 @@ import { Link } from 'react-router-dom';
 import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 
+import { myTripsCopy } from '../App';
+
 // For Trip component
 export function getTrip(trips, id) {
+    trips = (trips.length !== 0) ? trips : myTripsCopy
     return trips.find(
         trip => trip.id === id
     );

@@ -10,6 +10,8 @@ import Trips from './pages/Trips';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications'
 
+export var myTripsCopy = [];
+
 export default function App() {
   // Redirects
   var navigate = useNavigate();
@@ -282,6 +284,8 @@ export default function App() {
         }
       });
       setMyTrips(trip);
+      // To export
+      myTripsCopy = [...trip];
     })
   }
 

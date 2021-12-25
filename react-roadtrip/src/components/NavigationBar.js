@@ -65,9 +65,9 @@ export default function NavigationBar(props) {
                             selected={props.userQuery}
                         />
                         <NavDropdown style={{fontSize: '20px', fontWeight: 'bold'}} title={props.user[0].toUpperCase() + props.user.slice(1)} className="mx-2" id="basic-nav-dropdown">
-                            <Dropdown.Item><NavLink className="mb-1 mt-1" to="/notifications" style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faBell} /> Notifications</NavLink></Dropdown.Item>
-                            <Dropdown.Item><NavLink className="mb-1 mt-1" to={`/profile/${userId}`} style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faUser} /> My Profile</NavLink></Dropdown.Item>
-                            <NavDropdown.Item className="mb-1 mt-1" onClick={props.handleLogout} style={{fontSize: '18px'}}><FontAwesomeIcon icon={faSignOutAlt} /> Log Out</NavDropdown.Item>
+                            <Dropdown className="mb-2 mt-2 mx-3"><NavLink to="/notifications" style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faBell} /> Notifications</NavLink></Dropdown>
+                            <Dropdown className="mb-2 mt-2 mx-3"><NavLink to={`/profile/${userId}`} style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faUser} /> My Profile</NavLink></Dropdown>
+                            <NavDropdown.Item className="mb-2 mt-2" onClick={props.handleLogout} style={{fontSize: '18px'}}><FontAwesomeIcon icon={faSignOutAlt} /> Log Out</NavDropdown.Item>
                         </NavDropdown>
                     </Nav>
                 </Navbar.Collapse>
