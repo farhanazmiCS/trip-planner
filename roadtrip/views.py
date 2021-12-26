@@ -33,13 +33,15 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     # To get all users
     def list(self, request):
-        queryset = User.objects.all()
+        # queryset.all() is called to update the trip_counter attribute
+        # as the queryset is cached.
+        queryset = self.queryset.all()
         serializer = UserSerializer(queryset, many=True)
         return Response(serializer.data)
     
     # To get an individual user
     def retrieve(self, request, pk=None):
-        queryset = User.objects.all()
+        queryset = self.queryset
         user = get_object_or_404(queryset, pk=pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
@@ -90,7 +92,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     # Adding friends
     def addFriend(self, request, pk=None):
-        queryset = User.objects.all()
+        queryset = self.queryset
         user = get_object_or_404(queryset, pk=pk)
         data = json.loads(request.body)
         friend = data.get('friend')
@@ -100,7 +102,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=200)
     
     def unFriend(self, request, pk=None):
-        queryset = User.objects.all()
+        queryset = self.queryset
         # User objects
         user1 = request.user
         user2 = get_object_or_404(queryset, pk=pk)
@@ -139,7 +141,7 @@ class TripViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     def retrieve(self, request, pk=None):
-        queryset = Trip.objects.all()
+        queryset = self.queryset
         trip = get_object_or_404(queryset, pk=pk)    
         serializer = TripSerializer(trip)
         return Response(serializer.data)        
@@ -196,7 +198,7 @@ class TripViewSet(viewsets.ModelViewSet):
         return Response(status=200)
 
     def addFriendToTrip(self, request, pk=None):
-        queryset = Trip.objects.all()
+        queryset = self.queryset
         user = request.user
         trip = get_object_or_404(queryset, pk=pk)
         # Add user into the trip
@@ -208,14 +210,14 @@ class TripViewSet(viewsets.ModelViewSet):
 class WaypointViewSet(viewsets.ModelViewSet):
     queryset = Waypoint.objects.all()
     def retrieve(self, request, pk=None):
-        queryset = Waypoint.objects.all()
+        queryset = self.queryset
         waypoint = get_object_or_404(queryset, pk=pk)
         serializer = WaypointSerializer(waypoint)
         return Response(serializer.data)
 class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
     def retrieve(self, request, pk=None):
-        queryset = Todo.objects.all()
+        queryset = self.queryset
         todo = get_object_or_404(queryset, pk=pk)
         serializer = TodoSerializer(todo)
         return Response(serializer.data)
@@ -276,7 +278,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Response(status=200)
 
     def delete(self, request, pk=None):
-        queryset = Notification.objects.all()
+        queryset = self.queryset
         notification = get_object_or_404(queryset, pk=pk)
         notification.delete()
         return Response(status=200)       

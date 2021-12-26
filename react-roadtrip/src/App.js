@@ -286,6 +286,7 @@ export default function App() {
       setMyTrips(trip);
       // To export
       myTripsCopy = [...trip];
+      console.log(myTripsCopy);
     })
   }
 

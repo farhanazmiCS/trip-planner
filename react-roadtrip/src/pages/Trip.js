@@ -8,7 +8,7 @@ import { faChevronLeft, faPlus, faTimes } from '@fortawesome/free-solid-svg-icon
 
 import { trips } from './Profile';
 
-export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripInviteRequests }) {
+export default function Trip({ users, myTripInviteRequests }) {
     // State of collapse
     const [collapse, setCollapse] = useState(false);
     // State of content of friend invite buttons
@@ -24,14 +24,20 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
     }
     // Friends that are yet to be invited
     var toInvite = [...user.friends];
-    toInvite.forEach((friend, index) => {
-        trip.users.find(user => {
-            if (user.id === friend.id) {
-                toInvite.splice(index, 1);
+    for (let i = 0; i < toInvite.length; i++) {
+        for (let j = 0; j < trip.users.length; j++) {
+            if (toInvite[i].id === trip.users[j].id) {
+                toInvite[i] = undefined;
+                break;
             }
-            return null;
-        })
-    })
+        }
+    }
+    // Places all 'undefined' elements to the back to remove them
+    toInvite.sort();
+    // Remove all undefined elements
+    const indexToSplice = toInvite.findIndex(item => item === undefined);
+    toInvite.splice(indexToSplice);
+
     function initialiseButtons() {
         var buttonProps = toInvite.map(friend => {
             for (let i = 0; i < myTripInviteRequests.length; i++) {
@@ -41,17 +47,11 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
                         variant: 'outline-dark'
                     }
                 }
-                else {
-                    return {
-                        content: friend.username[0].toUpperCase() + friend.username.slice(1),
-                        variant: 'dark'
-                    }
-                }
             }
             return {
-                content: null,
-                variant: null
-            };
+                content: friend.username[0].toUpperCase() + friend.username.slice(1),
+                variant: 'dark'
+            }
         });
         setInviteBtnVar(buttonProps.map(button => button.variant));
         setInviteBtnContent(buttonProps.map(button => button.content));
@@ -88,13 +88,13 @@ export default function Trip({ myTrips, users, myTripInviteRequests, setMyTripIn
         })
         .catch(error => console.log(error));
     }
-    useEffect(initialiseButtons, [user.friends, myTripInviteRequests, trip.id]);
+    useEffect(initialiseButtons, []);
     return (
         <Container key={trip.id}>
             <div className="d-flex justify-content-between" style={{paddingTop: '10px', paddingBottom: '0px'}}>
                 <Link style={{textDecoration: 'none', fontSize: '18px'}} to="/trips" ><FontAwesomeIcon icon={faChevronLeft} /> Back to Trips</Link>
                 {/* Invite friends functionality */}
-                {!collapse && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px'}}><FontAwesomeIcon icon={faPlus} /> Add friends to trip</Button>}
+                {!collapse && trip.users.find(user => user.username === sessionStorage.getItem('username')) && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px'}}><FontAwesomeIcon icon={faPlus} /> Add friends to trip</Button>}
                 {collapse && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'red'}}><FontAwesomeIcon icon={faTimes} /> Cancel</Button>}
             </div>
             <Collapse in={collapse}>

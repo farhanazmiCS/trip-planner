@@ -8,7 +8,7 @@ import { myTripsCopy } from '../App';
 
 // For Trip component
 export function getTrip(trips, id) {
-    trips = (trips.length !== 0) ? trips : myTripsCopy
+    trips = (trips.length !== 0) ? trips.concat(myTripsCopy) : myTripsCopy
     return trips.find(
         trip => trip.id === id
     );

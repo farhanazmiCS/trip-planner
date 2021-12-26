@@ -272,8 +272,7 @@ export default function CreateTrip(props) {
     // Save the trip
     const saveTrip = (e) => {
         let request = new Request(
-            'http://127.0.0.1:8000/api/savetrip',
-            {
+            'http://127.0.0.1:8000/api/savetrip', {
                 headers: {
                     'Authorization': `Token ${auth_token}`
                 }
@@ -281,7 +280,6 @@ export default function CreateTrip(props) {
         );
         fetch(request, {
             method: 'POST',
-            mode: 'cors',
             body: JSON.stringify({
                 tripName: title,
                 waypoints: waypoints,

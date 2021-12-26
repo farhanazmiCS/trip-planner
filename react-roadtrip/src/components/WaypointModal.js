@@ -68,7 +68,7 @@ export default function WaypointModal(props) {
                 <div className="d-flex justify-content-evenly">
                     {!props.edit && props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addWaypoint}>Set Destination</Button>}
                     {!props.edit && !props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addWaypoint}>Add Point</Button>}
-                    {props.edit && !props.isDestination &&<Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
+                    {props.edit && !props.isDestination && <Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
                 </div>
             </Modal.Footer>
         </Modal>
