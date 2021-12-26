@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react';
-import { Container, Collapse, Button } from 'react-bootstrap';
+import { Container, Collapse, Button, Card } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
 import { getTrip } from '../pages/Trips';
+
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
 
+// To get trip objects, if available
 import { trips } from './Profile';
 
 export default function Trip({ users, myTripInviteRequests }) {
@@ -122,76 +124,94 @@ export default function Trip({ users, myTripInviteRequests }) {
                     ))}
                 </>
             }   
-            <Container id={trip.origin.role} style={{border: '2px solid black', borderRadius: '10px'}} className="pt-3 pb-3 pl-2 pr-2 mb-3">
-                <h4 style={{color: 'green', textAlign: 'center', fontWeight: 'bold'}}>{trip.origin.role}</h4>
-                <h3>{trip.origin.name}</h3>
-                <h6 style={{color: 'grey'}}>{trip.origin.detail}</h6>
-                <div className="dateTimeFrom">
-                    <h5>From: </h5>
-                    <p>{trip.origin.dateTimeFrom}</p>
-                </div>
-                <div className="dateTimeTo">
-                    <h5>To: </h5>
-                    <p>{trip.origin.dateTimeTo}</p>
-                </div>
-                {trip.origin.todo.length !== 0 && 
-                    <>
-                        <h5 key={`${trip.origin.role}-todos`} style={{fontWeight: 'bold'}}>Todos at this point:</h5>
-                        <ol>
-                            {trip.origin.todo.map(t => (
-                                <li key={t}>{t}</li>
-                            ))}
-                        </ol>
-                    </>
-                }
+            <Container id={trip.origin.role} className="mb-3">
+                <Card bg="dark" text="light" style={{width: '100%'}}>
+                    <Card.Header style={{textAlign: 'center', fontWeight: 'bold', fontSize: '24px'}}>
+                        {trip.origin.role}
+                    </Card.Header>
+                    <Card.Body>
+                        <h3>{trip.origin.name}</h3>
+                        <h6 style={{color: 'grey'}}>{trip.origin.detail}</h6>
+                        <div className="dateTimeFrom">
+                            <h5>From: </h5>
+                            <p>{trip.origin.dateTimeFrom}</p>
+                        </div>
+                        <div className="dateTimeTo">
+                            <h5>To: </h5>
+                            <p>{trip.origin.dateTimeTo}</p>
+                        </div>
+                        {trip.origin.todo.length !== 0 && 
+                            <>
+                                <h5 key={`${trip.origin.role}-todos`} style={{fontWeight: 'bold'}}>Todos at this point:</h5>
+                                <ol>
+                                    {trip.origin.todo.map(t => (
+                                        <li key={t}>{t}</li>
+                                    ))}
+                                </ol>
+                            </>
+                        }
+                    </Card.Body>
+                    </Card>
             </Container>
             {trip.waypoints.map(t => (
-                <Container key={`${t.role}-container`} style={{border: '2px solid black', borderRadius: '10px'}} className="pt-3 pb-3 pl-2 pr-2 mb-3 mt-3">
-                    <h4 key={t.role} style={{color: 'black', textAlign: 'center', fontWeight: 'bold'}}>{t.role}</h4>
-                    <h3 key={t.name}>{t.name}</h3>
-                    <h6 key={t.detail} style={{color: 'grey'}}>{t.detail}</h6>
-                    <div key={`dateTimeFrom-${t.role}`} className="dateTimeFrom">
-                        <h5 key={`dateTimeFrom-placeholder-${t.role}`}>From: </h5>
-                        <p key={t.dateTimeFrom}>{t.dateTimeFrom}</p>
-                    </div>
-                    <div key={`dateTimeTo-${t.role}`} className="dateTimeTo">
-                        <h5 key={`dateTimeTo-placeholder-${t.role}`}>To: </h5>
-                        <p key={t.dateTimeTo}>{t.dateTimeTo}</p>
-                    </div>
-                    {t.todo.length !== 0 && 
-                        <>
-                            <h5 key={`${t.role}-todos`} style={{fontWeight: 'bold'}}>Todos at this point:</h5>
-                            <ol>
-                                {t.todo.map(t => (
-                                    <li key={t}>{t}</li>
-                                ))}
-                            </ol>
-                        </>
-                    }
+                <Container id={t.role} className="mb-3">
+                    <Card bg="dark" text="light" style={{width: '100%'}}>
+                        <Card.Header style={{textAlign: 'center', fontWeight: 'bold', fontSize: '24px'}}>
+                            {t.role}
+                        </Card.Header>
+                        <Card.Body>
+                            <h3 key={t.name}>{t.name}</h3>
+                            <h6 key={t.detail} style={{color: 'grey'}}>{t.detail}</h6>
+                            <div key={`dateTimeFrom-${t.role}`} className="dateTimeFrom">
+                                <h5 key={`dateTimeFrom-placeholder-${t.role}`}>From: </h5>
+                                <p key={t.dateTimeFrom}>{t.dateTimeFrom}</p>
+                            </div>
+                            <div key={`dateTimeTo-${t.role}`} className="dateTimeTo">
+                                <h5 key={`dateTimeTo-placeholder-${t.role}`}>To: </h5>
+                                <p key={t.dateTimeTo}>{t.dateTimeTo}</p>
+                            </div>
+                            {t.todo.length !== 0 && 
+                                <>
+                                    <h5 key={`${t.role}-todos`} style={{fontWeight: 'bold'}}>Todos at this point:</h5>
+                                    <ol>
+                                        {t.todo.map(t => (
+                                            <li key={t}>{t}</li>
+                                        ))}
+                                    </ol>
+                                </>
+                            }
+                        </Card.Body>
+                    </Card>
                 </Container>
             ))}
-            <Container id={trip.destination.role} style={{border: '2px solid black', borderRadius: '10px'}} className="pt-3 pb-3 pl-2 pr-2 mt-3 mb-5">
-            <h4 style={{color: 'red', textAlign: 'center', fontWeight: 'bold'}}>{trip.destination.role}</h4>
-                <h3>{trip.destination.name}</h3>
-                <h6 style={{color: 'grey'}}>{trip.destination.detail}</h6>
-                <div className="dateTimeFrom">
-                    <h5>From: </h5>
-                    <p>{trip.destination.dateTimeFrom}</p>
-                </div>
-                <div className="dateTimeTo">
-                    <h5>To: </h5>
-                    <p>{trip.destination.dateTimeTo}</p>
-                </div>
-                {trip.destination.todo.length !== 0 && 
-                    <>
-                        <h5 style={{fontWeight: 'bold'}}>Todos at this point:</h5>
-                        <ol>
-                            {trip.destination.todo.map(t => (
-                                <li key={t}>{t}</li>
-                            ))}
-                        </ol>
-                    </>
-                }
+            <Container id={trip.destination.role} className="mb-3">
+                <Card bg="dark" text="light" style={{width: '100%'}}>
+                    <Card.Header style={{textAlign: 'center', fontWeight: 'bold', fontSize: '24px'}}>
+                        {trip.destination.role}
+                    </Card.Header>
+                    <Card.Body>
+                        <h3>{trip.destination.name}</h3>
+                        <h6 style={{color: 'grey'}}>{trip.destination.detail}</h6>
+                        <div className="dateTimeFrom">
+                            <h5>From: </h5>
+                            <p>{trip.destination.dateTimeFrom}</p>
+                        </div>
+                        <div className="dateTimeTo">
+                            <h5>To: </h5>
+                            <p>{trip.destination.dateTimeTo}</p>
+                        </div>
+                        {trip.destination.todo.length !== 0 && 
+                            <>
+                                <h5 style={{fontWeight: 'bold'}}>Todos at this point:</h5>
+                                <ol>
+                                    {trip.destination.todo.map(t => (
+                                        <li key={t}>{t}</li>
+                                    ))}
+                                </ol>
+                            </>
+                        }
+                    </Card.Body>
+                </Card>
             </Container>
         </Container>
     )
