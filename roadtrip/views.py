@@ -321,7 +321,7 @@ class LoginView(APIView):
             }
             return Response(content, status=200)
         else:
-            message = 'Incorrect passcode.'
+            message = 'Password is incorrect. Try again.'
             content = {
                 'user': str(request.user),  # returns AnonymousUser instance if not authenticated
                 'auth': str(request.auth),  # None

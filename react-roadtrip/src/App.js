@@ -79,23 +79,31 @@ export default function App() {
     let request = new Request(url);
     fetch(request, {
       method: 'POST',
-      mode: 'cors',
       body: JSON.stringify({
         username: username,
         password: password
       })
     })
-    .then(response => response.json())
-    .then(content => {
-      if (content.status !== 200) return;
-      const token = content['token'];
-      const username = content['username'];
-      // Save username and token to sessionStorage
-      sessionStorage.setItem(username, token);
-      sessionStorage.setItem('username', username);
-      // Set isLoggedIn to true
-      setIsLoggedIn(true);
-      navigate('/trips');
+    .then(response => {
+      if (response.status === 200) {
+        setError(null);
+        response.json().then(body => {
+          const token = body['token'];
+          const username = body['username'];
+          // Save username and token to sessionStorage
+          sessionStorage.setItem(username, token);
+          sessionStorage.setItem('username', username);
+          // Set isLoggedIn to true
+          setIsLoggedIn(true);
+          navigate('/trips');
+        })
+      }
+      else {
+        response.json().then(body => {
+          const error = body['message'];
+          setError(error);
+        })
+      }
     })
     e.preventDefault();
   }
@@ -127,7 +135,6 @@ export default function App() {
     let request = new Request(url);
     fetch(request, {
       method: 'POST',
-      mode: 'cors',
       body: JSON.stringify({
         email: emailRegister,
         username: usernameRegister,
@@ -419,6 +426,7 @@ export default function App() {
             setUsername={setUsername} 
             setPassword={setPassword} 
             handleLogin={handleLogin} 
+            error={error}
           />} 
         />
         <Route path="/register" 

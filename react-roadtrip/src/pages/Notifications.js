@@ -203,8 +203,8 @@ export default function Notifications(props) {
                     <h3 className="mt-0 mb-1" style={{fontWeight: 'bold'}}>Friend Request</h3>
                     <div style={{textAlign: 'right'}}>
                         <ButtonGroup aria-label="accept-reject">
-                            <Button onClick={() => acceptFriendRequest(request, index)} variant="dark"><FontAwesomeIcon icon={faCheck} /></Button>
-                            <Button onClick={() => declineFriendRequest(request, index)} variant="danger"><FontAwesomeIcon icon={faTimes} /></Button>
+                            <Button onClick={() => acceptFriendRequest(request, index)} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
+                            <Button onClick={() => declineFriendRequest(request, index)} variant="danger"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
                         </ButtonGroup>
                     </div>
                     <p style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to add you as a friend.</p>

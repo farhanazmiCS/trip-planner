@@ -6,7 +6,7 @@ import { Nav } from 'react-bootstrap';
 
 // FontAwesome Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCarSide, faUser, faSignOutAlt, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faCar, faUser, faSignOutAlt, faBell } from '@fortawesome/free-solid-svg-icons';
 
 // NavLink is used to add styling on a link
 import {NavLink} from 'react-router-dom';
@@ -30,7 +30,7 @@ export default function NavigationBar(props) {
         <Navbar bg="dark" variant="dark" expand="lg">
             <Container>
                 <Navbar.Brand>
-                    <FontAwesomeIcon icon={faCarSide} /> Road Trip
+                    <FontAwesomeIcon className="mx-2" icon={faCar} />Road Trip
                 </Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
