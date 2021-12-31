@@ -426,12 +426,19 @@ export default function App() {
             setUsername={setUsername} 
             setPassword={setPassword} 
             handleLogin={handleLogin} 
+            setUsernameRegister={setUsernameRegister} 
+            setEmailRegister={setEmailRegister} 
+            setPasswordRegister={setPasswordRegister} 
+            setConfirmRegister={setConfirmRegister} 
             error={error}
+            setError={setError}
           />} 
         />
         <Route path="/register" 
           element={<Register 
             username={usernameRegister} 
+            setUsername={setUsername} 
+            setPassword={setPassword} 
             setUsernameRegister={setUsernameRegister} 
             email={emailRegister} 
             setEmailRegister={setEmailRegister} 
@@ -440,6 +447,7 @@ export default function App() {
             confirm={confirmRegister} 
             setConfirmRegister={setConfirmRegister} 
             error={error} 
+            setError={setError}
             handleRegister={handleRegister} 
           />} 
         />

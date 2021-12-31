@@ -44,7 +44,11 @@ export default function Register(props) {
                 </div>}
             </Form>
             <div className="mt-3">
-                <Link style={{textDecoration: 'none'}} to="/login"><p style={{textAlign: 'center', color: 'grey'}}>Already have an account? Click here to login.</p></Link>
+                <Link onClick={() => {
+                    props.setError(null);
+                    props.setUsername('');
+                    props.setPassword('');
+                }} style={{textDecoration: 'none'}} to="/login"><p style={{textAlign: 'center', color: 'grey'}}>Already have an account? Click here to login.</p></Link>
             </div>
         </Container>
     )

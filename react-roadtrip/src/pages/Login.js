@@ -35,7 +35,13 @@ export default function Login(props) {
                 <p style={{color: 'red'}}>{props.error}</p>
             </div>}
             <div className="mt-3">
-                <Link style={{textDecoration: 'none'}} to="/register"><p style={{textAlign: 'center', color: 'grey'}}>Not registered? Click here to create an account.</p></Link>
+                <Link onClick={() => {
+                    props.setError(null);
+                    props.setUsernameRegister('');
+                    props.setEmailRegister('');
+                    props.setPasswordRegister('');
+                    props.setConfirmRegister('');
+                }} style={{textDecoration: 'none'}} to="/register"><p style={{textAlign: 'center', color: 'grey'}}>Not registered? Click here to create an account.</p></Link>
             </div>
         </Container>
     )

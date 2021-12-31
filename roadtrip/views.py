@@ -296,7 +296,7 @@ class LoginView(APIView):
             User.objects.get(username=username)
         except User.DoesNotExist:
             content = {
-                'message': f'User of username {username} does not exist.',
+                'message': f"User of username '{username}' does not exist.",
                 'status': 404
             }
             return Response(content, status=404)

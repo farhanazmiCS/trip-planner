@@ -20,7 +20,7 @@ export default function Trips(props) {
             {props.isLoggedIn && 
                 <Container>
                     <Container>
-                        <h1 style={{fontWeight: 'bolder'}} className="mt-2">My Trips</h1>
+                        <h1 style={{fontWeight: 'bolder', textAlign: 'center'}} className="mt-2">My Trips</h1>
                         <hr />
                     </Container>
                     {props.myTrips.map(trip => (
