@@ -4,7 +4,20 @@ RoadTrip is a web application that let users plan a road trip.
 ## Video Demo
 [VIDEO DEMO LINK]
 
-## How it works
+## Get Started
+
+* Firstly, download the [source code](https://github.com/farhanazmiCS/RoadTrip.git).
+* Open a terminal window and enter the `capstone` directory by typing `cd capstone`. 
+* Open another terminal window, enter the `react-roadtrip` directory by typing `cd capstone/react-roadtrip`.
+* For this application to run, you would need an access token for the MapBox API. You can generate an __access token__ by signing up for a MapBox account [here](https://account.mapbox.com/auth/signup/).
+* Once the token is generated, you can include the token in line 19 of the `CreateTrip.js` file in the `/react-roadtrip/src/pages` directory, then save the file. 
+```js ...
+const access_token = 'YOUR_ACCESS_TOKEN';
+```
+* In the `capstone` directory, run `python3 manage.py makemigrations` to run database migrations.
+* Afterwards, in the same directory, run `python3 manage.py migrate` to apply the migrations.
+* At this point, you're all set! Now, in the `capstone` directory, run `python3 manage.py runserver`. This will host a local server for the backend.
+* In the terminal window for the `react-roadtrip` directory, run `npm start`. This will start a React application.
 
 ### Authentication Function
 
