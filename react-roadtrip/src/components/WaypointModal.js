@@ -16,7 +16,8 @@ export default function WaypointModal(props) {
         <Modal scrollable={true} show={props.show} onHide={props.onHide}>
             <Modal.Header style={{fontWeight: 'bold', fontSize: '20px'}} closeButton>
                 {props.edit && !props.isDestination && 'Edit Point'}
-                {!props.edit && !props.isDestination && 'Add Point'}
+                {!props.edit && !props.isDestination && props.isOrigin && 'Set Origin'}
+                {!props.edit && !props.isDestination && !props.isOrigin && 'Add Stopover'}
                 {!props.edit && props.isDestination && 'Set Destination'}
             </Modal.Header>
             <Modal.Body>
@@ -25,7 +26,9 @@ export default function WaypointModal(props) {
                         <h4>Query Location</h4>
                         <AsyncTypeahead
                             className="mb-3"
+                            inputProps={{ required: true }}
                             id="location"
+                            minLength={5}
                             filterBy={props.filterBy}
                             isLoading={props.isLoading}
                             onSearch={props.handleSearch}
@@ -66,9 +69,10 @@ export default function WaypointModal(props) {
             </Modal.Body>
             <Modal.Footer>
                 <div className="d-flex justify-content-evenly">
-                    {!props.edit && props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addWaypoint}>Set Destination</Button>}
-                    {!props.edit && !props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addWaypoint}>Add Point</Button>}
-                    {props.edit && !props.isDestination && <Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
+                    {!props.edit && props.isOrigin && <Button className="mx-1" variant="dark" onClick={props.addOrigin}>Set Origin</Button>}
+                    {!props.edit && props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addDestination}>Set Destination</Button>}
+                    {!props.edit && !props.isDestination && !props.isOrigin && <Button className="mx-1" variant="dark" onClick={props.addStopover}>Add Point</Button>}
+                    {props.edit && !props.isDestination && !props.isOrigin && <Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
                 </div>
             </Modal.Footer>
         </Modal>

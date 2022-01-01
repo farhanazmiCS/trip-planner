@@ -36,7 +36,7 @@ export default function Register(props) {
                 </Form.Group>
 
                 <div className="pt-3" style={{textAlign: 'center'}}>
-                    <Button variant="dark" type="submit" onClick={props.handleRegister}>Register</Button>
+                    <Button variant="dark" onClick={props.handleRegister}>Register</Button>
                 </div>
 
                 {props.error && <div className="mt-3" style={{textAlign: 'center'}}>

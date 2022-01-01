@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import WaypointModal from '../components/WaypointModal';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Waypoint from '../components/Waypoint';
 import { InputGroup } from 'react-bootstrap';
 
@@ -149,6 +149,8 @@ export default function CreateTrip(props) {
     // State of waypoint(s)
     const [waypoints, setWaypoints] = useState([]);
 
+    // State to identify origin waypoint
+    const [isOrigin, setIsOrigin] = useState(false);
     // State to identify destination waypoint
     const [isDestination, setIsDestination] = useState(false);
 
@@ -168,11 +170,57 @@ export default function CreateTrip(props) {
         setError(null);
     }
 
+    const addOrigin = () => {
+        waypoints.push({
+            type: 'origin',
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            timeFrom: timeFrom,
+            timeTo: timeTo,
+            text: singleOption[0].text,
+            place_name: singleOption[0].place_name,
+            todo: todoObjects,
+            longitude: singleOption[0].longitude,
+            latitude: singleOption[0].latitude
+        })
+        setWaypoints([...waypoints]);
+        hideModal();
+        // Setting modal fields back to default
+        setTodoObjects([]);
+        setDateFrom(date);
+        setDateTo(date);
+        setTimeFrom(now);
+        setTimeTo(now);
+    }
+
+    const addDestination = () => {
+        waypoints.push({
+            type: 'destination',
+            dateFrom: dateFrom,
+            dateTo: dateTo,
+            timeFrom: timeFrom,
+            timeTo: timeTo,
+            text: singleOption[0].text,
+            place_name: singleOption[0].place_name,
+            todo: todoObjects,
+            longitude: singleOption[0].longitude,
+            latitude: singleOption[0].latitude
+        })
+        setWaypoints([...waypoints]);
+        hideModal();
+        // Setting modal fields back to default
+        setTodoObjects([]);
+        setDateFrom(date);
+        setDateTo(date);
+        setTimeFrom(now);
+        setTimeTo(now);
+    }
+
     // Create waypoint event handler
-    const addWaypoint = () => {
-        // Origin and Destination
-        if (waypoints.length === 0 || waypoints.length === 1) {
-            setWaypoints([...waypoints, {
+    const addStopover = () => {
+        if (waypoints.length === 1) {
+            waypoints.push({
+                type: 'stopover',
                 dateFrom: dateFrom,
                 dateTo: dateTo,
                 timeFrom: timeFrom,
@@ -182,11 +230,11 @@ export default function CreateTrip(props) {
                 todo: todoObjects,
                 longitude: singleOption[0].longitude,
                 latitude: singleOption[0].latitude
-            }]);
+            })
         }
-        // Stopovers
         else {
             waypoints.splice(waypoints.length - 1, 0, {
+                type: 'stopover',
                 dateFrom: dateFrom,
                 dateTo: dateTo,
                 timeFrom: timeFrom,
@@ -197,8 +245,8 @@ export default function CreateTrip(props) {
                 longitude: singleOption[0].longitude,
                 latitude: singleOption[0].latitude
             });
-            setWaypoints([...waypoints]);
         }
+        setWaypoints([...waypoints]);
         hideModal();
         // Setting modal fields back to default
         setTodoObjects([]);
@@ -215,10 +263,12 @@ export default function CreateTrip(props) {
         waypoints[key].timeFrom = timeFrom;
         waypoints[key].timeTo = timeTo;
         waypoints[key].todo = todoObjects;
-        waypoints[key].text = singleOption[0].text;
-        waypoints[key].place_name = singleOption[0].place_name;
-        waypoints[key].longitude = singleOption[0].longitude;
-        waypoints[key].latitude = singleOption[0].latitude;
+        if (singleOption[key] !== undefined) {
+            waypoints[key].text = singleOption[0].text;
+            waypoints[key].place_name = singleOption[0].place_name;
+            waypoints[key].longitude = singleOption[0].longitude;
+            waypoints[key].latitude = singleOption[0].latitude;
+        }
         setWaypoints([...waypoints]);
         hideModal();
     }
@@ -232,6 +282,7 @@ export default function CreateTrip(props) {
     // Display modal for editing waypoints
     const editWaypointModal = (key) => {
         setSingleOption([waypoints[key]]);
+        setIsOrigin(false);
         setIsDestination(false);
         displayEdit();
         setKey(key);
@@ -243,9 +294,23 @@ export default function CreateTrip(props) {
         showModal();
     }
 
-    // Display modal for adding waypoints
-    const addWaypointModal = () => {
+    const addOriginModal = () => {
         setSingleOption([]);
+        setIsOrigin(true);
+        setIsDestination(false);
+        hideEdit();
+        setTodoObjects([]);
+        setDateFrom(date);
+        setDateTo(date);
+        setTimeFrom(now);
+        setTimeTo(now);
+        showModal();
+    }
+
+    // Display modal for adding waypoints
+    const addStopoverModal = () => {
+        setSingleOption([]);
+        setIsOrigin(false);
         setIsDestination(false);
         hideEdit();
         setTodoObjects([]);
@@ -259,6 +324,7 @@ export default function CreateTrip(props) {
     // Display Waypoints for adding a destination
     const addDestinationModal = () => {
         setSingleOption([]);
+        setIsOrigin(false);
         setIsDestination(true);
         hideEdit();
         setTodoObjects([]);
@@ -301,6 +367,7 @@ export default function CreateTrip(props) {
         })
         e.preventDefault();
     }
+    useEffect(() => console.log(waypoints), [waypoints.length])
     return (
         <>
             {props.isLoggedIn && 
@@ -325,6 +392,7 @@ export default function CreateTrip(props) {
                             {waypoints.map((waypoint, index) => (
                                 <Waypoint
                                     key={(waypoint.text + waypoint.place_name).toUpperCase()}
+                                    type={waypoint.type}
                                     id={index} 
                                     dateFrom={waypoint.dateFrom} 
                                     dateTo={waypoint.dateTo} 
@@ -341,15 +409,18 @@ export default function CreateTrip(props) {
                         </Fragment>
                         <div className="mt-3 mb-3">
                             <Container className="d-flex justify-content-center">
-                                {waypoints.length === 0 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Set Origin <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
-                                {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={addWaypointModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
-                                {waypoints.length === 1 && <Button className="btn-danger mx-2" onClick={addDestinationModal}>Set Destination</Button>}
-                                {waypoints.length > 1 && <Button className="mx-2" variant="dark" onClick={saveTrip}>Save Trip</Button>}
+                                {/* For only showing Origin button */}
+                                {waypoints.find(waypoint => waypoint.type === 'origin') === undefined && <Button className="mx-2" variant="dark" onClick={addOriginModal}>Set Origin</Button>}
+                                {/* For showing both Stopover and Destination buttons */}
+                                {waypoints.find(waypoint => waypoint.type === 'destination') === undefined && waypoints.find(waypoint => waypoint.type === 'origin') !== undefined && <><Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers</Button><Button className="btn-danger mx-2" onClick={addDestinationModal}>Set Destination</Button></>}
+                                {/* For only showing Stopover button */}
+                                {waypoints.find(waypoint => waypoint.type === 'destination') && <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>}
+                                {/* For showing the Save Trip button */}
+                                {waypoints.find(waypoint => waypoint.type === 'origin') && waypoints.find(waypoint => waypoint.type === 'destination') && <Button className="mx-2" variant="dark" onClick={saveTrip}>Save Trip</Button>}
                             </Container>
                         </div>
                     </Container>
                     <WaypointModal show={show}
-                        key={key} 
                         onHide={hideModal} 
                         dateFrom={dateFrom}
                         dateTo={dateTo}
@@ -360,7 +431,9 @@ export default function CreateTrip(props) {
                         setDateTo={setDateTo}
                         setTimeFrom={setTimeFrom}
                         setTimeTo={setTimeTo}
-                        addWaypoint={addWaypoint}
+                        addOrigin={addOrigin}
+                        addStopover={addStopover}
+                        addDestination={addDestination}
                         modifyWaypoint={modifyWaypoint}
                         addTodo={addTodo}
                         removeTodo={removeTodo}
@@ -371,7 +444,8 @@ export default function CreateTrip(props) {
                         isLoading={isLoading}
                         options={options}
                         index={key}             
-                        edit={edit}      
+                        edit={edit}  
+                        isOrigin={isOrigin}    
                         isDestination={isDestination}
                         singleOption={singleOption}
                         setSingleOption={setSingleOption}  
