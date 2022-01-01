@@ -14,7 +14,7 @@ export default function Register(props) {
                 <h1 className="mb-0" style={{textAlign: 'center'}}><FontAwesomeIcon className="mx-2" icon={faCar} />RoadTrip</h1>
                 <p style={{textAlign: 'center', color: 'grey'}}>Register for an account.</p>
             </Container>
-            <Form>
+            <Form onSubmit={props.handleRegister}>
                 <Form.Group className="mb-3 mt-3" controlId="formEmail">
                     <Form.Label style={{fontSize: '20px', fontWeight: 'bolder'}}>Email address</Form.Label>
                     <Form.Control type="email" placeholder="Enter email" value={props.email} onChange={e => props.setEmailRegister(e.target.value)} />
@@ -36,7 +36,7 @@ export default function Register(props) {
                 </Form.Group>
 
                 <div className="pt-3" style={{textAlign: 'center'}}>
-                    <Button variant="dark" onClick={props.handleRegister}>Register</Button>
+                    <Button variant="dark" type="submit">Register</Button>
                 </div>
 
                 {props.error && <div className="mt-3" style={{textAlign: 'center'}}>

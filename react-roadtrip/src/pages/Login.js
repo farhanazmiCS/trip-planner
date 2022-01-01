@@ -28,7 +28,7 @@ export default function Login(props) {
                     <Form.Control type="password" placeholder="Password" value={props.password} onChange={(e) => props.setPassword(e.target.value)} />
                 </Form.Group>
                 <div style={{textAlign: 'center'}} className='mt-4 mb-4'>
-                    <Button variant="dark">Login</Button>
+                    <Button variant="dark" type="submit">Login</Button>
                 </div>
             </Form>
             {props.error && <div className="mt-3" style={{textAlign: 'center'}}>

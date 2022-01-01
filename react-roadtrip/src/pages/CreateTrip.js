@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import WaypointModal from '../components/WaypointModal';
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useState } from 'react';
 import Waypoint from '../components/Waypoint';
 import { InputGroup } from 'react-bootstrap';
 
@@ -367,7 +367,6 @@ export default function CreateTrip(props) {
         })
         e.preventDefault();
     }
-    useEffect(() => console.log(waypoints), [waypoints.length])
     return (
         <>
             {props.isLoggedIn && 
