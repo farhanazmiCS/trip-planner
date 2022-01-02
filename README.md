@@ -40,10 +40,17 @@ The following items are the "pages" of the web application. They are ultimately 
 * Notifications
 
 #### Login
-[TODO]
+* The `Login` component renders the login form, containing the password and input fields.
+* The __Login__ button, when clicked, calls the `handleLogin` function, a function 'prop' that is property passed down from the parent component `App`.
+* The `handleLogin` function takes the form data and sends it to the back-end as JSON payload.
+* If the login is successful, the user is directed to the __Trips__ page, if not, an error message will be displayed, informing the user what went wrong.
+* The user can also click the sentence below the __Login__ button to create an account if the user does not have one.
 
 #### Register 
-[TODO]
+* The `Register` component renders the registration form, containing the email, username, password and confirm password fields.
+* The __Register__ button, when clicked, calls the `handleRegister` function, which handles the submission of the form data to the backend as JSON payload.
+* If the registration is successful, the user is logged in automatically, and is redirected to the __Trips__ page. If not, an error message will be displayed.
+* The user can click the sentence below the __Register__ button to be redirected to the login page if the user already has an account.
 
 #### CreateTrip
 [TODO]
