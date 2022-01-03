@@ -53,7 +53,12 @@ The following items are the "pages" of the web application. They are ultimately 
 * The user can click the sentence below the __Register__ button to be redirected to the login page if the user already has an account.
 
 #### CreateTrip
-[TODO]
+* The `CreateTrip` component renders the page that allows the user to create a new trip. 
+* When this page is loaded, the name of the trip, by default, is set to 'Trip Name'. On the right of it is an edit button, a pencil icon, when clicked or pressed, will change the header to an input field, which allows the user to change the name of the trip.
+* Below the name header, a button of content 'Set Origin' is displayed. When the user clicks this button, a __WaypointModal__ component appears, containing a form. In this form, the user can set the parameters of the Origin waypoint, such as location, date and time, and todo items. More information of this modal will be explained in detail in the __Components__ section.
+* When the Origin waypoint parameters are set, the user can set the waypoint by pressing the __Set Origin__ button, after which the __Waypoint__ component is rendered within the __CreateTrip__ page. The user can edit the waypoints by pressing the pencil icon displayed on each __Waypoint__ component.
+* After setting the origin waypoint, the user will have an option of either setting the destination or adding stopovers. The functionality of pressing one of the two buttons are identical to that of setting the origin waypoint. All the waypoints are editable, but only the stopover points are deletable.
+* The user can then save the trip by clicking or pressing the __Save Trip__ button, which will submit the data as JSON to the back-end.
 
 #### Trips
 [TODO]
