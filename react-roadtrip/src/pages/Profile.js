@@ -23,7 +23,7 @@ export default function Profile(props) {
     // Get profile data
     const username = sessionStorage.getItem('username');
     let params = useParams();
-    let profile = getUser(props.users, parseInt(params.userId));
+    let profile = getUser(JSON.parse(sessionStorage.getItem('users')), parseInt(params.userId));
     
     // Returns an array, if the 'friends' array includes the logged on user's username
     const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'));
