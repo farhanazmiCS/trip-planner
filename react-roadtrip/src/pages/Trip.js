@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Collapse, Button, Card } from 'react-bootstrap';
 import { useParams, Link } from 'react-router-dom';
-import { getTrip } from '../pages/Trips';
 
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -10,16 +9,31 @@ import { faChevronLeft, faPlus, faTimes } from '@fortawesome/free-solid-svg-icon
 // To get trip objects, if available
 import { trips } from './Profile';
 
-export default function Trip({ users, myTripInviteRequests }) {
+// For Trip component
+function getTrip(trips, id) {
+    trips = (trips.length !== 0) ? trips.concat(JSON.parse(sessionStorage.getItem('cached_trips'))) : JSON.parse(sessionStorage.getItem('cached_trips'));
+    return trips.find(
+        trip => trip.id === id
+    );
+}
+
+export default function Trip(myTripInviteRequests) {
+    // Users
+    const users = JSON.parse(sessionStorage.getItem('users'));
+
     // State of collapse
     const [collapse, setCollapse] = useState(false);
+
     // State of content of friend invite buttons
     const [inviteBtnContent, setInviteBtnContent] = useState([]);
+
     // State of variant of friend invite buttons
     const [inviteBtnVar, setInviteBtnVar] = useState([]);
+
     // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
     let trip = getTrip(trips, parseInt(params.tripId));
+    
     // Retrieve the user
     for (let i = 0; i < users.length; i++) {
         if (users[i].username === sessionStorage.getItem('username')) var user = users[i];
@@ -160,7 +174,7 @@ export default function Trip({ users, myTripInviteRequests }) {
                             {t.role}
                         </Card.Header>
                         <Card.Body>
-                            <h3 key={t.name}>{t.name}</h3>
+                            <h3 key={`${t.name}-header`}>{t.name}</h3>
                             <h6 key={t.detail} style={{color: 'grey'}}>{t.detail}</h6>
                             <div key={`dateTimeFrom-${t.role}`} className="dateTimeFrom">
                                 <h5 key={`dateTimeFrom-placeholder-${t.role}`}>From: </h5>

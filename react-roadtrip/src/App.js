@@ -10,8 +10,6 @@ import Trips from './pages/Trips';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications'
 
-export var myTripsCopy = [];
-
 export default function App() {
   // Redirects
   var navigate = useNavigate();
@@ -291,8 +289,8 @@ export default function App() {
         }
       });
       setMyTrips(trip);
-      // To export
-      myTripsCopy = [...trip];
+      // Cache the trips
+      sessionStorage.setItem('cached_trips', JSON.stringify(trip));
     })
   }
 
@@ -300,7 +298,10 @@ export default function App() {
   function fetchUsers() {
     fetch(requests[2])
     .then(res => res.json())
-    .then(body => setUsers(body))
+    .then(body => {
+      setUsers(body);
+      sessionStorage.setItem('users', JSON.stringify(body));
+    })
   }
 
   // Fetch notifications
@@ -309,9 +310,17 @@ export default function App() {
     .then(res => res.json())
     .then(body => {
       body.forEach(n => {
-        if (n.is_addFriend === true) setFriendRequests([...friendRequests, n]);
-        else setTripRequests([...tripRequests, n])
-      });
+        if (n.is_addFriend === true) {
+          setFriendRequests([...friendRequests, n]);
+        }
+        else {
+          setTripRequests([...tripRequests, n]);
+        }
+      })
+    })
+    .then(() => {
+      sessionStorage.setItem('friend_request', JSON.stringify(friendRequests));
+      sessionStorage.setItem('trip_requests', JSON.stringify(tripRequests));
     })
   }
 
@@ -330,6 +339,7 @@ export default function App() {
         }
       });
       setMyFriendRequests(myFriendRequests);
+      sessionStorage.setItem('my_friend_requests', JSON.stringify(myFriendRequests));
     });
   }
 
@@ -349,6 +359,7 @@ export default function App() {
         }
       })
       setMyTripInviteRequests(myTripRequests);
+      sessionStorage.setItem('my_trip_requests', JSON.stringify(myTripRequests));
     })
   }
   
@@ -390,7 +401,6 @@ export default function App() {
         <Route path="/trips/:tripId" 
           element={<Trip 
             myTrips={myTrips} 
-            users={users} 
             myTripInviteRequests={myTripInviteRequests}
             setMyTripInviteRequests={setMyTripInviteRequests}
           />} 

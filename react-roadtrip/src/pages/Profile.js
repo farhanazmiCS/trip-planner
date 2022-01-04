@@ -96,6 +96,7 @@ export default function Profile(props) {
                 setProfileTrips(trip);
                 // To export
                 trips = [...trip];
+                sessionStorage.setItem(`${profile.username}, ${profile.id}`, trip);
             })
         }
     }, [props, profile.id, props.users]);
