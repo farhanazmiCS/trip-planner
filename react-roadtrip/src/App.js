@@ -107,14 +107,18 @@ export default function App() {
   }
   
   // Function to handle logout
-  function handleLogout(e) {
+  function handleLogout() {
     let url = 'http://127.0.0.1:8000/api/logout';
     let request = new Request(url);
     fetch(request)
     .then(() => {
+      navigate('/login');
+    })
+    .then(() => {
       // Clear session
       sessionStorage.clear();
       setIsLoggedIn(false);
+      setUserQuery([]);
       setMyTrips([]);
       setMyFriendRequests([]);
       setMyTripInviteRequests([]);
@@ -122,9 +126,7 @@ export default function App() {
       setTripRequests([]);
       setUsername('');
       setPassword('');
-      navigate('/login');
     })
-    e.preventDefault();
   }
 
   // Handle registering

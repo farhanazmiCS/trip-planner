@@ -58,6 +58,7 @@ export default function Notifications(props) {
             .then(body => {
                 const users = body.map(user => user)
                 props.setUsers(users);
+                sessionStorage.setItem('users', JSON.stringify(users));
             })
         })
         .catch(error => console.log(error));
@@ -175,6 +176,9 @@ export default function Notifications(props) {
                     }
                 })
                 props.setMyTrips(trips);
+                const cached_trips = JSON.parse(sessionStorage.getItem('cached_trips'));
+                cached_trips.concat(trips);
+                sessionStorage.setItem('cached_trips', JSON.stringify(cached_trips));
             });
         })
     }
@@ -201,13 +205,13 @@ export default function Notifications(props) {
             {props.friendRequests.map((request, index) => (
                 <Container className="mt-1" key={request.id}>
                     <h3 className="mt-0 mb-1" style={{fontWeight: 'bold'}}>Friend Request</h3>
+                    <p style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to add you as a friend.</p>
                     <div style={{textAlign: 'right'}}>
                         <ButtonGroup aria-label="accept-reject">
                             <Button onClick={() => acceptFriendRequest(request, index)} variant="dark"><FontAwesomeIcon icon={faCheck} /> Accept</Button>
                             <Button onClick={() => declineFriendRequest(request, index)} variant="danger"><FontAwesomeIcon icon={faTimes} /> Decline</Button>
                         </ButtonGroup>
                     </div>
-                    <p style={{color: 'grey', fontSize: '18px'}}>{request.frm.username[0].toUpperCase() + request.frm.username.slice(1)} would like to add you as a friend.</p>
                     <hr />
                 </Container>
             ))}

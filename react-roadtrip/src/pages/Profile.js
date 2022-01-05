@@ -96,12 +96,14 @@ export default function Profile(props) {
                 setProfileTrips(trip);
                 // To export
                 trips = [...trip];
-                sessionStorage.setItem(`${profile.username}, ${profile.id}`, trip);
+                const cached_trips = JSON.parse(sessionStorage.getItem('cached_trips'));
+                cached_trips.concat(trip);
+                sessionStorage.setItem('cached_trips', JSON.stringify(cached_trips));
             })
         }
     }, [props, profile.id, props.users]);
     // Add Friend button handler
-    function addFriend(e) {
+    function addFriend() {
         let url = 'http://127.0.0.1:8000/api/savenotification';
         let request = new Request(url, {
             headers: {
@@ -124,10 +126,9 @@ export default function Profile(props) {
             }
         })
         .catch(error => console.log(error));
-        e.preventDefault();
     }
     // Remove Friend
-    function unFriend(e, user) {
+    function unFriend(user) {
         let url = `http://127.0.0.1:8000/api/unFriend/${user.id}`;
         let request = new Request(url, {
             headers: {
@@ -145,10 +146,10 @@ export default function Profile(props) {
             .then(body => {
                 const users = body.map(user => user)
                 props.setUsers(users);
+                sessionStorage.setItem('users', JSON.stringify(users));
             })
         })
         .catch(error => console.log(error));
-        e.preventDefault();
     }
     // Viewing other profiles
     if (profile.username !== sessionStorage.getItem('username')) {
@@ -201,7 +202,7 @@ export default function Profile(props) {
                     {friends.find(friend => friend) === true && 
                         <>
                             <div className="row">
-                                <Button onClick={e => unFriend(e, profile)} variant="outline-dark">Unfriend</Button>
+                                <Button onClick={() => unFriend(profile)} variant="outline-dark">Unfriend</Button>
                             </div>
                             <hr />
                             {profileTrips.map(trip => (
