@@ -92,7 +92,14 @@ The following items are the "pages" of the web application. They are ultimately 
  <br />
  
 #### Notifications 
-[TODO]
+* The `Notifications` component renders the page that displays notifications from other users.
+* The user may receive two different types of notifications, a __trip invite__ or a __friend request__.
+* For every notification, the user can opt to accept or decline a notification by pressing the __Accept/Decline__ button, like the one shown below.
+ <div align="center">
+    <img width="338" alt="requestfriend" src="https://user-images.githubusercontent.com/68798786/148169163-32a1791f-bc05-4dcc-9d93-2b5699a327b4.png">
+ </div>
+ <br />
+
 
 ### Components (JavaScript - React)
 
@@ -103,6 +110,30 @@ They are utilised by the "pages".
 * Todo
 * Waypoint
 * WaypointModal
+
+#### NavigationBar
+* The `NavigationBar` component renders the navigation bar at the top of the page when the user is logged in.
+* The navigation bar can be used to navigate through the web application, such as:
+
+  1. __Trips__ page
+  2. __Create Trip__ page
+  3. __My Profile__ page
+  4. __Notifications__ page
+  5. __Logout__ button
+
+#### Todo
+* `Todo` component is a form input field that is part of the `WaypointModal` component, used for the user to add todo items in every waypoint object.
+* The user can add as many todo items as they desire, as demonstrated in the gif below:
+ <div align="center">
+   <img width="250" src="https://user-images.githubusercontent.com/68798786/148171801-8cf78174-65a1-48ef-9e73-f215fcde0314.gif" alt="todo">
+ </div>
+ <br />
+ 
+#### Waypoint
+[Todo]
+
+#### WaypointModal
+[Todo]
 
 ### BackEnd (Django-REST Framework)
 
