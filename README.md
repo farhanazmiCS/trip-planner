@@ -49,15 +49,15 @@ The following items are the "pages" of the web application. They are ultimately 
 #### Register 
 * The `Register` component renders the registration form, containing the email, username, password and confirm password fields.
 * The __Register__ button, when clicked, calls the `handleRegister` function, which handles the submission of the form data to the backend as JSON payload.
-* If the registration is successful, the user is logged in automatically, and is redirected to the __Trips__ page. If not, an error message will be displayed.
+* If the registration is successful, the user is logged in automatically and is then redirected to the __Trips__ page. If not, an error message will be displayed.
 * The user can click the sentence below the __Register__ button to be redirected to the login page if the user already has an account.
 
 #### CreateTrip
 * The `CreateTrip` component renders the page that allows the user to create a new trip. 
-* When this page is loaded, the name of the trip, by default, is set to 'Trip Name'. On the right of it is an edit button, a pencil icon, when clicked or pressed, will change the header to an input field, which allows the user to change the name of the trip.
-* Below the name header, a button of content 'Set Origin' is displayed. When the user clicks this button, a __WaypointModal__ component appears, containing a form. In this form, the user can set the parameters of the Origin waypoint, such as location, date and time, and todo items. More information of this modal will be explained in detail in the __Components__ section.
+* When this page is loaded, the name of the trip, by default, is set to 'Trip Name'. On the right of it is an edit button, a pencil icon, when clicked or pressed, will change the header to an input field, allowing the user to change the name of the trip.
+* Below the name header, a button of content __Set Origin__ is displayed. When the user clicks this button, a __WaypointModal__ component appears, containing a form. In this form, the user can set the parameters of the Origin waypoint, such as location, date and time, and todo items. More information of this modal will be explained in detail in the __Components__ section.
 * When the Origin waypoint parameters are set, the user can set the waypoint by pressing the __Set Origin__ button, after which the __Waypoint__ component is rendered within the __CreateTrip__ page. The user can edit the waypoints by pressing the pencil icon displayed on each __Waypoint__ component.
-* After setting the origin waypoint, the user will have an option of either setting the destination or adding stopovers. The functionality of pressing one of the two buttons are identical to that of setting the origin waypoint. All the waypoints are editable, but only the stopover points are deletable.
+* After setting the origin waypoint, the user will have an option of either setting the destination or adding stopovers. The functionality of pressing the __Add Stopover__ or __Set Destination__ buttons are identical to that of setting the origin waypoint. All the waypoints are editable, but only the stopover points are deletable.
 * The user can then save the trip by clicking or pressing the __Save Trip__ button, which will submit the data as JSON to the back-end for processing. If successful, the user will be redirected back to the __Trips__ page, with the new trip being displayed in the page.
 
 #### Trips
@@ -67,7 +67,7 @@ The following items are the "pages" of the web application. They are ultimately 
 #### Trip
 * The `Trip` component renders the page that displays information about a particular trip.
 * Information such as the __Trip Name__, __Origin__ waypoint, __Stopover__ waypoints, __Destination__ waypoints as well as their associated data are displayed in this page.
-* If the user is in the trip that he or she is viewing, the user can invite friends into the trip by clicking or pressing the 'Invite Friends' button located at the top right corner of the page. 
+* If the user is in the trip that he or she is viewing, the user can invite friends into the trip by clicking or pressing the __Invite Friends__ button located at the top right corner of the page. 
 
 #### Profile 
 * The `Profile` component renders the page that displays information about a queried user.
@@ -119,7 +119,8 @@ They are utilised by the "pages".
   2. __Create Trip__ page
   3. __My Profile__ page
   4. __Notifications__ page
-  5. __Logout__ button
+  5. __My Profile__ page
+  6. __Logout__ button
 
 #### Todo
 * `Todo` component is a form input field that is part of the `WaypointModal` component, used for the user to add todo items in every waypoint object.
@@ -135,7 +136,7 @@ They are utilised by the "pages".
 #### WaypointModal
 [Todo]
 
-### BackEnd (Django-REST Framework)
+### Backend (Django-REST Framework)
 
 The backend is utilised solely as an API, and does not perform the rendering. Django-REST Framework (DRF) was utilised
 for developing views based on database models, using the Create, Read, Update and Delete (CRUD) principle to handle 
