@@ -131,7 +131,9 @@ They are utilised by the "pages".
  <br />
  
 #### Waypoint
-[Todo]
+* The `Waypoint` component is used to display the information of a particular waypoint.
+* Information such as location, date and time, and todo items are displayed in this component.
+* It is rendered using a __Card__ component as defined in the React-Bootstrap library.
 
 #### WaypointModal
 [Todo]
