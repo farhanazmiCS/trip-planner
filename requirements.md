@@ -15,6 +15,8 @@ This web application uses __`react` v17.0.2`__. To install, follow the instructi
 ### FontAwesome Icon
 - The __FontAwesome Icon__ react library was implemented to gain access to FontAwesome's icons used for the UI.
 - The guide for the installation can be seen [here](https://fontawesome.com/v5.15/how-to-use/on-the-web/using-with/react).
+### MapBox
+[TODO]
 ### Django
 [TODO]
 ### Django-REST Framework
