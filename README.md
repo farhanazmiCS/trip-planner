@@ -136,14 +136,26 @@ They are utilised by the "pages".
 * It is rendered using a __Card__ component as defined in the React-Bootstrap library.
 
 #### WaypointModal
-[Todo]
+* The `WaypointModal` component displays a bootstrap modal component when the user presses or clicks the __Set Origin/Add Stopover/Set Destination__ button in the __CreateTrip__ page.
+* In the modal contains a form containing input fields that allows the user to query for a specific location, set the date and time period of the waypoint, and add todo items.
+* The user can then press the __Set Origin/Add Stopover/Set Waypoint__ button at the bottom of the modal to complete the form.
 
 ### Backend (Django-REST Framework)
 
-The backend is utilised solely as an API, and does not perform the rendering. Django-REST Framework (DRF) was utilised
-for developing views based on database models, using the Create, Read, Update and Delete (CRUD) principle to handle 
-the data. In addition, DRF was also used as serialization of data into JavaScript Object Notation (JSON) was made 
-simpler.
+The backend utilises Django-REST Framework, a Django extension used to develop a Representational State Transfer (REST) API. The backend does not perform any rendering of the data into HTML, but handles the data, serializes them into JSON and providing a response back to the client.
+
+There are several parts in the backend that needs to be discussed, namely:
+- Views
+- Models
+- Serialization
+
+#### Views
+[TODO]
+
+#### Models
+[TODO]
+
+#### Serialization
+[TODO]
 
 To be continued...
-
