@@ -10,6 +10,25 @@ import Trips from './pages/Trips';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications'
 
+// FOR CSRF TOKEN: src: https://docs.djangoproject.com/en/3.2/ref/csrf/
+function getCookie(name) {
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+      const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+  }
+  return cookieValue;
+}
+// Declare CSRF Token
+const csrftoken = getCookie('csrftoken');
+
 export default function App() {
   // Redirects
   var navigate = useNavigate();
@@ -74,7 +93,11 @@ export default function App() {
   function handleLogin(e) {
     // To clear previous user's session
     let url = 'http://127.0.0.1:8000/api/login';
-    let request = new Request(url);
+    let request = new Request(url, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    });
     fetch(request, {
       method: 'POST',
       body: JSON.stringify({
@@ -132,7 +155,11 @@ export default function App() {
   // Handle registering
   const handleRegister = (e) => {
     let url = 'http://127.0.0.1:8000/api/register';
-    let request = new Request(url);
+    let request = new Request(url, {
+      headers: {
+        'X-CSRFToken': csrftoken
+      }
+    });
     fetch(request, {
       method: 'POST',
       body: JSON.stringify({

@@ -16,7 +16,7 @@ export default function CreateTrip(props) {
     const auth_token = sessionStorage.getItem(username);
 
     // Mapbox access token
-    const access_token = 'API_KEY';
+    const access_token = 'YOUR_ACCESS_TOKEN';
 
     // Modal Control
     const [show, setShow] = useState(false);
