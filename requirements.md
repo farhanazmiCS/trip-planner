@@ -1,7 +1,7 @@
 # Requirements
 ## Required Packages
 ### React and Node.js
-This web application uses __`react` v17.0.2`__. To install, follow the instructions below:
+This web application uses __`react` v17.0.2__. To install, follow the instructions below:
 - [Install](https://nodejs.org/en/) the latest version of Node.js and the Node Package Manager (npm).
 - In your terminal, follow the instructions [here](https://reactjs.org/docs/create-a-new-react-app.html#create-react-app) to create a new react application.
 ### React Router
