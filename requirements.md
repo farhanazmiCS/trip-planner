@@ -11,11 +11,12 @@ This web application uses __`react` v17.0.2`__. To install, follow the instructi
 - __`react-bootstrap` v2.0.1__ was used to build the react application's user interface (UI).
 - The react application uses components from the react-bootstrap library. Click [here](https://react-bootstrap.github.io/getting-started/introduction) to learn the steps for installation.
 ### React Bootstrap TypeAhead
-[TODO]
+- `react-bootstrap-typeahead` was used for the user search field in the navigation bar and the location search field in the __WaypointModal__ component.
+- Click [here](https://www.npmjs.com/package/react-bootstrap-typeahead) for the installation guide.
 ### FontAwesome Icon
 - The __FontAwesome Icon__ react library was implemented to gain access to FontAwesome's icons used for the UI.
 - The guide for the installation can be seen [here](https://fontawesome.com/v5.15/how-to-use/on-the-web/using-with/react).
 ### Django
-[TODO]
+- The backend of this web application utilises Django. Click [here](https://www.djangoproject.com/download/) to install.
 ### Django-REST Framework
-[TODO]
+- Django-REST Framework (DRF) is an extension to Django that is used to design and build RESTful APIs. Click [here](https://www.django-rest-framework.org/#installation) for instructions on how to install.
