@@ -150,7 +150,33 @@ There are several parts in the backend that needs to be discussed, namely:
 - Serialization
 
 #### Views
-[TODO]
+The views in the backend are contained in the `views.py` file, which contain several class-based views. Listed below are the views, as well as their associated methods:
+- `TripViewSet`
+  - __list:__ Lists all the logged-on user's trips.
+  - __listOther:__ Lists the trips of a user, given a key (user id) as a parameter.
+  - __retrieve:__ Retrieve a particular trip, given a key (trip id) as a parameter.
+  - __create:__ Create a new trip object.
+  - __addFriendToTrip:__ Add a user object to the __users__ key in a trip object.
+
+- `WaypointViewSet`
+  - __retrieve:__ Retrieve a waypoint object, given a key (waypoind id) as a parameter.
+
+- `TodoViewSet`
+  - __retrieve:__ Retrieve a todo object, given a key (todo id) as a parameter.
+
+- `NotificationViewSet`
+  - __list:__ List all the logged-on user's notifications (Friend requests and trip invites made by other users to the logged-on user).
+  - __listRequestsMadeByMe_friend_request:__ Lists all the friend request notifications that originate from the logged-on user.
+  - __listRequestsMadeByMe_trip_request:__ Lists all the trip invite notifications that originate from the logged-on user.
+  - __create:__ Create a new notification object, originating from the logged-on user.
+  - __delete:__ Delete a notification object. Used when a user accepts or declines a request.
+
+- `LoginView`
+  - __get:__ When a client requests this endpoint with the appropriate authorization headers, the API will provide a response code of `200`. If there are no authorization headers present, `request.user` will return `None` and will return a HTTP status of `400`.
+  - __post:__ Takes the login form and processes it. Returns a user object if matching credentials found, else returns `404` if no user found with the queried username, or `401` if the password is incorrect.
+
+- `LogoutView`
+  - __get:__ Calls the `logout()` function and logs the user out.
 
 #### Models
 [TODO]
