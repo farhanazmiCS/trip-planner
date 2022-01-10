@@ -284,7 +284,8 @@ class NotificationViewSet(viewsets.ModelViewSet):
         return Response(status=200)       
 class LoginView(APIView):
     def get(self, request):
-        return Response(status=200)
+        if request.user != None:    
+            return Response(status=200)
 
     def post(self, request):
         data = json.loads(request.body)
@@ -295,10 +296,16 @@ class LoginView(APIView):
         try:
             User.objects.get(username=username)
         except User.DoesNotExist:
-            content = {
-                'message': f"User of username '{username}' does not exist.",
-                'status': 404
-            }
+            if username == '':
+                content = {
+                    'message': "Username field empty.",
+                    'status': 404
+                }
+            else:
+                content = {
+                    'message': f"User of username '{username}' does not exist.",
+                    'status': 404
+                }
             return Response(content, status=404)
         
         # Authenticate user
@@ -326,9 +333,9 @@ class LoginView(APIView):
                 'user': str(request.user),  # returns AnonymousUser instance if not authenticated
                 'auth': str(request.auth),  # None
                 'message': message,
-                'status': 400
+                'status': 401
             }
-            return Response(content, status=400)       
+            return Response(content, status=401)       
 class LogoutView(APIView):
     def get(self, request):
         logout(request)
