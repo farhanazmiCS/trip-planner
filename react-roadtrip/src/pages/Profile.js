@@ -178,7 +178,9 @@ export default function Profile(props) {
                     {is_requested && 
                         <>
                             <div className="row">
-                                <Button variant="outline-dark">Requested</Button>
+                                <Container className="d-grid gap-2 mt-3">
+                                    <Button variant="outline-dark">Requested</Button>
+                                </Container>
                             </div>
                             <hr />
                             <div className="row">
@@ -190,10 +192,12 @@ export default function Profile(props) {
                     {friends.find(friend => friend) === undefined && !is_requested && 
                         <>
                             <div className="row">
-                                <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
+                                <Container className="d-grid gap-2 mt-3">
+                                    <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
+                                </Container>
                             </div>
                             <hr />
-                            <div className="row">
+                            <div className="row mt-5">
                                 <h1 style={{textAlign: 'center'}}><FontAwesomeIcon icon={faLock} style={{textAlign: 'center'}} /></h1>
                                 <h3 style={{textAlign: 'center'}}>This profile is private.</h3>
                             </div>
@@ -202,9 +206,14 @@ export default function Profile(props) {
                     {friends.find(friend => friend) === true && 
                         <>
                             <div className="row">
-                                <Button onClick={() => unFriend(profile)} variant="outline-dark">Unfriend</Button>
+                                <Container className="d-grid gap-2 mt-3">
+                                    <Button onClick={() => unFriend(profile)} variant="outline-dark">Unfriend</Button>
+                                </Container>
                             </div>
                             <hr />
+                            <Container className="d-grid gap-2 mb-2">
+                                <h3 style={{fontWeight: 'bolder'}}>{profile.username[0].toUpperCase() + profile.username.slice(1)}'s Trips</h3>
+                            </Container>
                             {profileTrips.map(trip => (
                                 <Link style={{textDecoration: 'none'}} to={`/trips/${trip.id}`} key={trip.id}>
                                     <Container key={`trips-${trip.id}`} className="d-grid gap-2">
@@ -215,6 +224,11 @@ export default function Profile(props) {
                                     </Container>
                                 </Link>
                             ))}
+                            {profileTrips.length === 0 && 
+                                <Container className="d-grid gap-2 mt-5">
+                                    <h2 style={{textAlign: 'center', color: 'grey'}}>No Trips :/</h2>
+                                </Container>
+                            }
                         </>
                     }
                 </Container>
@@ -246,6 +260,9 @@ export default function Profile(props) {
                         </div>
                     </div>
                     <hr />
+                    <Container className="mb-3">
+                        <h3 style={{fontWeight: 'bolder'}}>Your Trips</h3>
+                    </Container>
                     {props.myTrips.map(trip => (
                         <Link style={{textDecoration: 'none'}} to={`/trips/${trip.id}`} key={trip.id}>
                             <Container key={`trips-${trip.id}`} className="d-grid gap-2">
