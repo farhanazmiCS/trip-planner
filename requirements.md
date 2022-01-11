@@ -20,3 +20,5 @@ This web application uses __`react` v17.0.2__. To install, follow the instructio
 - The backend of this web application utilises Django. Click [here](https://www.djangoproject.com/download/) to install.
 ### Django-REST Framework
 - Django-REST Framework (DRF) is an extension to Django that is used to design and build RESTful APIs. Click [here](https://www.django-rest-framework.org/#installation) for instructions on how to install.
+### Django CORS Headers
+- Used to allow other sites to make requests the Django API endpoint. Click [here](https://pypi.org/project/django-cors-headers/) to install.
