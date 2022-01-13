@@ -154,7 +154,7 @@ export default function App() {
 
   // Handle registering
   const handleRegister = (e) => {
-    let url = 'http://127.0.0.1:8000/register';
+    let url = 'http://127.0.0.1:8000/users/register';
     let request = new Request(url, {
       headers: {
         'X-CSRFToken': csrftoken
