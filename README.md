@@ -182,7 +182,52 @@ The views in the backend are contained in the `views.py` file, which contain sev
   - __get:__ Calls the `logout()` function and logs the user out.
 
 #### Models
-[TODO]
+The models that are defined in this web application are listed below:
+- __User__
+- __Trip__
+- __Waypoint__
+- __Todo__
+- __Notification__
+
+__User__
+
+The __User__ model inherits from the `AbstractUser` class which contain attributes such as username and email. Additionally, the model also feature attributes such as friends, a `many-to-many` field, as well as friendCounter and tripCounter, both of which are `integerField`s.
+
+__Trip__
+
+The __Trip__ model features a few attributes which will be explained below:
+
+- __name:__ A `charField` instance describing the name of the trip.
+- __origin:__ Has a `many-to-one` relation to a __Waypoint__ object, describing the attributes of the origin.
+- __destination:__ Has a `many-to-one` relation to a __Waypoint__ object, describing the attributes of the destination.
+- __waypoint:__ Has a `many-to-many` relationship to multiple __Waypoint__ objects, describing the attributes of the stopovers.
+- __users:__ Has a `many-to-many` relationship to multiple __User__ objects. The __users__ in a trip describe the users that are following a particular trip.
+
+__Waypoint__
+
+The __Waypoint__ model describes the attribute of each waypoint object:
+
+- __text:__ A `charField` instance. Describes the name of the location, but shortened.
+- __place_name:__ A `charField` instance. Describes the name of the location in detail.
+- __longitude:__ A `DecimalField` instance describing the longitude data of the location.
+- __latitude:__ A `DecimalField` instance describing the latitude data of the location.
+- __dateTimeFrom:__ A `DateTimeField` instance describing the date and time where the user begins being at the waypoint.
+- __dateTimeTo:__ A `DateTimeField` instance describing the date and time where the user ends being at the waypoint.
+- __todo:__ Has a `many-to-many` relationship to multiple __Todo__ objects.
+
+__Todo__
+
+Each __Todo__ object contain a single attribute __task__, a `textField` instance.
+
+__Notification__
+
+The __Notification__ model describes the attribute of each notification object:
+
+- __frm:__ Has a `many-to-one` relation with a user object. This user object is the sender.
+- __to:__ Has a `many-to-one` relation with a user object. This user object is the recipient.
+- __isAddFriend:__ A `booleanField` attribute. If `True`, this notification object is a friend request.
+- __isInviteToTrip:__ A `booleanField` attribute. If `True`, this notification object is a trip invitation.
+- __trip:__ Has a `many-to-one` relation with a trip object. If the __isInviteToTrip__ attribute is `True`, a notification object will be sent to the recipient with the related trip object.
 
 #### Serialization
 [TODO]
