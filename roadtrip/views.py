@@ -47,7 +47,7 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
-    @action(methods=['post'], detail=False)
+    @action(methods=['POST'], detail=False)
     def register(self, request):
         data = json.loads(request.body)
         # Retrieve fields

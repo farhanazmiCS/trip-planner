@@ -11,10 +11,10 @@ export default function Notifications(props) {
         let accepter = props.users.find(user => user.username === request.to.username);
         let requester = props.users.find(user => user.username === request.frm.username);
         // Url endpoints for amending accepter and requester friends list
-        let urlAccepter = `http://127.0.0.1:8000/users/${accepter.id}/add_friend`;
-        let urlRequester = `http://127.0.0.1:8000/users/${requester.id}/add_friend`;
+        let urlAccepter = `http://127.0.0.1:8000/users/${accepter.id}/add_friend/`;
+        let urlRequester = `http://127.0.0.1:8000/users/${requester.id}/add_friend/`;
         // Url endpoint for deleting the notification
-        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification`;
+        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification/`;
         // Initialising new Requests
         let requestAddFriendToAccepterFriendList = new Request(urlAccepter, {
             headers: {
@@ -67,7 +67,7 @@ export default function Notifications(props) {
     }
     function declineFriendRequest(request, index) {
         // For declining friend request, simply delete the notification object.
-        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification`;
+        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification/`;
         let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
@@ -82,14 +82,14 @@ export default function Notifications(props) {
     }
     function acceptTripRequest(request, index) {
         // To add user in the trip object
-        let url = `http://127.0.0.1:8000/trips/${request.trip.id}/add_friend_to_trip`;
+        let url = `http://127.0.0.1:8000/trips/${request.trip.id}/add_friend_to_trip/`;
         let addUserToTrip = new Request(url, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
             }
         })
         // To delete the notification object
-        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification`;
+        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification/`;
         let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,
@@ -183,7 +183,7 @@ export default function Notifications(props) {
         })
     }
     function declineTripRequest(request, index) {
-        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification`;
+        let urlDeleteNotification = `http://127.0.0.1:8000/notifications/${request.id}/delete_notification/`;
         let deleteNotificationObjectAfterAction = new Request(urlDeleteNotification, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`,

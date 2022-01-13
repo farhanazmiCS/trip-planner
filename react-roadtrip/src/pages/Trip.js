@@ -74,7 +74,7 @@ export default function Trip(myTripInviteRequests) {
     }
     // Function to invite friends to the trip
     function inviteFriend(friend, index) {
-        let url = `http://127.0.0.1:8000/notifications/send_request`;
+        let url = `http://127.0.0.1:8000/notifications/send_request/`;
         let request = new Request(url, {
             'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
         })

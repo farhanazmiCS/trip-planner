@@ -218,7 +218,7 @@ export default function CreateTrip(props) {
 
     // Create waypoint event handler
     const addStopover = () => {
-        if (waypoints.length === 1) {
+        if (waypoints.find(waypoint => waypoint.type === 'destination') === undefined) {
             waypoints.push({
                 type: 'stopover',
                 dateFrom: dateFrom,
@@ -232,7 +232,7 @@ export default function CreateTrip(props) {
                 latitude: singleOption[0].latitude
             })
         }
-        else {
+        else if (waypoints.find(waypoint => waypoint.type === 'destination') === 'destination') {
             waypoints.splice(waypoints.length - 1, 0, {
                 type: 'stopover',
                 dateFrom: dateFrom,
@@ -338,7 +338,7 @@ export default function CreateTrip(props) {
     // Save the trip
     const saveTrip = (e) => {
         let request = new Request(
-            'http://127.0.0.1:8000/trips/save_trip', {
+            'http://127.0.0.1:8000/trips/save_trip/', {
                 headers: {
                     'Authorization': `Token ${auth_token}`
                 }
