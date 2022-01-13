@@ -194,7 +194,7 @@ export default function App() {
     let user = sessionStorage.getItem('username');
     if (!user) return;
     // Defining the url endpoints to fetch auth status, data, users, and notifications
-    let url = 'http://127.0.0.1:8000/login';
+    let url = 'http://127.0.0.1:8000/api/login';
     let urlTrips = 'http://127.0.0.1:8000/trips';
     let urlUsers = 'http://127.0.0.1:8000/users';
     let urlNotifications = 'http://127.0.0.1:8000/notifications';

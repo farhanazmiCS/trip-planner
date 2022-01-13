@@ -303,8 +303,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
 class LoginView(APIView):
     def get(self, request):
-        if request.user != None:    
-            return Response(status=200)
+        return Response(status=200)
 
     def post(self, request):
         data = json.loads(request.body)
