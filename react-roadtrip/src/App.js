@@ -92,7 +92,7 @@ export default function App() {
   // Handle Login
   function handleLogin(e) {
     // To clear previous user's session
-    let url = 'https://roadtrip-django-backend.herokuapp.com/api/login';
+    let url = 'http://127.0.0.1:8000/api/login';
     let request = new Request(url, {
       headers: {
         'X-CSRFToken': csrftoken
@@ -131,7 +131,7 @@ export default function App() {
   
   // Function to handle logout
   function handleLogout() {
-    let url = 'https://roadtrip-django-backend.herokuapp.com/api/logout';
+    let url = 'http://127.0.0.1:8000/api/logout';
     let request = new Request(url);
     fetch(request)
     .then(() => {
@@ -154,7 +154,7 @@ export default function App() {
 
   // Handle registering
   const handleRegister = (e) => {
-    let url = 'https://roadtrip-django-backend.herokuapp.com/register';
+    let url = 'http://127.0.0.1:8000/register';
     let request = new Request(url, {
       headers: {
         'X-CSRFToken': csrftoken
@@ -194,12 +194,12 @@ export default function App() {
     let user = sessionStorage.getItem('username');
     if (!user) return;
     // Defining the url endpoints to fetch auth status, data, users, and notifications
-    let url = 'https://roadtrip-django-backend.herokuapp.com/login';
-    let urlTrips = 'https://roadtrip-django-backend.herokuapp.com/trips';
-    let urlUsers = 'https://roadtrip-django-backend.herokuapp.com/users';
-    let urlNotifications = 'https://roadtrip-django-backend.herokuapp.com/notifications';
-    let urlMyRequestsFriends = 'https://roadtrip-django-backend.herokuapp.com/notifications/my_requests_friends';
-    let urlMyRequestsTrips = 'https://roadtrip-django-backend.herokuapp.com/notifications/my_requests_trips';
+    let url = 'http://127.0.0.1:8000/login';
+    let urlTrips = 'http://127.0.0.1:8000/trips';
+    let urlUsers = 'http://127.0.0.1:8000/users';
+    let urlNotifications = 'http://127.0.0.1:8000/notifications';
+    let urlMyRequestsFriends = 'http://127.0.0.1:8000/notifications/my_requests_friends';
+    let urlMyRequestsTrips = 'http://127.0.0.1:8000/notifications/my_requests_trips';
     // Initialize requests (For auth status and data)
     let request = new Request(url, {
       headers: {

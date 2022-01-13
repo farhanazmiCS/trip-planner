@@ -38,7 +38,7 @@ export default function Profile(props) {
     useEffect(() => {
         if (friends.find(friend => friend) === undefined) return;
         else {
-            let profileTripsUrl = `https://roadtrip-django-backend.herokuapp.com/trips/${profile.id}/list_other_trip`;
+            let profileTripsUrl = `http://127.0.0.1:8000/trips/${profile.id}/list_other_trip`;
             let requestProfileTrips = new Request(profileTripsUrl, {
                 headers: {
                     'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
@@ -104,7 +104,7 @@ export default function Profile(props) {
     }, [props, profile.id, props.users]);
     // Add Friend button handler
     function addFriend() {
-        let url = 'https://roadtrip-django-backend.herokuapp.com/notifications/send_request';
+        let url = 'http://127.0.0.1:8000/notifications/send_request';
         let request = new Request(url, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(username)}`
@@ -129,7 +129,7 @@ export default function Profile(props) {
     }
     // Remove Friend
     function unFriend(user) {
-        let url = `https://roadtrip-django-backend.herokuapp.com/users/${user.id}/remove_friend`;
+        let url = `http://127.0.0.1:8000/users/${user.id}/remove_friend`;
         let request = new Request(url, {
             headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
@@ -139,7 +139,7 @@ export default function Profile(props) {
             method: 'DELETE'
         })
         .then(() => {
-            let urlUpdateUsers = 'https://roadtrip-django-backend.herokuapp.com/users';
+            let urlUpdateUsers = 'http://127.0.0.1:8000/users';
             let requestUpdateUsers = new Request(urlUpdateUsers);
             fetch(requestUpdateUsers)
             .then(res => res.json())
