@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Collapse, Button, Card } from 'react-bootstrap';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -18,6 +18,9 @@ function getTrip(trips, id) {
 }
 
 export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) {
+    // To redirect back 
+    const navigate = useNavigate();
+   
     // Users
     const users = JSON.parse(sessionStorage.getItem('users'));
 
@@ -92,15 +95,15 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
         })
         .then(() => {
             const toSetButtonProp = {
-                content: `Invite sent to ${friend.username[0].toUpperCase() + friend.username.slice(1)}!`,
+                content: `${friend.username[0].toUpperCase() + friend.username.slice(1)} invited!`,
                 variant: 'outline-dark'
             }
             // Copy
-            const inviteBtnVarCopy = [...inviteBtnVar];
-            const inviteBtnContentCopy = [...inviteBtnContent];
+            let inviteBtnVarCopy = [...inviteBtnVar];
+            let inviteBtnContentCopy = [...inviteBtnContent];
             // Amendments to array
-            inviteBtnVarCopy.splice(index, 1, toSetButtonProp.variant);
-            inviteBtnContentCopy.splice(index, 1, toSetButtonProp.content);
+            inviteBtnVarCopy[index] = toSetButtonProp.variant
+            inviteBtnContentCopy[index] = toSetButtonProp.content
             // Set the array to new properties
             setInviteBtnContent(inviteBtnContentCopy);
             setInviteBtnVar(inviteBtnVarCopy);
@@ -132,13 +135,13 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
         })
         .catch(error => console.log(error));
     }
-    useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests]);
+    useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
     return (
         <Container key={trip.id}>
             <div className="d-flex justify-content-between" style={{paddingTop: '10px', paddingBottom: '0px'}}>
-                <Link style={{textDecoration: 'none', fontSize: '18px'}} to="/trips" ><FontAwesomeIcon icon={faChevronLeft} /> Back to Trips</Link>
+                <h5 className="pt-2" style={{textDecoration: 'none', fontSize: '18px'}} onClick={() => navigate(-1)} ><FontAwesomeIcon icon={faChevronLeft} /> Back to Trips</h5>
                 {/* Invite friends functionality */}
-                {!collapse && trip.users.find(user => user.username === sessionStorage.getItem('username')) && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px'}}><FontAwesomeIcon icon={faPlus} /> Add friends to trip</Button>}
+                {!collapse && trip.users.find(user => user.username === sessionStorage.getItem('username')) && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'black'}}><FontAwesomeIcon icon={faPlus} /> Add friends to trip</Button>}
                 {collapse && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'red'}}><FontAwesomeIcon icon={faTimes} /> Cancel</Button>}
             </div>
             <Collapse in={collapse}>

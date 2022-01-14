@@ -55,7 +55,13 @@ export default function Profile(props) {
         })
         .then(() => {
             // If check returns undefined, no requests are made to this user.
-            const check = props.myFriendRequests.find(fr => fr.user.username === profile.username);
+            if (props.myFriendRequests.length === 0) {
+                var friend_requests = JSON.parse(sessionStorage.getItem('my_friend_requests'));
+                var check = friend_requests.find(fr => fr.user.username === profile.username);
+            }
+            else {
+                check = props.myFriendRequests.find(fr => fr.user.username === profile.username);
+            }
             if (check !== undefined) {
                 setIsRequested(true);
                 setButtonVariant('outline-dark');
@@ -208,6 +214,7 @@ export default function Profile(props) {
                             <h4 style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
                         </div>
                     </div>
+                    {/* If friend request is sent */}
                     {isRequested && 
                         <>
                             <div className="row">
@@ -222,6 +229,7 @@ export default function Profile(props) {
                             </div>
                         </>
                     }
+                    {/* If friend request is NOT sent, not a friend of the logged user */}
                     {friends.find(friend => friend) === undefined && !isRequested && 
                         <>
                             <div className="row">
@@ -236,6 +244,7 @@ export default function Profile(props) {
                             </div>
                         </>
                     }
+                    {/* Is a friend of logged user */}
                     {friends.find(friend => friend) === true && 
                         <>
                             <div className="row">
