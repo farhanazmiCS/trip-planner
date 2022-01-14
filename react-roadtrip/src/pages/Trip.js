@@ -17,7 +17,7 @@ function getTrip(trips, id) {
     );
 }
 
-export default function Trip(myTripInviteRequests) {
+export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) {
     // Users
     const users = JSON.parse(sessionStorage.getItem('users'));
 
@@ -40,19 +40,22 @@ export default function Trip(myTripInviteRequests) {
     }
     // Friends that are yet to be invited
     var toInvite = [...user.friends];
+    // Iterate through the user's friends list
     for (let i = 0; i < toInvite.length; i++) {
-        for (let j = 0; j < trip.users.length; j++) {
-            if (toInvite[i].id === trip.users[j].id) {
-                toInvite[i] = undefined;
-                break;
-            }
+        // For every friend, check if that friend is in the trip.
+        if (trip.users.find(user => toInvite[i].username === user.username) !== undefined) {
+            toInvite[i] = undefined;
         }
     }
     // Places all 'undefined' elements to the back to remove them
     toInvite.sort();
     // Remove all undefined elements
     const indexToSplice = toInvite.findIndex(item => item === undefined);
-    toInvite.splice(indexToSplice);
+    // When no elements in toInvite is undefined, indexToSplice will be set to -1 (A property of js :/).
+    // Hence, only splice when it is not -1.
+    if (indexToSplice !== -1) {
+        toInvite.splice(indexToSplice);
+    }
 
     function initialiseButtons() {
         var buttonProps = toInvite.map(friend => {
@@ -102,9 +105,34 @@ export default function Trip(myTripInviteRequests) {
             setInviteBtnContent(inviteBtnContentCopy);
             setInviteBtnVar(inviteBtnVarCopy);
         })
+        .then(() => {
+            const url = 'http://127.0.0.1:8000/notifications/my_requests_trips';
+            const request = new Request(url, {
+                headers: {
+                    'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
+                }
+            })
+            fetch(request)
+            .then(res => res.json())
+            .then(body => {
+                const myTripRequests = body.map(m => {
+                    return {
+                        user: {
+                            id: m.to.id,
+                            username: m.to.username,
+                        },
+                        trip: {
+                            id: m.trip.id
+                        }
+                    }
+                })
+                setMyTripInviteRequests(myTripRequests);
+                sessionStorage.setItem('my_trip_requests', JSON.stringify(myTripRequests));
+            })
+        })
         .catch(error => console.log(error));
     }
-    useEffect(initialiseButtons, []);
+    useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests]);
     return (
         <Container key={trip.id}>
             <div className="d-flex justify-content-between" style={{paddingTop: '10px', paddingBottom: '0px'}}>

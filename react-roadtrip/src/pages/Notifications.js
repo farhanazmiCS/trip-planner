@@ -56,8 +56,10 @@ export default function Notifications(props) {
             fetch(requestUpdateUsers)
             .then(res => res.json())
             .then(body => {
-                const users = body.map(user => user)
-                props.setUsers(users);
+                props.setUsers(body);
+                return body;
+            })
+            .then(users => {
                 sessionStorage.setItem('users', JSON.stringify(users));
             })
         })
@@ -176,9 +178,7 @@ export default function Notifications(props) {
                     }
                 })
                 props.setMyTrips(trips);
-                const cached_trips = JSON.parse(sessionStorage.getItem('cached_trips'));
-                cached_trips.concat(trips);
-                sessionStorage.setItem('cached_trips', JSON.stringify(cached_trips));
+                props.setTripCounter(trips.length);
             });
         })
     }

@@ -338,18 +338,27 @@ export default function App() {
     fetch(requests[3])
     .then(res => res.json())
     .then(body => {
-      body.forEach(n => {
-        if (n.is_addFriend === true) {
-          setFriendRequests([...friendRequests, n]);
-        }
-        else {
-          setTripRequests([...tripRequests, n]);
-        }
-      })
+      sessionStorage.setItem('notifications', JSON.stringify(body));
     })
     .then(() => {
-      sessionStorage.setItem('friend_request', JSON.stringify(friendRequests));
-      sessionStorage.setItem('trip_requests', JSON.stringify(tripRequests));
+      const notifications = JSON.parse(sessionStorage.getItem('notifications'));
+      const friend_requests = [];
+      const trip_invites = [];
+      const notification_array = [];
+      notifications.forEach(n => {
+        if (n.is_addFriend === true) {
+          friend_requests.push(n);
+        }
+        else {
+          trip_invites.push(n);
+        }
+      })
+      notification_array.push(friend_requests, trip_invites);
+      return notification_array;
+    })
+    .then(notification_array => {
+      setFriendRequests(notification_array[0]);
+      setTripRequests(notification_array[1]);
     })
   }
 
@@ -442,6 +451,8 @@ export default function App() {
             myTrips={myTrips}
             navigate={navigate}
             myFriendRequests={myFriendRequests}
+            setFriendRequests={setFriendRequests} 
+            setTripRequests={setTripRequests} 
             formatDateTime={formatDateTime}
           />} 
         />
@@ -454,6 +465,7 @@ export default function App() {
             users={users} 
             setUsers={setUsers} 
             setMyTrips={setMyTrips}
+            setTripCounter={setTripCounter}
             formatDateTime={formatDateTime}
           />} 
         />
