@@ -14,6 +14,8 @@ function getUser(users, id) {
 export var trips = [];
 
 export default function Profile(props) {
+    // State of isRequested
+    const [isRequested, setIsRequested] = useState(false);
     // State of "Add Friend" button
     const [buttonVariant, setButtonVariant] = useState('dark');
     const [buttonContent, setButtonContent] = useState('Add Friend');
@@ -27,14 +29,46 @@ export default function Profile(props) {
     
     // Returns an array, if the 'friends' array includes the logged on user's username
     const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'));
+
+    // When isRequested changes (with the click of the 'Add Friend' button),
+    // This script will run. 
+    useEffect(() => {
+        const url = 'http://127.0.0.1:8000/notifications/my_requests_friends';
+        const request = new Request(url, {
+            'headers': {
+                'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
+            }
+        })
+        fetch(request)
+        .then(res => res.json())
+        .then(body => {
+            const myFriendRequests = body.map(m => {
+                return {
+                    user: {
+                      id: m.to.id,
+                      username: m.to.username
+                    }
+                }
+            })
+            props.setMyFriendRequests(myFriendRequests)
+            sessionStorage.setItem('my_friend_requests', JSON.stringify(myFriendRequests))
+        })
+        .then(() => {
+            // If check returns undefined, no requests are made to this user.
+            const check = props.myFriendRequests.find(fr => fr.user.username === profile.username);
+            if (check !== undefined) {
+                setIsRequested(true);
+                setButtonVariant('outline-dark');
+                setButtonContent('Requested');
+            }
+            else {
+                setIsRequested(false);
+                setButtonVariant('dark');
+                setButtonContent('Add Friend');
+            }
+        })
+    }, [isRequested, params.userId])
     
-    // For loop to check if this profile has a friend request sent
-    for (let i = 0; i < props.myFriendRequests.length; i++) {
-        if (profile.username === props.myFriendRequests[i].user.username) {
-            var is_requested = true;
-        }
-        else is_requested = false;
-    }
     useEffect(() => {
         if (friends.find(friend => friend) === undefined) return;
         else {
@@ -121,8 +155,7 @@ export default function Profile(props) {
         .then(res => res.status)
         .then(status => {
             if (status === 200) {
-                setButtonContent('Requested');
-                setButtonVariant('outline-dark');
+                setIsRequested(true);
             }
         })
         .catch(error => console.log(error));
@@ -175,11 +208,11 @@ export default function Profile(props) {
                             <h4 style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
                         </div>
                     </div>
-                    {is_requested && 
+                    {isRequested && 
                         <>
                             <div className="row">
                                 <Container className="d-grid gap-2 mt-3">
-                                    <Button variant="outline-dark">Requested</Button>
+                                    <Button variant={buttonVariant}>{buttonContent}</Button>
                                 </Container>
                             </div>
                             <hr />
@@ -189,7 +222,7 @@ export default function Profile(props) {
                             </div>
                         </>
                     }
-                    {friends.find(friend => friend) === undefined && !is_requested && 
+                    {friends.find(friend => friend) === undefined && !isRequested && 
                         <>
                             <div className="row">
                                 <Container className="d-grid gap-2 mt-3">

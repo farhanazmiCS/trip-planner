@@ -451,6 +451,7 @@ export default function App() {
             myTrips={myTrips}
             navigate={navigate}
             myFriendRequests={myFriendRequests}
+            setMyFriendRequests={setMyFriendRequests}
             setFriendRequests={setFriendRequests} 
             setTripRequests={setTripRequests} 
             formatDateTime={formatDateTime}
