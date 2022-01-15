@@ -20,7 +20,7 @@ function getTrip(trips, id) {
 export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) {
     // To redirect back 
     const navigate = useNavigate();
-   
+
     // Users
     const users = JSON.parse(sessionStorage.getItem('users'));
 
@@ -32,6 +32,8 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
 
     // State of variant of friend invite buttons
     const [inviteBtnVar, setInviteBtnVar] = useState([]);
+
+    const [inviteBtnClick, setInviteBtnClick] = useState([]);
 
     // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
@@ -61,22 +63,25 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
     }
 
     function initialiseButtons() {
-        var buttonProps = toInvite.map(friend => {
+        var buttonProps = toInvite.map((friend, index)  => {
             for (let i = 0; i < myTripInviteRequests.length; i++) {
                 if (friend.id === myTripInviteRequests[i].user.id && trip.id === myTripInviteRequests[i].trip.id) {
                     return {
                         content: `${friend.username[0].toUpperCase() + friend.username.slice(1)} invited!`,
-                        variant: 'outline-dark'
+                        variant: 'outline-dark',
+                        onclick: () => {return;}
                     }
                 }
             }
             return {
                 content: friend.username[0].toUpperCase() + friend.username.slice(1),
-                variant: 'dark'
+                variant: 'dark',
+                onclick: () => inviteFriend(friend, index)
             }
         });
         setInviteBtnVar(buttonProps.map(button => button.variant));
         setInviteBtnContent(buttonProps.map(button => button.content));
+        setInviteBtnClick(buttonProps.map(button => button.onclick));
     }
     // Function to invite friends to the trip
     function inviteFriend(friend, index) {
@@ -96,17 +101,21 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
         .then(() => {
             const toSetButtonProp = {
                 content: `${friend.username[0].toUpperCase() + friend.username.slice(1)} invited!`,
-                variant: 'outline-dark'
+                variant: 'outline-dark',
+                onclick: () => {return;}
             }
             // Copy
             let inviteBtnVarCopy = [...inviteBtnVar];
             let inviteBtnContentCopy = [...inviteBtnContent];
+            let inviteBtnClickCopy = [...inviteBtnClick];
             // Amendments to array
             inviteBtnVarCopy[index] = toSetButtonProp.variant;
             inviteBtnContentCopy[index] = toSetButtonProp.content;
+            inviteBtnClickCopy[index] = toSetButtonProp.onclick;
             // Set the array to new properties
             setInviteBtnContent(inviteBtnContentCopy);
             setInviteBtnVar(inviteBtnVarCopy);
+            setInviteBtnClick(inviteBtnClickCopy);
         })
         .then(() => {
             const url = 'http://127.0.0.1:8000/notifications/my_requests_trips';
@@ -148,7 +157,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                 <div id="my-friends">
                     <h6 className="m-1">Select friends to invite:</h6>
                     {toInvite.map((friend, index) => (
-                        <Button key={friend.id} onClick={() => inviteFriend(friend, index)} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
+                        <Button key={friend.id} onClick={inviteBtnClick[index]} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
                     ))}
                     {toInvite.length === 0 && 
                     <>
