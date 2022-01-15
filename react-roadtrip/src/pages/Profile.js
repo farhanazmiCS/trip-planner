@@ -35,7 +35,7 @@ export default function Profile(props) {
     useEffect(() => {
         const url = 'http://127.0.0.1:8000/notifications/my_requests_friends';
         const request = new Request(url, {
-            'headers': {
+            headers: {
                 'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
             }
         })
@@ -192,7 +192,7 @@ export default function Profile(props) {
         })
         .catch(error => console.log(error));
     }
-    
+
     // Viewing other profiles
     if (profile.username !== sessionStorage.getItem('username')) {
         return (
