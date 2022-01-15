@@ -31,20 +31,21 @@ from django.db import IntegrityError
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
+    serializer_class = UserSerializer
     # To get all users
     def list(self, request):
         # queryset.all() is called to update the trip_counter attribute
         # as the queryset is cached.
         queryset = self.queryset.all()
-        serializer = UserSerializer(queryset, many=True)
+        serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
     # To get an individual user
     @action(methods=['GET'], detail=True)
     def get_user(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         user = get_object_or_404(queryset, pk=pk)
-        serializer = UserSerializer(user)
+        serializer = self.serializer_class(user)
         return Response(serializer.data)
 
     @action(methods=['POST'], detail=False)
@@ -95,7 +96,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # Adding friends
     @action(methods=['PUT'], detail=True)
     def add_friend(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         user = get_object_or_404(queryset, pk=pk)
         data = json.loads(request.body)
         friend = data.get('friend')
@@ -107,7 +108,7 @@ class UserViewSet(viewsets.ModelViewSet):
     # Unfriend
     @action(methods=['DELETE'], detail=True)
     def remove_friend(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         # User objects
         user1 = request.user
         user2 = get_object_or_404(queryset, pk=pk)
@@ -124,6 +125,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.all()
+    serializer_class = TripSerializer
     # View to list all the trips for the logged on user
     def list(self, request):
         try:
@@ -132,14 +134,14 @@ class TripViewSet(viewsets.ModelViewSet):
         except Trip.DoesNotExist:
             return Http404
         
-        serializer = TripSerializer(trips, many=True)
+        serializer = self.serializer_class(trips, many=True)
         return Response(serializer.data)
 
     @action(methods=['GET'], detail=True)
     def get_trip(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         trip = get_object_or_404(queryset, pk=pk)    
-        serializer = TripSerializer(trip)
+        serializer = self.serializer_class(trip)
         return Response(serializer.data)   
 
     # View to list all the trips for other users
@@ -151,7 +153,7 @@ class TripViewSet(viewsets.ModelViewSet):
         except Trip.DoesNotExist:
             return Http404
         
-        serializer = TripSerializer(trips, many=True)
+        serializer = self.serializer_class(trips, many=True)
         return Response(serializer.data)     
        
     # View to save a trip
@@ -208,7 +210,7 @@ class TripViewSet(viewsets.ModelViewSet):
 
     @action(methods=['PUT'], detail=True)
     def add_friend_to_trip(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         user = request.user
         trip = get_object_or_404(queryset, pk=pk)
         # Add user into the trip
@@ -220,24 +222,27 @@ class TripViewSet(viewsets.ModelViewSet):
 
 class WaypointViewSet(viewsets.ModelViewSet):
     queryset = Waypoint.objects.all()
+    serializer_class = WaypointSerializer
     @action(methods=['GET'], detail=True)
     def get_waypoint(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         waypoint = get_object_or_404(queryset, pk=pk)
-        serializer = WaypointSerializer(waypoint)
+        serializer = self.serializer_class(waypoint)
         return Response(serializer.data)
 
 class TodoViewSet(viewsets.ModelViewSet):
     queryset = Todo.objects.all()
+    serializer_class = TodoSerializer
     @action(methods=['GET'], detail=True)
     def get_todo(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         todo = get_object_or_404(queryset, pk=pk)
-        serializer = TodoSerializer(todo)
+        serializer = self.serializer_class(todo)
         return Response(serializer.data)
 
 class NotificationViewSet(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
     # List the notifications of logged on user
     def list(self, request):
         user = request.user 
@@ -245,7 +250,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
             notifications = user.my_notifications.all()
         except Notification.DoesNotExist:
             return Http404
-        serializer = NotificationSerializer(notifications, many=True)
+        serializer = self.serializer_class(notifications, many=True)
         return Response(serializer.data)
 
     # List the notification requests made by the user
@@ -256,7 +261,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
             friend_requests = user.my_requests.filter(is_addFriend=True)
         except Notification.DoesNotExist:
             return Http404
-        serializer = NotificationSerializer(friend_requests, many=True)
+        serializer = self.serializer_class(friend_requests, many=True)
         return Response(serializer.data)
 
     @action(methods=['GET'], detail=False)
@@ -266,7 +271,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
             trip_requests = user.my_requests.filter(is_inviteToTrip=True)
         except Notification.DoesNotExist:
             return Http404
-        serializer = NotificationSerializer(trip_requests, many=True)
+        serializer = self.serializer_class(trip_requests, many=True)
         return Response(serializer.data)
 
     # Sending notification to other user
@@ -297,7 +302,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
     @action(methods=['DELETE'], detail=True)
     def delete_notification(self, request, pk=None):
-        queryset = self.queryset
+        queryset = self.queryset.all()
         notification = get_object_or_404(queryset, pk=pk)
         notification.delete()
         return Response(status=200)       
