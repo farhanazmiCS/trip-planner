@@ -1,5 +1,5 @@
 # Requirements
-## Required Packages
+## Client
 ### React and Node.js
 This web application uses __`react` v17.0.2__. To install, follow the instructions below:
 - [Install](https://nodejs.org/en/) the latest version of Node.js and the Node Package Manager (npm).
@@ -16,6 +16,8 @@ This web application uses __`react` v17.0.2__. To install, follow the instructio
 ### FontAwesome Icon
 - The __FontAwesome Icon__ react library was implemented to gain access to FontAwesome's icons used for the UI.
 - The guide for the installation can be seen [here](https://fontawesome.com/v5.15/how-to-use/on-the-web/using-with/react).
+## Server
+The necessary packages for the server-side are declared in the `requirements.txt` file.
 ### Django
 - The backend of this web application utilises Django. Click [here](https://www.djangoproject.com/download/) to install.
 ### Django-REST Framework
