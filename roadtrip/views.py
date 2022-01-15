@@ -121,6 +121,7 @@ class UserViewSet(viewsets.ModelViewSet):
         user1.save()
         user2.save()
         return Response(status=200)
+
 class TripViewSet(viewsets.ModelViewSet):
     queryset = Trip.objects.all()
     # View to list all the trips for the logged on user
@@ -354,7 +355,8 @@ class LoginView(APIView):
                 'message': message,
                 'status': 401
             }
-            return Response(content, status=401)       
+            return Response(content, status=401)     
+  
 class LogoutView(APIView):
     def get(self, request):
         logout(request)

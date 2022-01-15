@@ -142,6 +142,7 @@ export default function Profile(props) {
             })
         }
     }, [props, profile.id, props.users]);
+
     // Add Friend button handler
     function addFriend() {
         let url = 'http://127.0.0.1:8000/notifications/send_request/';
@@ -166,6 +167,7 @@ export default function Profile(props) {
         })
         .catch(error => console.log(error));
     }
+
     // Remove Friend
     function unFriend(user) {
         let url = `http://127.0.0.1:8000/users/${user.id}/remove_friend/`;
@@ -190,6 +192,7 @@ export default function Profile(props) {
         })
         .catch(error => console.log(error));
     }
+    
     // Viewing other profiles
     if (profile.username !== sessionStorage.getItem('username')) {
         return (

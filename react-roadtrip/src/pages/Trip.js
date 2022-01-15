@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Container, Collapse, Button, Card } from 'react-bootstrap';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -102,8 +102,8 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
             let inviteBtnVarCopy = [...inviteBtnVar];
             let inviteBtnContentCopy = [...inviteBtnContent];
             // Amendments to array
-            inviteBtnVarCopy[index] = toSetButtonProp.variant
-            inviteBtnContentCopy[index] = toSetButtonProp.content
+            inviteBtnVarCopy[index] = toSetButtonProp.variant;
+            inviteBtnContentCopy[index] = toSetButtonProp.content;
             // Set the array to new properties
             setInviteBtnContent(inviteBtnContentCopy);
             setInviteBtnVar(inviteBtnVarCopy);
