@@ -2,7 +2,9 @@
 RoadTrip is a web application that let users plan a road trip. 
 
 ## App Demo
-You can try the app yourself [here](https://roadtrip-react-frontend.herokuapp.com/login)!
+You can try the app yourself [here](https://roadtrip-react-frontend.herokuapp.com/login)! 
+
+__NOTE__: This application will not work with web browsers that utilises Apple's WebKit engine (e.g. Safari on the desktop, all web browsers on iOS and iPadOS) due to the incompatibility with the Fetch API. Hence, this application will only work on non-iOS/iPadOS devices.
 
 ## Video Demo
 [VIDEO DEMO LINK]
