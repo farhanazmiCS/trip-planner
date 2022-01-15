@@ -1,5 +1,5 @@
-# RoadTrip
-RoadTrip is a web application that let users plan a road trip. 
+# Road Trip
+__Road Trip__ is a web application that let users plan a road trip. 
 
 ## App Demo
 You can try the app yourself [here](https://roadtrip-react-frontend.herokuapp.com/login)! 
