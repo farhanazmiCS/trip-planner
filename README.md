@@ -40,10 +40,48 @@ At this point, you're all set! You can now proceed to `http://localhost:3000` (t
 Listed below are the functions and components of the web application necessary for it to function, for both the client
 and server-side.
 
+### Index and App files (JavaScript - React)
+
+#### Index
+The `index.js` file renders the `<App />` component inside the `div` element of id `root` in the `index.html` page by calling the `ReactDom.render` function.
+
+#### App
+The `App.js` file serves as the 'hub' of the React application. It contains the __App__ component, which contain much of the hooks and functions to be used by the __App__ component itself or passed down to it's child components. 
+
+Examples of hooks and functions are the _username_ and _password_ state hooks, both being `useState` hooks that are passed down to the __Login__ component to control the state of the login form fields. To learn out more about the useState hook, click [here](https://reactjs.org/docs/hooks-state.html). 
+
+Another example is the `onLoadorRefresh` function, called by the `useEffect` hook when the state of `isLoggedIn` or `tripCounter` changes. The `useEffect` hook is used as a side effect function, taking a function and a dependency array as arguments. More on the  `useEffect` can be learnt [here](https://reactjs.org/docs/hooks-effect.html).
+
+The __App__ component will return several components. Below is the list of components that is returned by the __App__ component:
+* __NavigationBar:__ Only renders when the `isLoggedIn` state hook is set to `true`.
+
+* __Routes:__ Defines the available route paths with the help of React Router DOM.
+
+  * __Route path `/`:__ Loads the __Home__ component when queried `http://localhost:3000/`.
+  
+  * __Route path `/create-trip`:__ Loads the __CreateTrip__ component when queried `http://localhost:3000/create-trip`.
+  
+  * __Route path `/trips`:__ Loads the __Trips__ component when queried `http://localhost:3000/trips`.
+  
+  * __Route path `/trip/:tripId`:__ Loads a __Trip__ component, given a trip id, when queried `http://localhost:3000/trip/${id}`.
+  
+  * __Route path `/profile/:userId`__ Loads a __Profile__ component, given a user id, when queried `http://localhost:3000/profile/${id}`.
+  
+  * __Route path `/notifications`:__ Loads the __Notifications__ component when queried `http://localhost:3000/notifications`.
+  
+  * __Route path `/login`:__ Loads the __Login__ component when queried `http://localhost:3000/login`.
+  
+  * __Route path `/register`:__ Loads the __Register__ component when queried `http://localhost:3000/register`.
+  
+  * __Route path `/logout`:__ Loads the __Logout__ component when queried `http://localhost:3000/logout`.
+  
+  * __Route path `*`:__ A wildcard route for a route that is not defined by any of the routes listed above.
+
 ### Pages (JavaScript - React)
 
 The following items are the "pages" of the web application. They are ultimately React components.
 
+* Home
 * Login
 * Register
 * CreateTrip
@@ -52,8 +90,11 @@ The following items are the "pages" of the web application. They are ultimately 
 * Profile
 * Notifications
 
+#### Home
+Depending on the state of the `isLoggedIn` state hook passed from the __App__ component, the __Home__ component, defined in the `Home.js` file, re-routes the user to the __Login__ page or the __Trips__ page, with the help of React Router.
+
 #### Login
-* The `Login` component renders the login form, containing the password and input fields.
+* The __Login__ component is defined in the `Login.js` file, rendering the login form containing the password and input fields.
 
 * The __Login__ button, when clicked, calls the `handleLogin` function, a function 'prop' that is property passed down from the parent component `App`.
 
@@ -64,7 +105,7 @@ The following items are the "pages" of the web application. They are ultimately 
 * The user can also click the sentence below the __Login__ button to create an account if the user does not have one.
 
 #### Register 
-* The `Register` component renders the registration form, containing the email, username, password and confirm password fields.
+* The __Register__ component is defined in the `Register.js` file, rendering the registration form containing the email, username, password and confirm password fields.
 
 * The __Register__ button, when clicked, calls the `handleRegister` function, which handles the submission of the form data to the backend as JSON payload.
 
@@ -73,7 +114,7 @@ The following items are the "pages" of the web application. They are ultimately 
 * The user can click the sentence below the __Register__ button to be redirected to the login page if the user already has an account.
 
 #### CreateTrip
-* The `CreateTrip` component renders the page that allows the user to create a new trip. 
+* The __CreateTrip__ component is defined in the `CreateTrip.js` file and renders the page that allows the user to create a new trip. 
 
 * When this page is loaded, the name of the trip, by default, is set to 'Trip Name'. On the right of it is an edit button, a pencil icon, when clicked or pressed, will change the header to an input field, allowing the user to change the name of the trip.
 
@@ -86,19 +127,19 @@ The following items are the "pages" of the web application. They are ultimately 
 * The user can then save the trip by clicking or pressing the __Save Trip__ button, which will submit the data as JSON to the back-end for processing. If successful, the user will be redirected back to the __Trips__ page, with the new trip being displayed in the page.
 
 #### Trips
-* The `Trips` component renders the page that displays all of the user's trips.
+* The __Trips__ component is defined in the `Trips.js` file that renders all of the user's trips.
 
 * The user can click or press any of the trips to view more information of the trip, which will direct them to the __Trip__ page.
 
 #### Trip
-* The `Trip` component renders the page that displays information about a particular trip.
+* The __Trip__ component is defined in the `Trip.js` file, displaying information about a particular trip.
 
 * Information such as the __Trip Name__, __Origin__ waypoint, __Stopover__ waypoints, __Destination__ waypoints as well as their associated data are displayed in this page.
 
 * If the user is in the trip that he or she is viewing, the user can invite friends into the trip by clicking or pressing the __Invite Friends__ button located at the top right corner of the page. 
 
 #### Profile 
-* The `Profile` component renders the page that displays information about a queried user.
+* The __Profile__ component is defined in the `Profile.js` file, displaying information about a queried user.
 
 * In this page, the __username__ of the user is displayed at the top middle. Below it displays the __trip count (shown as Trips)__ and __friend count (shown as Friends)__.
 
@@ -123,7 +164,7 @@ The following items are the "pages" of the web application. They are ultimately 
    <br />
  
 #### Notifications 
-* The `Notifications` component renders the page that displays notifications from other users.
+* The __Notifications__ component is defined in the `Notifications.js` file. It displays notifications from other users.
 
 * The user may receive two different types of notifications, a __trip invite__ or a __friend request__.
 
@@ -145,7 +186,7 @@ They are utilised by the "pages".
 * WaypointModal
 
 #### NavigationBar
-* The `NavigationBar` component renders the navigation bar at the top of the page when the user is logged in.
+* The __NavigationBar__ component is defined in the `NavigationBar.js` file. It renders the navigation bar at the top of the page when the user is logged in.
 * The navigation bar can be used to navigate through the web application, such as:
 
   1. __Trips__ page
@@ -156,7 +197,7 @@ They are utilised by the "pages".
   6. __Logout__ button
 
 #### Todo
-* `Todo` component is a form input field that is part of the `WaypointModal` component, used for the user to add todo items in every waypoint object.
+* The __Todo__ component is defined in the `Todo.js` file. It takes the form of an input field that is part of the __WaypointModal__ component, used for the user to add todo items in every waypoint object.
 
 * The user can add as many todo items as they desire, as demonstrated in the gif below:
  <div align="center">
@@ -165,14 +206,14 @@ They are utilised by the "pages".
  <br />
  
 #### Waypoint
-* The `Waypoint` component is used to display the information of a particular waypoint.
+* The __Waypoint__ component is defined in the `Waypoint.js` file and displays the information of a particular waypoint.
 
 * Information such as location, date and time, and todo items are displayed in this component.
 
 * It is rendered using a __Card__ component as defined in the React-Bootstrap library.
 
 #### WaypointModal
-* The `WaypointModal` component displays a bootstrap modal component when the user presses or clicks the __Set Origin/Add Stopover/Set Destination__ button in the __CreateTrip__ page.
+* The __WaypointModal__ component is defined in the `WaypointModal.js` file. It displays a bootstrap modal component when the user presses or clicks the __Set Origin/Add Stopover/Set Destination__ button in the __CreateTrip__ page.
 
 * In the modal contains a form containing input fields that allows the user to query for a specific location, set the date and time period of the waypoint, and add todo items.
 
