@@ -8,15 +8,15 @@ class User(AbstractUser):
     tripCounter = models.IntegerField(default=0)
 
 class Trip(models.Model):
-    name = models.TextField(max_length=500, unique=True)
+    name = models.TextField(unique=True)
     origin = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True, related_name='origin')
     destination = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True, related_name='destination')
     waypoint = models.ManyToManyField('Waypoint', related_name='waypoint')
     users = models.ManyToManyField(User, related_name='trip')
 
 class Waypoint(models.Model):
-    text = models.TextField(max_length=1000, null=True)
-    place_name = models.TextField(max_length=1000, null=True)
+    text = models.TextField(null=True)
+    place_name = models.TextField(null=True)
     longitude = models.DecimalField(decimal_places=4, max_digits=10, null=True)
     latitude = models.DecimalField(decimal_places=4, max_digits=10, null=True)
     dateTimeFrom = models.DateTimeField(default=None, null=True)
