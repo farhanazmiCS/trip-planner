@@ -183,39 +183,80 @@ They are utilised by the "pages".
 The backend utilises Django-REST Framework, a Django extension used to develop a Representational State Transfer (REST) API. The backend does not perform any rendering of the data into HTML, but handles the data, serializes them into JSON and providing a response back to the client.
 
 There are several parts in the backend that needs to be discussed, namely:
-- Views
-- Models
-- Serialization
+- Settings `capstone/capstone/settings.py`
+
+- Validators `capstone/capstone/validators.py`
+
+- Views `capstone/roadtrip/views.py`
+
+- Models `capstone/roadtrip/models.py`
+
+- Serialization `capstone/roadtrip/serializers.py`
+
+- URL routing `capstone/roadtrip/urls.py`
+
+#### Settings
+The `settings.py` file sets the parameters of the application. Listed below are some parameters modified for use in this application:
+- `ALLOWED_HOSTS`: Defines the servers that can host the backend.
+
+- `AUTH_USER_MODEL`: Defines the model for user authentication.
+
+- `CORS_ALLOWED_ORIGINS`: Defines the url that can make requests to the backend.
+
+- `INSTALLED_APPS`: Defines the apps that are installed in this Django project. The additional apps are listed below:
+    - _roadtrip_: The app as well as it's files lies in this directory
+ 
+    - _rest_framework_: For Django REST Framework
+ 
+    - _rest_framework.authtoken_: For DRF token authentication
+   
+    - _corsheaders_: To enable CORS requests 
+
+- `AUTH_PASSWORD_VALIDATORS`: Defines the password validators used when a password is being created for a user. On top of the usual validators included by default in Django, an additional validator, `MandatoryCharacterValidator`, is defined. This will be further explained in the __Validators__ section.
+
+#### Validators
+The additional validator class, `MandatoryCharacterValidator`, is defined in the `validators.py` file.
 
 #### Views
 The views in the backend are contained in the `views.py` file, which contain several class-based views. Listed below are the views, as well as their associated methods:
+- `UserViewSet`
+  - __list:__ List down all the users.
+  
+  - __get_user:__ Retrieves the information of a particular user.
+
+  - __register:__ Create a new account.
+
+  - __add_friend:__ Adds a user to the logged-on user's friends list.
+
+  - __remove_friend:__ Removes a user from the logged-on user's friends list.
+
 - `TripViewSet`
   - __list:__ Lists all the logged-on user's trips.
   
-  - __listOther:__ Lists the trips of a user, given a key (user id) as a parameter.
+  - __list_other_trip:__ Lists the trips of a user, given a key (user id) as a parameter.
   
-  - __retrieve:__ Retrieve a particular trip, given a key (trip id) as a parameter.
+  - __get_trip:__ Retrieve a particular trip, given a key (trip id) as a parameter.
   
-  - __create:__ Create a new trip object.
+  - __save_trip:__ Create a new trip object.
  
-  - __addFriendToTrip:__ Add a user object to the __users__ key in a trip object.
+  - __add_friend_to_trip:__ Add a user object to the __users__ key in a trip object.
 
 - `WaypointViewSet`
-  - __retrieve:__ Retrieve a waypoint object, given a key (waypoind id) as a parameter.
+  - __get_waypoint:__ Retrieve a waypoint object, given a key (waypoind id) as a parameter.
 
 - `TodoViewSet`
-  - __retrieve:__ Retrieve a todo object, given a key (todo id) as a parameter.
+  - __get_todo:__ Retrieve a todo object, given a key (todo id) as a parameter.
 
 - `NotificationViewSet`
   - __list:__ List all the logged-on user's notifications (Friend requests and trip invites made by other users to the logged-on user).
  
-  - __listRequestsMadeByMe_friend_request:__ Lists all the friend request notifications that originate from the logged-on user.
+  - __my_requests_friends:__ Lists all the friend request notifications that originate from the logged-on user.
  
-  - __listRequestsMadeByMe_trip_request:__ Lists all the trip invite notifications that originate from the logged-on user.
+  - __my_requests_trips:__ Lists all the trip invite notifications that originate from the logged-on user.
  
-  - __create:__ Create a new notification object, originating from the logged-on user.
+  - __send_request:__ Create a new notification object, originating from the logged-on user.
 
-  - __delete:__ Delete a notification object. Used when a user accepts or declines a request.
+  - __delete_notification:__ Delete a notification object. Used when a user accepts or declines a request.
 
 - `LoginView`
   - __get:__ When a client requests this endpoint with the appropriate authorization headers, the API will provide a response code of `200`. If there are no authorization headers present, `request.user` will return `None` and will return a HTTP status of `400`.
