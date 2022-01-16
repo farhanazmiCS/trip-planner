@@ -175,12 +175,14 @@ export default function App() {
           sessionStorage.setItem(body['username'], body['token']);
           sessionStorage.setItem('username', body['username']);
           setIsLoggedIn(true);
+          setError(null);
         });
         navigate('/trips');
       }
       else {
         response.json().then(body => {
           const error = body['error'];
+          console.log(typeof error);
           setError(error);
         })
       }

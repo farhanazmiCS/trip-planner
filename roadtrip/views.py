@@ -25,7 +25,7 @@ from .models import Notification, User, Trip, Waypoint, Todo
 from .serializers import NotificationSerializer, TodoSerializer, UserSerializer, TripSerializer, WaypointSerializer
 from roadtrip import serializers
 
-from django.contrib.auth.password_validation import password_validators_help_text_html, validate_password
+from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
 from django.db import IntegrityError
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
@@ -59,7 +59,8 @@ class UserViewSet(viewsets.ModelViewSet):
         # Check if passwords match
         if password != confirm:
             response = {
-                'error': 'Passwords must match!'
+                'error': 'Passwords must match!',
+                'status': 400
             }
             return Response(response, status=400)
         # Validate password
@@ -67,7 +68,8 @@ class UserViewSet(viewsets.ModelViewSet):
             validate_password(password)
         except ValidationError:
             response = {
-                'error': password_validators_help_text_html
+                'error': password_validators_help_texts(),
+                'status': 400
             }
             return Response(response, status=400)
         # Create user instance
@@ -80,7 +82,8 @@ class UserViewSet(viewsets.ModelViewSet):
             user.save()
         except IntegrityError:
             response = {
-                'error': f'Username of name {username} already exists!'
+                'error': f'Username of name {username} already exists!',
+                'status': 400
             }
             return Response(response, status=400)
         # Create token for user
@@ -89,7 +92,8 @@ class UserViewSet(viewsets.ModelViewSet):
         login(request, user)
         response = {
             'username': request.user.username,
-            'token': token.key
+            'token': token.key,
+            'status': 200
         }
         return Response(response, status=200)
 
@@ -168,7 +172,8 @@ class TripViewSet(viewsets.ModelViewSet):
             trip.save()
         except IntegrityError:
             response = {
-                'error': f'''The title '{data["tripName"]}' has already been used.'''
+                'error': f'''The title '{data["tripName"]}' has already been used.''',
+                'status': 400
             }
             return Response(response, status=400)
         trip.users.add(request.user)

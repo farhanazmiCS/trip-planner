@@ -39,9 +39,19 @@ export default function Register(props) {
                     <Button variant="dark" type="submit">Register</Button>
                 </div>
 
-                {props.error && <div className="mt-3" style={{textAlign: 'center'}}>
+                {props.error !== null && typeof props.error === 'string' && <div className="mt-3" style={{textAlign: 'center'}}>
                     <p style={{color: 'red'}}>{props.error}</p>
                 </div>}
+                {props.error !== null && typeof props.error === 'object' && 
+                    <div className="mt-4 p-3" style={{ border: '2px solid grey', borderRadius: '7px' }}>
+                        <h4 style={{ color: 'grey'}}>Some tips for choosing a password:</h4>
+                        {props.error.map(e => (
+                            <ul>
+                                <li style={{color: 'red'}}>{e}</li>
+                            </ul>
+                        ))}
+                    </div>
+                }
             </Form>
             <div className="mt-3">
                 <Link onClick={() => {

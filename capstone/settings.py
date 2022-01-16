@@ -122,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MandatoryCharacterValidator',
+        'NAME': 'capstone.validators.MandatoryCharacterValidator',
     },
 ]
 
