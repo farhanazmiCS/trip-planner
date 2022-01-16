@@ -212,7 +212,7 @@ The `settings.py` file sets the parameters of the application. Listed below are 
    
     - _corsheaders_: To enable CORS requests 
 
-- `AUTH_PASSWORD_VALIDATORS`: Defines the password validators used when a password is being created for a user. On top of the usual validators included by default in Django, an additional validator, `MandatoryCharacterValidator`, is defined. This will be further explained in the __Validators__ section.
+- `AUTH_PASSWORD_VALIDATORS`: Defines the password validators used when a password is being created for a user. On top of the default validator classes included in Django, an additional validator class, `MandatoryCharacterValidator`, is defined. This will be further explained in the __Validators__ section.
 
 #### Validators
 The additional validator class, `MandatoryCharacterValidator`, is defined in the `validators.py` file.
