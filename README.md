@@ -193,7 +193,7 @@ There are several parts in the backend that needs to be discussed, namely:
 
 - Serialization `capstone/roadtrip/serializers.py`
 
-- URL routing `capstone/roadtrip/urls.py`
+- URLs `capstone/roadtrip/urls.py`
 
 #### Settings
 The `settings.py` file sets the parameters of the application. Listed below are some parameters modified for use in this application:
@@ -348,5 +348,63 @@ The `serializers.py` file contains the code that serializes the __ModelViewSet__
 
 - __NotificationSerializer:__ Serializes a `Notification` object into the fields _id_, _frm_, _to_, _is_addFriend_, _is_inviteToTrip_ and _trip_ fields. The _frm_ and _to_ fields are serialized by the __UserSerializer__ and the _trip_ field is serialized by the __TripSerializer__.
 
-#### URL routing
-[TODO]
+#### URLs
+The application's URL endpoints are defined in the `urls.py` file in the `capstone/roadtrip/` directory. DRF allows for a simplified URL definition when combined with __ViewSets__, or class-based views. 
+
+Firstly, a router is defined via importing `router` from the `rest_framework` library. After defining the router, each __ViewSet__ can be registered to the router. An example for registering a `UserViewSet` router is as follows:
+```python
+...
+router.register(r'users', UserViewSet)
+```
+with the first argument being the _prefix_, the first parameter after the `/` of a URL, and the second argument being the _viewset_.
+
+```python
+class UserViewSet(viewsets.ModelViewSet):
+  ...
+  def list(self, request):
+    ...
+```
+
+Now, when the user goes to `http://127.0.0.1:8000/users`, the router will load the `list` method of the `UserViewSet`. Below is a list of default routes that is defined by the router, as well as their associated methods, using the `UserViewSet` as an example:
+
+__Endpoint__ --> __Method__
+
+`http://127.0.0.1:8000/users` --> `list`
+
+`http://127.0.0.1:8000/users/{pk}` --> `detail`
+
+The app does more than just listing and retrieving data from the backend. Thus, custom actions for routing was utilised. To implement this, an `@action()` decorator was added at the top of a class method. Below is an example on a `UserViewSet`, for a method to register a new user:
+
+```python
+class UserViewSet(viewsets.ModelViewSet):
+  ...
+  @action(methods=['POST'], detail=False)
+  def register(self, request):
+    ...
+```
+In this method, an `@action()` decorator is declared at the top of the method, with the first argument being the accepted HTTP request methods, and the second being the detail (The detail will be set to `True` when `pk`, or primary key, is used). In this case, the URL endpoint is as follows:
+
+```http://127.0.0.1:8000/users/register/```
+
+with the second parameter, after `/users`, being the name of the method.
+
+Another example, for adding a _friend_ to a `User` object:
+
+```python
+class UserViewSet(viewsets.ModelViewSet):
+  ...
+  @action(methods=['PUT'], detail=True)
+  def add_friend(self, request, pk=None):
+    ...
+```
+For this method, the URL endpoint is defined as:
+
+```http://127.0.0.1/users/{pk}/add_friend/```
+
+where the __pk__ is the second parameter, and the __method name__ is the third.
+
+Lastly, to add the URLs defined in the router to the `urlpatterns` list, include this line of code below the `urlpatterns`:
+
+```python
+urlpatterns += router.urls
+```
