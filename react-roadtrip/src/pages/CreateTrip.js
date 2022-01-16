@@ -263,18 +263,10 @@ export default function CreateTrip(props) {
         waypoints[key].timeFrom = timeFrom;
         waypoints[key].timeTo = timeTo;
         waypoints[key].todo = todoObjects;
-        if (singleOption[key] === undefined) {
-            waypoints[key].text = waypoints[key].text;
-            waypoints[key].place_name = waypoints[key].place_name;
-            waypoints[key].longitude = waypoints[key].longitude;
-            waypoints[key].latitude = waypoints[key].latitude;
-        }
-        else {
-            waypoints[key].text = singleOption[0].text;
-            waypoints[key].place_name = singleOption[0].place_name;
-            waypoints[key].longitude = singleOption[0].longitude;
-            waypoints[key].latitude = singleOption[0].latitude;
-        }
+        waypoints[key].text = singleOption[0].text;
+        waypoints[key].place_name = singleOption[0].place_name;
+        waypoints[key].longitude = singleOption[0].longitude;
+        waypoints[key].latitude = singleOption[0].latitude;
         setWaypoints([...waypoints]);
         hideModal();
     }
