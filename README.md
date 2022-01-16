@@ -215,7 +215,12 @@ The `settings.py` file sets the parameters of the application. Listed below are 
 - `AUTH_PASSWORD_VALIDATORS`: Defines the password validators used when a password is being created for a user. On top of the default validator classes included in Django, an additional validator class, `MandatoryCharacterValidator`, is defined. This will be further explained in the __Validators__ section.
 
 #### Validators
-The additional validator class, `MandatoryCharacterValidator`, is defined in the `validators.py` file.
+The additional validator class, `MandatoryCharacterValidator`, is defined in the `validators.py` file. This validator class checks the password if it contains at least one of the following characters:
+
+- Uppercase letter
+- Lowercase letter
+- Numeral
+- Special character / symbol
 
 #### Views
 The views in the backend are contained in the `views.py` file, which contain several class-based views. Listed below are the views, as well as their associated methods:
