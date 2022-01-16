@@ -232,7 +232,7 @@ export default function CreateTrip(props) {
                 latitude: singleOption[0].latitude
             })
         }
-        else if (waypoints.find(waypoint => waypoint.type === 'destination') === 'destination') {
+        else if (waypoints.find(waypoint => waypoint.type === 'destination') !== undefined) {
             waypoints.splice(waypoints.length - 1, 0, {
                 type: 'stopover',
                 dateFrom: dateFrom,
