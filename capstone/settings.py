@@ -45,7 +45,7 @@ AUTHENTICATION_BACKENDS = [
 ]
 
 # When node.js is hosted, that IP is used here.
-CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
+CORS_ALLOWED_ORIGINS = ['http://localhost:3001']
 
 # Application definition
 
