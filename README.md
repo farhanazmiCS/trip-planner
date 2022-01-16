@@ -40,13 +40,48 @@ At this point, you're all set! You can now proceed to `http://localhost:3000` (t
 Listed below are the functions and components of the web application necessary for it to function, for both the client
 and server-side.
 
-### `Index.js` and `App.js` (JavaScript - React)
-[TODO]
+### Index and App files (JavaScript - React)
+
+#### Index
+The `index.js` file renders the `<App />` component inside the `div` element of id `root` in the `index.html` page by calling the `ReactDom.render` function.
+
+#### App
+The `App.js` file serves as the 'hub' of the React application. It contains the __App__ component, which contain much of the hooks and functions to be used by the __App__ component itself or passed down to it's child components. 
+
+Examples of hooks and functions are the _username_ and _password_ state hooks, both being `useState` hooks that are passed down to the __Login__ component to control the state of the login form fields. To learn out more about the useState hook, click [here](https://reactjs.org/docs/hooks-state.html). 
+
+Another example is the `onLoadorRefresh` function, called by the `useEffect` hook when the state of `isLoggedIn` or `tripCounter` changes. The `useEffect` hook is used as a side effect function, taking a function and a dependency array as arguments. More on the  `useEffect` can be learnt [here](https://reactjs.org/docs/hooks-effect.html).
+
+The __App__ component will return several components. Below is the list of components that is returned by the __App__ component:
+* __NavigationBar:__ Only renders when the `isLoggedIn` state hook is set to `true`.
+
+* __Routes:__ Defines the available route paths with the help of React Router DOM.
+
+  * __Route path `/`:__ Loads the __Home__ component when queried `http://localhost:3000/`.
+  
+  * __Route path `/create-trip`:__ Loads the __CreateTrip__ component when queried `http://localhost:3000/create-trip`.
+  
+  * __Route path `/trips`:__ Loads the __Trips__ component when queried `http://localhost:3000/trips`.
+  
+  * __Route path `/trip/:tripId`:__ Loads a __Trip__ component, given a trip id, when queried `http://localhost:3000/trip/${id}`.
+  
+  * __Route path `/profile/:userId`__ Loads a __Profile__ component, given a user id, when queried `http://localhost:3000/profile/${id}`.
+  
+  * __Route path `/notifications`:__ Loads the __Notifications__ component when queried `http://localhost:3000/notifications`.
+  
+  * __Route path `/login`:__ Loads the __Login__ component when queried `http://localhost:3000/login`.
+  
+  * __Route path `/register`:__ Loads the __Register__ component when queried `http://localhost:3000/register`.
+  
+  * __Route path `/logout`:__ Loads the __Logout__ component when queried `http://localhost:3000/logout`.
+  
+  * __Route path `*`:__ A wildcard route for a route that is not defined by any of the routes listed above.
 
 ### Pages (JavaScript - React)
 
 The following items are the "pages" of the web application. They are ultimately React components.
 
+* Home
 * Login
 * Register
 * CreateTrip
@@ -54,6 +89,9 @@ The following items are the "pages" of the web application. They are ultimately 
 * Trip
 * Profile
 * Notifications
+
+#### Home
+Depending on the state of the `isLoggedIn` state hook passed from the __App__ component, the __Home__ component, defined in the `Home.js` file, re-routes the user to the __Login__ page or the __Trips__ page, with the help of React Router.
 
 #### Login
 * The __Login__ component is defined in the `Login.js` file, rendering the login form containing the password and input fields.
