@@ -91,7 +91,7 @@ The following items are the "pages" of the web application. They are ultimately 
 * Notifications
 
 #### Home
-Depending on the state of the `isLoggedIn` state hook passed from the __App__ component, the __Home__ component, defined in the `Home.js` file, re-routes the user to the __Login__ page or the __Trips__ page, with the help of React Router.
+Depending on whether the authentication token is present in `sessionStorage`, the __Home__ component, defined in the `Home.js` file, re-routes the user to the __Login__ page or the __Trips__ page, with the help of React Router.
 
 #### Login
 * The __Login__ component is defined in the `Login.js` file, rendering the login form containing the password and input fields.
