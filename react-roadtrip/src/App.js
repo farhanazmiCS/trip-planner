@@ -417,7 +417,7 @@ export default function App() {
         handleLogout={handleLogout} 
       />}
       <Routes>
-        <Route path="/" element={<Home isLoggedIn={isLoggedIn}/>} />
+        <Route path="/" element={<Home />} />
         <Route path="/create-trip" 
           element={<CreateTrip 
             tripCounter={tripCounter}
