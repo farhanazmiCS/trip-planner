@@ -444,7 +444,7 @@ For this method, the URL endpoint is defined as:
 
 where the __pk__ is the second parameter, and the __method name__ is the third.
 
-Lastly, to add the URLs defined in the router to the `urlpatterns` list, include this line of code below the `urlpatterns`:
+Lastly, to add the URLs defined in the router to the `urlpatterns` list, this line of code was inserted below the `urlpatterns`:
 
 ```python
 urlpatterns += router.urls
