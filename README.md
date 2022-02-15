@@ -64,6 +64,8 @@ The __App__ component will return several components. Below is the list of compo
   * __Route path `/trips`:__ Loads the __Trips__ component when queried `http://localhost:3000/trips`.
   
   * __Route path `/trip/:tripId`:__ Loads a __Trip__ component, given a trip id, when queried `http://localhost:3000/trip/${id}`.
+
+  * __Route path `/users`:__ Loads the __FindUsers__ component when queried `http://localhost:3000/users`.
   
   * __Route path `/profile/:userId`__ Loads a __Profile__ component, given a user id, when queried `http://localhost:3000/profile/${id}`.
   
@@ -89,6 +91,7 @@ The following items are the "pages" of the web application. They are ultimately 
 * Trip
 * Profile
 * Notifications
+* FindUsers
 
 #### Home
 Depending on whether the authentication token is present in `sessionStorage`, the __Home__ component, defined in the `Home.js` file, re-routes the user to the __Login__ page or the __Trips__ page, with the help of React Router.
@@ -173,7 +176,9 @@ Depending on whether the authentication token is present in `sessionStorage`, th
     <img width="338" alt="requestfriend" src="https://user-images.githubusercontent.com/68798786/148169163-32a1791f-bc05-4dcc-9d93-2b5699a327b4.png">
  </div>
  <br />
-
+ 
+#### FindUsers
+* The __FindUsers__ component is defined in the `FindUsers.js` file. It consists of a page that incorporates an `AsyncTypeAhead` input field that allows the user to search for other users.
 
 ### Components (JavaScript - React)
 
@@ -184,6 +189,7 @@ They are utilised by the "pages".
 * Todo
 * Waypoint
 * WaypointModal
+* FriendsListModal
 
 #### NavigationBar
 * The __NavigationBar__ component is defined in the `NavigationBar.js` file. It renders the navigation bar at the top of the page when the user is logged in.
@@ -191,10 +197,11 @@ They are utilised by the "pages".
 
   1. __Trips__ page
   2. __Create Trip__ page
-  3. __My Profile__ page
-  4. __Notifications__ page
-  5. __My Profile__ page
-  6. __Logout__ button
+  3. __Find Users__ page
+  4. __My Profile__ page
+  5. __Notifications__ page
+  6. __My Profile__ page
+  7. __Logout__ button
 
 #### Todo
 * The __Todo__ component is defined in the `Todo.js` file. It takes the form of an input field that is part of the __WaypointModal__ component, used for the user to add todo items in every waypoint object.
@@ -218,6 +225,14 @@ They are utilised by the "pages".
 * In the modal contains a form containing input fields that allows the user to query for a specific location, set the date and time period of the waypoint, and add todo items.
 
 * The user can then press the __Set Origin/Add Stopover/Set Waypoint__ button at the bottom of the modal to complete the form.
+
+#### FriendsListModal
+* The __FriendsListModal__ component is defined in the `FriendsListModal.js` file. It displays a bootstrap modal component when the user, when viewing a user's profile, presses the number below the 'Friends' header. The user can click on any of the usernames present in the modal to view a profile. The gif below demonstrates this:
+
+<div align="center">
+    <img width="250" src="https://user-images.githubusercontent.com/68798786/154028299-80efdb2f-62a9-4427-b65d-93d35cb534cd.gif" alt="todo">
+</div>
+<br />
 
 ### Backend (Django-REST Framework)
 
