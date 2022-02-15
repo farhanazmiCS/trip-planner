@@ -170,10 +170,10 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
             <h6 className="mt-0 mb-1">Who's coming:</h6>
             {trip.users.length !== 0 && 
                 <>
-                    {trip.users.map(user => (
+                    {trip.users.map((user, index) => (
                         <>
-                            {user.username === sessionStorage.getItem('username') && <p style={{fontWeight: 'bold', marginBottom: '20px'}} key={user.username}>Me</p>}
-                            {user.username !== sessionStorage.getItem('username') && <p style={{fontWeight: 'bold', marginBottom: '20px'}} key={user.username}>{user.username[0].toUpperCase() + user.username.slice(1)}</p>}
+                            {user.username === sessionStorage.getItem('username') && <p key={user.username}>{index + 1}. Me</p>}
+                            {user.username !== sessionStorage.getItem('username') && <p key={user.username}>{index + 1}. {user.username[0].toUpperCase() + user.username.slice(1)}</p>}
                         </>
                     ))}
                 </>

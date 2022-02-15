@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { Container, Button } from "react-bootstrap";
 import { Link, useParams } from "react-router-dom";
+import FriendsListModal from "../components/FriendsListModal";
 
 function getUser(users, id) {
     return (
@@ -29,6 +30,16 @@ export default function Profile(props) {
     
     // Returns an array, if the 'friends' array includes the logged on user's username
     const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'));
+
+    // Friends list modal
+    const [show, setShow] = useState(false);
+    function handleClose() {
+        setShow(false);
+    } 
+    // To show friend list modal
+    function handleShow() {
+        setShow(true);
+    }
 
     // When isRequested changes (with the click of the 'Add Friend' button),
     // This script will run. 
@@ -214,7 +225,7 @@ export default function Profile(props) {
                             <h4 style={{textAlign: 'center'}}>{profile.tripCounter}</h4>
                         </div>
                         <div className="col">
-                            <h4 style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
+                            <h4 onClick={handleShow} style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
                         </div>
                     </div>
                     {/* If friend request is sent */}
@@ -277,6 +288,11 @@ export default function Profile(props) {
                         </>
                     }
                 </Container>
+                <FriendsListModal 
+                    show={show} 
+                    handleClose={handleClose} 
+                    friends={profile.friends}
+                />
             </Container>
         )
     }
@@ -301,7 +317,7 @@ export default function Profile(props) {
                             <h4 style={{textAlign: 'center'}}>{profile.tripCounter}</h4>
                         </div>
                         <div className="col">
-                            <h4 style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
+                            <h4 onClick={() => handleShow()} style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
                         </div>
                     </div>
                     <hr />
@@ -319,6 +335,11 @@ export default function Profile(props) {
                         </Link>
                     ))}
                 </Container>
+                <FriendsListModal 
+                    show={show} 
+                    handleClose={handleClose} 
+                    friends={profile.friends}
+                />
             </Container>
         )
     }

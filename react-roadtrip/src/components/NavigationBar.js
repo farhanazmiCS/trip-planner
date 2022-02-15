@@ -9,10 +9,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar, faUser, faSignOutAlt, faBell } from '@fortawesome/free-solid-svg-icons';
 
 // NavLink is used to add styling on a link
-import {NavLink} from 'react-router-dom';
-
-// Typeahead
-import { Typeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
+import { NavLink } from 'react-router-dom';
 
 export default function NavigationBar(props) {
     // Make a copy of the users array
@@ -37,33 +34,9 @@ export default function NavigationBar(props) {
                     <Nav className="me-auto">
                         <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/trips" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>My Trips</NavLink>
                         <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/create-trip" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Create Trip</NavLink>
+                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/users"  style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Find Users</NavLink>
                     </Nav>
                     <Nav>
-                        {/* For searching users */}
-                        {/* src: https://github.com/ericgio/react-bootstrap-typeahead/blob/master/docs/Rendering.md */}
-                        <Typeahead 
-                            id="user_search"
-                            className="mx-2"
-                            renderMenu={(results, menuProps) => (
-                                <Menu {...menuProps}>
-                                    {results.map((result, index) => (
-                                        <MenuItem
-                                            key={index}
-                                            option={result}
-                                            position={index}
-                                            onClick={() => props.navigate(`/profile/${result.id}`)}
-                                        >
-                                            <h6>{result.username}</h6>
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
-                            )}
-                            labelKey="username"
-                            onChange={props.setUserQuery}
-                            options={users}
-                            placeholder="Search for a user..."
-                            selected={props.userQuery}
-                        />
                         <NavDropdown style={{fontSize: '20px', fontWeight: 'bold'}} title={props.user[0].toUpperCase() + props.user.slice(1)} className="mx-2" id="basic-nav-dropdown">
                             <Dropdown className="mb-2 mt-2 mx-3"><NavLink to="/notifications" style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faBell} /> Notifications</NavLink></Dropdown>
                             <Dropdown className="mb-2 mt-2 mx-3"><NavLink to={`/profile/${userId}`} style={{fontSize: '18px', textDecoration: 'none', color: '#292b2c', fontWeight: 'normal'}}><FontAwesomeIcon icon={faUser} /> My Profile</NavLink></Dropdown>

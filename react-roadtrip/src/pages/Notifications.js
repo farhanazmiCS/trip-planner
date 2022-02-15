@@ -234,6 +234,12 @@ export default function Notifications(props) {
                     <hr />
                 </Container>
             ))}
+            {props.tripRequests.length === 0 && props.friendRequests.length === 0 && 
+            <>
+                <Container>
+                    <h1 className="mt-5" style={{textAlign: 'center', color: 'grey'}}>No new notifications :/</h1>
+                </Container>
+            </>}
         </Container>
     )
 }

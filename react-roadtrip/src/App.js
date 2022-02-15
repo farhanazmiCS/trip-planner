@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Trips from './pages/Trips';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications'
+import FindUsers from './pages/FindUsers';
 
 // FOR CSRF TOKEN: src: https://docs.djangoproject.com/en/3.2/ref/csrf/
 function getCookie(name) {
@@ -444,6 +445,14 @@ export default function App() {
             myTripInviteRequests={myTripInviteRequests}
             setMyTripInviteRequests={setMyTripInviteRequests}
           />} 
+        />
+        <Route path="/users" 
+          element={
+            <FindUsers 
+              users={users}
+              navigate={navigate}
+            />
+          }
         />
         <Route path="/profile/:userId" 
           element={<Profile 
