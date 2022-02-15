@@ -1,4 +1,4 @@
-import { Container } from 'react-bootstrap';
+import Container from 'react-bootstrap/Container';
 import Modal from 'react-bootstrap/Modal';
 import { useNavigate } from 'react-router-dom';
 
