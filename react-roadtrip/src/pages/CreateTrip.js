@@ -16,7 +16,7 @@ export default function CreateTrip(props) {
     const auth_token = sessionStorage.getItem(username);
 
     // Mapbox access token
-    const access_token = 'YOUR_ACCESS_TOKEN';
+    const access_token = 'API_KEY';
 
     // Modal Control
     const [show, setShow] = useState(false);
@@ -365,6 +365,8 @@ export default function CreateTrip(props) {
         })
         e.preventDefault();
     }
+    CreateTrip.removeWaypoint = removeWaypoint;
+    CreateTrip.editWaypointModal = editWaypointModal;
     return (
         <>
             {props.isLoggedIn && 
@@ -400,7 +402,6 @@ export default function CreateTrip(props) {
                                     todo={waypoint.todo} 
                                     removeWaypoint={removeWaypoint}
                                     editWaypoint={editWaypointModal}
-                                    waypointLength={waypoints.length}
                                 />
                             ))}
                         </Fragment>

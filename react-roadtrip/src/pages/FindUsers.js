@@ -20,6 +20,7 @@ export default function FindUsers(props) {
             <h1 className="mb-3" style={{textAlign: 'center'}}>Find Users</h1>
             <Typeahead 
                 id="user_search"
+                minLength={3}
                 renderMenu={(results, menuProps) => (
                     <Menu {...menuProps}>
                         {results.map((result, index) => (

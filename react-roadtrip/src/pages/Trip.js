@@ -8,6 +8,8 @@ import { faChevronLeft, faPlus, faTimes } from '@fortawesome/free-solid-svg-icon
 
 // To get trip objects, if available
 import { trips } from './Profile';
+import Waypoint from '../components/Waypoint';
+import CreateTrip from './CreateTrip';
 
 // For Trip component
 function getTrip(trips, id) {
@@ -82,6 +84,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
         setInviteBtnVar(buttonProps.map(button => button.variant));
         setInviteBtnContent(buttonProps.map(button => button.content));
         setInviteBtnClick(buttonProps.map(button => button.onclick));
+        console.log(trip);
     }
     // Function to invite friends to the trip
     function inviteFriend(friend, index) {
@@ -155,7 +158,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
             </div>
             <Collapse in={collapse}>
                 <div id="my-friends">
-                    <h6 className="m-1">Select friends to invite:</h6>
+                    <h5 className="m-1">Select friends to invite:</h5>
                     {toInvite.map((friend, index) => (
                         <Button key={friend.id} onClick={inviteBtnClick[index]} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
                     ))}
@@ -163,110 +166,67 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                     <>
                         <p className="m-1" style={{color: 'grey', fontSize: '16px'}}>No one to invite to this trip.</p>
                     </>}
+                    <h5 className="mt-2 mb-2 mx-1">Who's coming:</h5>
+                    {trip.users.length !== 0 && 
+                        <div className="mb-2 mx-1">
+                            {trip.users.map((user, index) => (
+                                <>
+                                    {user.username === sessionStorage.getItem('username') && <p className="mb-0" style={{color: 'grey', fontSize: '16px'}} key={user.username}>{index + 1}. Me</p>}
+                                    {user.username !== sessionStorage.getItem('username') && <p className="mb-0" style={{color: 'grey', fontSize: '16px'}} key={user.username}>{index + 1}. {user.username[0].toUpperCase() + user.username.slice(1)}</p>}
+                                </>
+                            ))}
+                        </div>
+                    }  
                 </div>
             </Collapse>
             <hr />
-            <h1 className="mt-2 mb-2" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name}</h1>
-            <h6 className="mt-0 mb-1">Who's coming:</h6>
-            {trip.users.length !== 0 && 
-                <>
-                    {trip.users.map((user, index) => (
-                        <>
-                            {user.username === sessionStorage.getItem('username') && <p key={user.username}>{index + 1}. Me</p>}
-                            {user.username !== sessionStorage.getItem('username') && <p key={user.username}>{index + 1}. {user.username[0].toUpperCase() + user.username.slice(1)}</p>}
-                        </>
-                    ))}
-                </>
-            }   
-            <Container id={trip.origin.role} className="mb-3">
-                <Card bg="dark" text="light" style={{width: '100%'}}>
-                    <Card.Header style={{textAlign: 'center', fontWeight: 'bold', fontSize: '24px'}}>
-                        {trip.origin.role}
-                    </Card.Header>
-                    <Card.Body>
-                        <h3>{trip.origin.name}</h3>
-                        <h6 style={{color: 'grey'}}>{trip.origin.detail}</h6>
-                        <div className="dateTimeFrom">
-                            <h5>From: </h5>
-                            <p>{trip.origin.dateTimeFrom}</p>
-                        </div>
-                        <div className="dateTimeTo">
-                            <h5>To: </h5>
-                            <p>{trip.origin.dateTimeTo}</p>
-                        </div>
-                        {trip.origin.todo.length !== 0 && 
-                            <>
-                                <h5 key={`${trip.origin.role}-todos`} style={{fontWeight: 'bold'}}>Todos at this point:</h5>
-                                <ol>
-                                    {trip.origin.todo.map(t => (
-                                        <li key={t}>{t}</li>
-                                    ))}
-                                </ol>
-                            </>
-                        }
-                    </Card.Body>
-                    </Card>
-            </Container>
-            {trip.waypoints.map(t => (
-                <Container id={t.role} className="mb-3">
-                    <Card bg="dark" text="light" style={{width: '100%'}}>
-                        <Card.Header style={{textAlign: 'center', fontWeight: 'bold', fontSize: '24px'}}>
-                            {t.role}
-                        </Card.Header>
-                        <Card.Body>
-                            <h3 key={`${t.name}-header`}>{t.name}</h3>
-                            <h6 key={t.detail} style={{color: 'grey'}}>{t.detail}</h6>
-                            <div key={`dateTimeFrom-${t.role}`} className="dateTimeFrom">
-                                <h5 key={`dateTimeFrom-placeholder-${t.role}`}>From: </h5>
-                                <p key={t.dateTimeFrom}>{t.dateTimeFrom}</p>
-                            </div>
-                            <div key={`dateTimeTo-${t.role}`} className="dateTimeTo">
-                                <h5 key={`dateTimeTo-placeholder-${t.role}`}>To: </h5>
-                                <p key={t.dateTimeTo}>{t.dateTimeTo}</p>
-                            </div>
-                            {t.todo.length !== 0 && 
-                                <>
-                                    <h5 key={`${t.role}-todos`} style={{fontWeight: 'bold'}}>Todos at this point:</h5>
-                                    <ol>
-                                        {t.todo.map(t => (
-                                            <li key={t}>{t}</li>
-                                        ))}
-                                    </ol>
-                                </>
-                            }
-                        </Card.Body>
-                    </Card>
-                </Container>
+            <p className="mb-0" style={{textAlign: 'center', color: 'grey'}}>Trip</p>
+            <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name}</h1> 
+            {/* Origin */}
+            <Waypoint 
+                key={(trip.origin.name + trip.origin.detail).toUpperCase() + '1'}
+                type={trip.origin.role.toLowerCase()}
+                id={0} 
+                dateFrom={trip.origin.dateTimeFrom.slice(0, 10)} 
+                dateTo={trip.origin.dateTimeTo.slice(0, 10)} 
+                timeFrom={trip.origin.dateTimeFrom.slice(12)} 
+                timeTo={trip.origin.dateTimeTo.slice(12)} 
+                text={trip.origin.name} 
+                place={trip.origin.detail}
+                todo={trip.origin.todo} 
+                removeWaypoint={CreateTrip.removeWaypoint}
+                editWaypoint={CreateTrip.editWaypointModal}
+            />
+            {trip.waypoints.map((waypoint, index) => (
+                <Waypoint 
+                    key={(waypoint.name + waypoint.detail).toUpperCase() + '1'}
+                    type={waypoint.role.toLowerCase()}
+                    id={index + 1} 
+                    dateFrom={waypoint.dateTimeFrom.slice(0, 10)} 
+                    dateTo={waypoint.dateTimeTo.slice(0, 10)} 
+                    timeFrom={waypoint.dateTimeFrom.slice(12)} 
+                    timeTo={waypoint.dateTimeTo.slice(12)} 
+                    text={waypoint.name} 
+                    place={waypoint.detail}
+                    todo={waypoint.todo} 
+                    removeWaypoint={CreateTrip.removeWaypoint}
+                    editWaypoint={CreateTrip.editWaypointModal}
+                />
             ))}
-            <Container id={trip.destination.role} className="mb-3">
-                <Card bg="dark" text="light" style={{width: '100%'}}>
-                    <Card.Header style={{textAlign: 'center', fontWeight: 'bold', fontSize: '24px'}}>
-                        {trip.destination.role}
-                    </Card.Header>
-                    <Card.Body>
-                        <h3>{trip.destination.name}</h3>
-                        <h6 style={{color: 'grey'}}>{trip.destination.detail}</h6>
-                        <div className="dateTimeFrom">
-                            <h5>From: </h5>
-                            <p>{trip.destination.dateTimeFrom}</p>
-                        </div>
-                        <div className="dateTimeTo">
-                            <h5>To: </h5>
-                            <p>{trip.destination.dateTimeTo}</p>
-                        </div>
-                        {trip.destination.todo.length !== 0 && 
-                            <>
-                                <h5 style={{fontWeight: 'bold'}}>Todos at this point:</h5>
-                                <ol>
-                                    {trip.destination.todo.map(t => (
-                                        <li key={t}>{t}</li>
-                                    ))}
-                                </ol>
-                            </>
-                        }
-                    </Card.Body>
-                </Card>
-            </Container>
+            <Waypoint 
+                key={(trip.destination.name + trip.destination.detail).toUpperCase() + '1'}
+                type={trip.destination.role.toLowerCase()}
+                id={trip.waypoints.length + 1} 
+                dateFrom={trip.destination.dateTimeFrom.slice(0, 10)} 
+                dateTo={trip.destination.dateTimeTo.slice(0, 10)} 
+                timeFrom={trip.destination.dateTimeFrom.slice(12)} 
+                timeTo={trip.destination.dateTimeTo.slice(12)} 
+                text={trip.destination.name} 
+                place={trip.destination.detail}
+                todo={trip.destination.todo} 
+                removeWaypoint={CreateTrip.removeWaypoint}
+                editWaypoint={CreateTrip.editWaypointModal}
+            />
         </Container>
     )
 }

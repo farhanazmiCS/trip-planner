@@ -237,7 +237,7 @@ export default function Profile(props) {
                                 </Container>
                             </div>
                             <hr />
-                            <div className="row">
+                            <div className="row mt-5">
                                 <h1 style={{textAlign: 'center'}}><FontAwesomeIcon icon={faLock} style={{textAlign: 'center'}} /></h1>
                                 <h3 style={{textAlign: 'center'}}>This profile is private.</h3>
                             </div>
