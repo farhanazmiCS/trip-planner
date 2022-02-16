@@ -246,12 +246,10 @@ export default function Profile(props) {
                     {/* If friend request is NOT sent, not a friend of the logged user */}
                     {friends.find(friend => friend) === undefined && !isRequested && 
                         <>
-                            <div className="row">
-                                <Container className="d-grid gap-2 mt-3">
-                                    <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
-                                </Container>
-                            </div>
-                            <hr />
+                            <Container className="d-grid mt-2">
+                                <Button onClick={addFriend} variant={buttonVariant}>{buttonContent}</Button>
+                                <hr />
+                            </Container>
                             <div className="row mt-5">
                                 <h1 style={{textAlign: 'center'}}><FontAwesomeIcon icon={faLock} style={{textAlign: 'center'}} /></h1>
                                 <h3 style={{textAlign: 'center'}}>This profile is private.</h3>
@@ -261,13 +259,11 @@ export default function Profile(props) {
                     {/* Is a friend of logged user */}
                     {friends.find(friend => friend) === true && 
                         <>
-                            <div className="row">
-                                <Container className="d-grid gap-2 mt-3">
-                                    <Button onClick={() => unFriend(profile)} variant="outline-dark">Unfriend</Button>
-                                </Container>
-                            </div>
-                            <hr />
-                            <Container className="d-grid gap-2 mb-2">
+                            <Container className="d-grid mt-2">
+                                <Button onClick={() => unFriend(profile)} variant="outline-dark">Unfriend</Button>
+                                <hr />
+                            </Container>
+                            <Container className="d-grid mb-2">
                                 <h3 style={{fontWeight: 'bolder'}}>{profile.username[0].toUpperCase() + profile.username.slice(1)}'s Trips</h3>
                             </Container>
                             {profileTrips.map(trip => (
@@ -320,7 +316,9 @@ export default function Profile(props) {
                             <h4 onClick={() => handleShow()} style={{textAlign: 'center'}}>{profile.friendCounter}</h4>
                         </div>
                     </div>
-                    <hr />
+                    <Container className="d-grid mt-2">
+                        <hr />
+                    </Container>
                     <Container className="mb-3">
                         <h3 style={{fontWeight: 'bolder'}}>Your Trips</h3>
                     </Container>

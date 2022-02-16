@@ -68,25 +68,31 @@ export default function Waypoint(props) {
             <Card bg="dark" text="light" style={{width: '100%' }}>
                 {props.type === 'origin' && 
                     <Card.Header className="d-flex justify-content-between" style={{color: 'white', fontWeight: 'bold', fontSize: '20px'}}>
-                        Origin 
-                        <div className="d-flex justify-content-start">
-                            <FontAwesomeIcon className="mt-1" icon={faPen} style={{color : 'white'}} onClick={() => props.editWaypoint(props.id)} />
-                        </div>
+                        Origin
+                        {props.me && 
+                            <div className="d-flex justify-content-start">
+                                <FontAwesomeIcon className="mt-1" icon={faPen} style={{color : 'white'}} onClick={() => props.editWaypoint(props.id)} />
+                            </div>
+                        } 
                     </Card.Header>}
                 {props.type.includes('stopover') && 
                     <Card.Header className="d-flex justify-content-between" style={{color: 'white', fontWeight: 'bold', fontSize: '20px'}}>
                         Stopover {props.id}
-                    <div className="d-flex justify-content-start">
-                        <FontAwesomeIcon className="mt-1 mx-3" icon={faPen} style={{color : 'white'}} onClick={() => props.editWaypoint(props.id)} />
-                        <FontAwesomeIcon className="mt-1" icon={faTimesCircle} style={{color : 'white'}} onClick={() => props.removeWaypoint(props.id)} />
-                    </div>
+                        {props.me &&
+                            <div className="d-flex justify-content-start">
+                                <FontAwesomeIcon className="mt-1 mx-3" icon={faPen} style={{color : 'white'}} onClick={() => props.editWaypoint(props.id)} />
+                                <FontAwesomeIcon className="mt-1" icon={faTimesCircle} style={{color : 'white'}} onClick={() => props.removeWaypoint(props.id)} />
+                            </div>
+                        }
                     </Card.Header>}
                 {props.type === 'destination' && 
                     <Card.Header className="d-flex justify-content-between" style={{color: 'white', fontWeight: 'bold', fontSize: '20px'}}>
                         Destination
-                    <div className="d-flex justify-content-start">
-                        <FontAwesomeIcon className="mt-1" icon={faPen} style={{color : 'white'}} onClick={() => props.editWaypoint(props.id)} />
-                    </div>
+                        {props.me && 
+                            <div className="d-flex justify-content-start">
+                                <FontAwesomeIcon className="mt-1" icon={faPen} style={{color : 'white'}} onClick={() => props.editWaypoint(props.id)} />
+                            </div>
+                        }
                     </Card.Header>}
                 <Card.Body>
                     <Card.Title style={{fontWeight: 'bold'}}>{props.text}</Card.Title>

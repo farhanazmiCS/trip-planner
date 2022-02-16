@@ -168,7 +168,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                     <div className="mx-3 mt-3">
                         <h5>Select friends to invite:</h5>
                             {toInvite.map((friend, index) => (
-                                <Button className="me-2" key={friend.id} onClick={inviteBtnClick[index]} variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
+                                <Button className="me-2 mb-2" key={friend.id} onClick={inviteBtnClick[index]} variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
                             ))}
                         </div>
                     {toInvite.length === 0 && 
@@ -231,6 +231,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                 todo={trip.origin.todo} 
                 removeWaypoint={CreateTrip.removeWaypoint}
                 editWaypoint={CreateTrip.editWaypointModal}
+                me={me}
             />
             {trip.waypoints.map((waypoint, index) => (
                 <Waypoint 
@@ -246,6 +247,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                     todo={waypoint.todo} 
                     removeWaypoint={CreateTrip.removeWaypoint}
                     editWaypoint={CreateTrip.editWaypointModal}
+                    me={me}
                 />
             ))}
             <Waypoint 
@@ -261,6 +263,7 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                 todo={trip.destination.todo} 
                 removeWaypoint={CreateTrip.removeWaypoint}
                 editWaypoint={CreateTrip.editWaypointModal}
+                me={me}
             />
         </Container>
     )
