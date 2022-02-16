@@ -29,8 +29,8 @@ export default function Waypoint(props) {
         }
         if ((date.indexOf('-')) !== -1) {
             var year = date.slice(0, 4);
-            var month = date.slice(5, date.indexOf('-'), 5);
-            var day = date.slice((date.indexOf('-'), 5) + 1);
+            var month = date.slice(5, date.indexOf('-', 5));
+            var day = date.slice(date.indexOf('-', 5) + 1);
         }
         else {
             day = date.slice(0, date.indexOf('/'));
@@ -42,8 +42,8 @@ export default function Waypoint(props) {
     // Formats time
     function timeFormatter(time) {
         if (time.length === 5) {
-            var hours = time.slice(0, 2);
-            var minutes = time.slice(3);
+            var hours = time.slice(0, time.indexOf(':'));
+            var minutes = time.slice(time.indexOf(':') + 1);
             // To determine AM or PM
             if (Number(time.slice(0, 2)) < 12) {
                 var ampm = 'AM';
@@ -57,9 +57,9 @@ export default function Waypoint(props) {
             }
         }
         else {
-            hours = time.slice(0, 2);
-            minutes = time.slice(3, 5);
-            ampm = time.slice(5).toUpperCase();
+            hours = time.slice(0, time.indexOf(':'));
+            minutes = time.slice(time.indexOf(':') + 1, time.indexOf(':') + 3);
+            ampm = time.slice(-2).toUpperCase();
         }
         return `${hours}:${minutes} ${ampm}`;
     }

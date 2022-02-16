@@ -40,6 +40,13 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
     // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
     let trip = getTrip(trips, parseInt(params.tripId));
+
+    // To find if the logged on user is in a trip. Concat into the remaining users array.
+    const me = trip.users.find(user => user.username === sessionStorage.getItem('username'));
+    // Mutate the trip.users to exclude the logged on user, me
+    const meIndex = trip.users.findIndex(user => user === me);
+    const trip_users_copy = [...trip.users];
+    trip_users_copy.splice(meIndex, 1);
     
     // Retrieve the user
     for (let i = 0; i < users.length; i++) {
@@ -158,21 +165,49 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
             </div>
             <Collapse in={collapse}>
                 <div id="my-friends">
-                    <h5 className="m-1">Select friends to invite:</h5>
-                    {toInvite.map((friend, index) => (
-                        <Button key={friend.id} onClick={inviteBtnClick[index]} className="m-1" variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
-                    ))}
+                    <div className="mx-3 mt-3">
+                        <h5>Select friends to invite:</h5>
+                            {toInvite.map((friend, index) => (
+                                <Button className="me-2" key={friend.id} onClick={inviteBtnClick[index]} variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
+                            ))}
+                        </div>
                     {toInvite.length === 0 && 
                     <>
-                        <p className="m-1" style={{color: 'grey', fontSize: '16px'}}>No one to invite to this trip.</p>
+                        <p className="m-1 mx-3" style={{color: 'grey', fontSize: '16px'}}>No one to invite to this trip.</p>
                     </>}
-                    <h5 className="mt-2 mb-2 mx-1">Who's coming:</h5>
+                    <h5 className="mt-4 mb-2 mx-3">Who's coming:</h5>
                     {trip.users.length !== 0 && 
                         <div className="mb-2 mx-1">
-                            {trip.users.map((user, index) => (
+                            {me &&  
                                 <>
-                                    {user.username === sessionStorage.getItem('username') && <p className="mb-0" style={{color: 'grey', fontSize: '16px'}} key={user.username}>{index + 1}. Me</p>}
-                                    {user.username !== sessionStorage.getItem('username') && <p className="mb-0" style={{color: 'grey', fontSize: '16px'}} key={user.username}>{index + 1}. {user.username[0].toUpperCase() + user.username.slice(1)}</p>}
+                                    <Button 
+                                        variant="link"
+                                        className="mb-0" 
+                                        onClick={() => navigate(`/profile/${me.id}`)}
+                                        style={{color: 'grey', fontSize: '16px', textDecoration: 'none'}} 
+                                        key={me.username}
+                                    >
+                                        {1}. Me
+                                    </Button>
+                                    <br />
+                                </>
+                            }
+                            {trip_users_copy.map((user, index) => (
+                                <>
+                                    {user.username !== sessionStorage.getItem('username') && 
+                                        <>
+                                            <Button 
+                                                variant="link"
+                                                className="mb-0" 
+                                                onClick={() => navigate(`/profile/${user.id}`)}
+                                                style={{color: 'grey', fontSize: '16px', textDecoration: 'none'}} 
+                                                key={user.username}
+                                            >
+                                                {index + 2}. {user.username[0].toUpperCase() + user.username.slice(1)}
+                                            </Button>
+                                            <br />
+                                        </>
+                                    }
                                 </>
                             ))}
                         </div>
