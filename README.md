@@ -139,7 +139,12 @@ Depending on whether the authentication token is present in `sessionStorage`, th
 
 * Information such as the __Trip Name__, __Origin__ waypoint, __Stopover__ waypoints, __Destination__ waypoints as well as their associated data are displayed in this page.
 
-* If the user is in the trip that he or she is viewing, the user can invite friends into the trip by clicking or pressing the __Invite Friends__ button located at the top right corner of the page. 
+* If the user is in the trip that he or she is viewing, the user can view the users that are following the trip and invite friends to the trip by clicking or pressing the __Invite Friends__ button located at the top right corner of the page. This functionality is demonstrated in the gif below:
+
+<div align="center">
+  <img width="250" src="https://user-images.githubusercontent.com/68798786/154205988-b2160000-0bf5-4520-84b0-265b92c487ba.gif" alt="todo">
+</div>
+<br />
 
 #### Profile 
 * The __Profile__ component is defined in the `Profile.js` file, displaying information about a queried user.
