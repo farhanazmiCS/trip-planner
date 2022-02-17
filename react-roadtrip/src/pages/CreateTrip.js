@@ -157,18 +157,15 @@ export default function CreateTrip(props) {
     // Error message
     const [error, setError] = useState(null);
 
-    // State of trip title
-    const [title, setTitle] = useState('Trip Name');
-    const [titleFieldStyle, setTitleFieldStyle] = useState('border border-dark');
+    const me = props.users.find(user => user.username === sessionStorage.getItem('username'));
     
-    // If true, show the editable field, else show a header
-    const [titleField, setTitleField] = useState(false);
-
-    const updateTitle = (e) => {
-        setTitleFieldStyle('border border-dark');
-        setTitle(e.target.value);
-        setError(null);
-    }
+    // Inherit title props from App component
+    const title = props.title
+    const updateTitle = props.updateTitle;
+    const titleFieldStyle = props.titleFieldStyle
+    const setTitleFieldStyle = props.setTitleFieldStyle
+    const titleField = props.titleField
+    const setTitleField = props.setTitleField
 
     const addOrigin = () => {
         waypoints.push({
@@ -365,8 +362,6 @@ export default function CreateTrip(props) {
         })
         e.preventDefault();
     }
-    CreateTrip.removeWaypoint = removeWaypoint;
-    CreateTrip.editWaypointModal = editWaypointModal;
     return (
         <>
             {props.isLoggedIn && 
@@ -390,6 +385,7 @@ export default function CreateTrip(props) {
                         <Fragment>
                             {waypoints.map((waypoint, index) => (
                                 <Waypoint
+                                    me={me}
                                     key={(waypoint.text + waypoint.place_name).toUpperCase() + index.toString()}
                                     type={waypoint.type}
                                     id={index} 

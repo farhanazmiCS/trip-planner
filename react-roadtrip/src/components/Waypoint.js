@@ -104,7 +104,7 @@ export default function Waypoint(props) {
                     <Collapse in={collapse}>
                         <div id="todo-collapse">
                             {props.todo.length > 0 && <Card.Title style={{fontWeight: 'bold'}}>Todos</Card.Title>}
-                            <ol>
+                            <ol style={{paddingLeft: '18px'}}>
                             {props.todo.map((todoItem, index) => (
                                 <li key={index}>{todoItem.value}</li>
                             ))}

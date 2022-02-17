@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Container, Collapse, Button, Card } from 'react-bootstrap';
+import { Container, Collapse, Button, FormControl, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faPlus, faTimes, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 // To get trip objects, if available
 import { trips } from './Profile';
 import Waypoint from '../components/Waypoint';
-import CreateTrip from './CreateTrip';
 
 // For Trip component
 function getTrip(trips, id) {
@@ -19,9 +18,15 @@ function getTrip(trips, id) {
     );
 }
 
-export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) {
+export default function Trip(props) {
     // To redirect back 
     const navigate = useNavigate();
+
+    const { myTripInviteRequests, setMyTripInviteRequests, 
+    
+        titleFieldStyle, setTitleFieldStyle,
+        titleField, setTitleField,
+        error, setError } = props;
 
     // Users
     const users = JSON.parse(sessionStorage.getItem('users'));
@@ -40,6 +45,8 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
     // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
     let trip = getTrip(trips, parseInt(params.tripId));
+
+    const [titleEdit, setTitleEdit] = useState(trip.name);
 
     // To find if the logged on user is in a trip. Concat into the remaining users array.
     const me = trip.users.find(user => user.username === sessionStorage.getItem('username'));
@@ -91,7 +98,6 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
         setInviteBtnVar(buttonProps.map(button => button.variant));
         setInviteBtnContent(buttonProps.map(button => button.content));
         setInviteBtnClick(buttonProps.map(button => button.onclick));
-        console.log(trip);
     }
     // Function to invite friends to the trip
     function inviteFriend(friend, index) {
@@ -153,6 +159,14 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
             })
         })
         .catch(error => console.log(error));
+    }
+    /**
+     * Function to update the title of a trip that is already saved
+     * @return {undefined}
+     */
+    function updateTitle(e) {
+        setTitleEdit(e.target.value);
+        setError(null);
     }
     useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
     return (
@@ -216,7 +230,25 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
             </Collapse>
             <hr />
             <p className="mb-0" style={{textAlign: 'center', color: 'grey'}}>Trip</p>
-            <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name}</h1> 
+            {!titleField && titleEdit !== '' && 
+                <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{titleEdit} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
+            }
+            {!titleField && titleEdit === '' && 
+                <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
+            }
+            {titleField && 
+                <Container>
+                    <InputGroup className="my-3">
+                        <FormControl size="lg" className={titleFieldStyle} aria-describedby="done" style={{display: 'inline-block'}} type="text" value={titleEdit} onChange={updateTitle} />
+                        <Button variant="dark" className={titleFieldStyle} id="done" onClick={() => setTitleField(false)}><FontAwesomeIcon icon={faCheck} onClick={() => setTitleField(false)} /></Button>
+                    </InputGroup>
+                </Container>
+            }
+            {error && 
+                <Container>
+                    <Container><p style={{color: 'red'}} className="mb-3">{error}</p></Container>
+                </Container>
+            }
             {/* Origin */}
             <Waypoint 
                 key={(trip.origin.name + trip.origin.detail).toUpperCase() + '1'}
@@ -229,8 +261,6 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                 text={trip.origin.name} 
                 place={trip.origin.detail}
                 todo={trip.origin.todo} 
-                removeWaypoint={CreateTrip.removeWaypoint}
-                editWaypoint={CreateTrip.editWaypointModal}
                 me={me}
             />
             {trip.waypoints.map((waypoint, index) => (
@@ -245,8 +275,6 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                     text={waypoint.name} 
                     place={waypoint.detail}
                     todo={waypoint.todo} 
-                    removeWaypoint={CreateTrip.removeWaypoint}
-                    editWaypoint={CreateTrip.editWaypointModal}
                     me={me}
                 />
             ))}
@@ -261,8 +289,6 @@ export default function Trip({ myTripInviteRequests, setMyTripInviteRequests }) 
                 text={trip.destination.name} 
                 place={trip.destination.detail}
                 todo={trip.destination.todo} 
-                removeWaypoint={CreateTrip.removeWaypoint}
-                editWaypoint={CreateTrip.editWaypointModal}
                 me={me}
             />
         </Container>

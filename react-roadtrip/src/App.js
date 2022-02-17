@@ -49,8 +49,14 @@ export default function App() {
   const [passwordRegister, setPasswordRegister] = useState('');
   const [confirmRegister, setConfirmRegister] = useState('');
 
-  // State of error message during register, if any
+  // State of error message during register/login/createtrip/edittrip, if any
   const [error, setError] = useState(null);
+
+  // Title and Field Style
+  const [title, setTitle] = useState('Trip Name');
+  const [titleFieldStyle, setTitleFieldStyle] = useState('border border-dark');
+  // Boolean variable that shows or hide the input field for changing the name of the trip.
+  const [titleField, setTitleField] = useState(false);
   
   // Auth status
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,7 +76,11 @@ export default function App() {
   // Array to store the requests
   var requests = [];
 
-  // To format the date and time
+  /**
+   * Function to format date and time from YYYY-MM-DD HH:MM:SS,
+   * to DD/MM/YYYY, HH:MM(AM/PM)
+   * @return {string}
+   */
   function formatDateTime(dateTime) {
     let year = dateTime.slice(0, 4);
     let month = dateTime.slice(5, 7);
@@ -90,7 +100,13 @@ export default function App() {
     return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
   }
   
-  // Handle Login
+  /**
+   * Function to handle submission of the login form. If response status is 200,
+   * saves the username and response token to sessionStorage, and navigates the user to 
+   * the '/trips' page.
+   * url: endpoint for login.
+   * @return {undefined}
+   */
   function handleLogin(e) {
     // To clear previous user's session
     let url = 'http://127.0.0.1:8000/api/login';
@@ -130,7 +146,11 @@ export default function App() {
     e.preventDefault();
   }
   
-  // Function to handle logout
+  /**
+   * Function to handle logout. Clears sessionStorage on successful logout.
+   * url: endpoint for logging out.
+   * @return {undefined}
+   */
   function handleLogout() {
     let url = 'http://127.0.0.1:8000/api/logout';
     let request = new Request(url);
@@ -153,8 +173,13 @@ export default function App() {
     })
   }
 
-  // Handle registering
-  const handleRegister = (e) => {
+  /** 
+   * Function that is called once the registration form is submitted. Saves the username and user token
+   * to sessionStorage if response status is 200.
+   * url: endpoint for registering a user.
+   * @return {undefined}
+   */
+  function handleRegister(e) {
     let url = 'http://127.0.0.1:8000/users/register/';
     let request = new Request(url, {
       headers: {
@@ -191,7 +216,23 @@ export default function App() {
     e.preventDefault();
   }
 
-  // Function to handle onLoad/onRefresh
+  /**
+   * Function that defines the urls to fetch and calls the fetchAuthStatus() function.
+   * requests: an array that contains all of the request objects.
+   * url: endpoint to check user's auth status
+   * urlTrips: endpoint to fetch the user's trips
+   * urlUsers: endpoint to fetch all users
+   * urlNotifications: endpoint to fetch user's notifications
+   * urlmyRequestsFriends: endpoint to fetch user's friend requests (made by user)
+   * urlMyRequestsTrips: endpoint to fetch user's trip invites (made by user)
+   * request: request object for url.
+   * requestTrips: request object for urlTrips.
+   * requestUsers: request object for urlUsers.
+   * requestNotifications: request object for urlNotifications.
+   * requestMyRequestsFriends: request object for urlMyRequestsFriends.
+   * requestMyRequestsTrips: request object for urlMyRequestsTrips
+   * @return {undefined}
+   */
   function onLoadOrRefresh() {
     // Retrieves the username, if any, from the session storage
     let user = sessionStorage.getItem('username');
@@ -245,7 +286,11 @@ export default function App() {
     fetchAuthStatus();
   }
   
-  // Fetch auth status
+  /**
+   * Function to fetch the authentication status of the user. If the response status is 200,
+   * call the functions that are defined below to fetch the information.
+   * @return {undefined}
+   */
   function fetchAuthStatus() {
     fetch(requests[0])
     .then(res => {
@@ -269,7 +314,11 @@ export default function App() {
     })
   }
   
-  // Fetch trips
+  /**
+   * A function that fetches all of the user's trips.
+   * trip: maps through the response and sets it into a React Hook, myTrips, as well as into sessionStorage.
+   * @return {undefined}
+   */
   function fetchTrips() {
     fetch(requests[1])
     .then(res => res.json())
@@ -326,7 +375,10 @@ export default function App() {
     })
   }
 
-  // Fetch users
+  /**
+   * A function that fetches all the users and saves them in sessionStorage.
+   * @return {undefined}
+   */
   function fetchUsers() {
     fetch(requests[2])
     .then(res => res.json())
@@ -336,7 +388,13 @@ export default function App() {
     })
   }
 
-  // Fetch notifications
+  /**
+   * A function that fetches all my notifications, both friend requests and trip invites, and stores them in React Hooks.
+   * notifications: A JSON object that contains a list of notification objects.
+   * friend_requests: An array that is initialised to store all the friend request notifications
+   * trip_invites: An array that is initialised to store all the trip invite notifications
+   * @return {undefined}
+   */
   function fetchNotifications() {
     fetch(requests[3])
     .then(res => res.json())
@@ -365,7 +423,11 @@ export default function App() {
     })
   }
 
-  // Fetch requests made by user
+  /**
+   * Function to fetch the friend requests sent by me to other users and save it in a React Hook and sessionStorage
+   * myFriendRequests: an array object that stores the friend request objects
+   * @return {undefined}
+   */
   function fetchMyRequestsFriends() {
     fetch(requests[4])
     .then(res => res.json())
@@ -384,6 +446,11 @@ export default function App() {
     });
   }
 
+  /**
+   * Function to fetch the trip requests made by me to other users and saves it in a React Hook and sessionStorage
+   * myTripRequests: an array object that stores the request objects.
+   * @return {undefined}
+   */
   function fetchMyRequestsTrips() {
     fetch(requests[5])
     .then(res => res.json())
@@ -404,8 +471,22 @@ export default function App() {
     })
   }
   
+  /** 
+   * Function to update the title of a trip
+   * To be passed down to CreateTrip component
+   * @return {undefined}
+   */
+  function updateTitle(e) {
+    setTitle(e.target.value);
+    setError(null);
+  }
+  
   // Call the onLoadOrRefresh function once the states of isLoggedIn and tripCounter are changed.
   useEffect(() => onLoadOrRefresh(), [isLoggedIn, tripCounter]);
+  // Closes the title field once on another page
+  useEffect(() => {
+    setTitleField(false)
+  }, [window.location.href])
   return (
     <>
       {isLoggedIn && <NavigationBar 
@@ -420,7 +501,8 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/create-trip" 
-          element={<CreateTrip 
+          element={<CreateTrip
+            users={users} 
             tripCounter={tripCounter}
             setTripCounter={setTripCounter}
             navigate={navigate}
@@ -431,6 +513,12 @@ export default function App() {
             password={password} 
             setPassword={setPassword} 
             handleLogin={handleLogin} 
+            title={title}
+            updateTitle={updateTitle}
+            titleFieldStyle={titleFieldStyle}
+            setTitleFieldStyle={setTitleFieldStyle}
+            titleField={titleField}
+            setTitleField={setTitleField}
           />} 
         />
         <Route path="/trips" 
@@ -441,9 +529,14 @@ export default function App() {
         />
         <Route path="/trips/:tripId" 
           element={<Trip 
-            myTrips={myTrips} 
             myTripInviteRequests={myTripInviteRequests}
             setMyTripInviteRequests={setMyTripInviteRequests}
+            titleFieldStyle={titleFieldStyle}
+            setTitleFieldStyle={setTitleFieldStyle}
+            titleField={titleField}
+            setTitleField={setTitleField}
+            error={error}
+            setError={setError}
           />} 
         />
         <Route path="/users" 
