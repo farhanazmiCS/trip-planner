@@ -7,62 +7,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
 
+// Date and time formatter
+import { dateFormatter, timeFormatter } from '../helper';
+
 export default function Waypoint(props) {
     // Collapse button
     const [collapse, setCollapse] = useState(false);
-
-    // Formats date
-    function dateFormatter(date) {
-        const monthDict = {
-            '01': 'January',
-            '02': 'February',
-            '03': 'March',
-            '04': 'April',
-            '05': 'May',
-            '06': 'June',
-            '07': 'July',
-            '08': 'August',
-            '09': 'September',
-            '10': 'October',
-            '11': 'November',
-            '12': 'December'
-        }
-        if ((date.indexOf('-')) !== -1) {
-            var year = date.slice(0, 4);
-            var month = date.slice(5, date.indexOf('-', 5));
-            var day = date.slice(date.indexOf('-', 5) + 1);
-        }
-        else {
-            day = date.slice(0, date.indexOf('/'));
-            month = date.slice(date.indexOf('/') + 1, date.indexOf('/', 3))
-            year = date.slice(-4)
-        }
-        return `${day} ${monthDict[month]} ${year}`;
-    }
-    // Formats time
-    function timeFormatter(time) {
-        if (time.length === 5) {
-            var hours = time.slice(0, time.indexOf(':'));
-            var minutes = time.slice(time.indexOf(':') + 1);
-            // To determine AM or PM
-            if (Number(time.slice(0, 2)) < 12) {
-                var ampm = 'AM';
-            }
-            else if (Number(time.slice(0, 2) > 12)) {
-                hours = Number(hours) - 12;
-                ampm = 'PM';
-            }
-            else {
-                ampm = 'PM';
-            }
-        }
-        else {
-            hours = time.slice(0, time.indexOf(':'));
-            minutes = time.slice(time.indexOf(':') + 1, time.indexOf(':') + 3);
-            ampm = time.slice(-2).toUpperCase();
-        }
-        return `${hours}:${minutes} ${ampm}`;
-    }
     return(
         <div id={"waypoint-card-" + props.id} className="mb-3">
             <Card bg="dark" text="light" style={{width: '100%' }}>

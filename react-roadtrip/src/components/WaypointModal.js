@@ -48,13 +48,13 @@ export default function WaypointModal(props) {
                     <h4>Period</h4>
                     <Form.Group>
                         <Form.Label>From</Form.Label>
-                        <Form.Control className="mb-3" type="date" value={props.dateFrom} onChange={(e) => props.setDateFrom(e.target.value)} />
-                        <Form.Control className="mb-3" type="time" value={props.timeFrom} onChange={(e) => props.setTimeFrom(e.target.value)} />
+                        <Form.Control className="mb-3" type="date" value={props.dateFrom} onChange={(e) => props.setDateTime({...props.dateTime, dateFrom: e.target.value})} />
+                        <Form.Control className="mb-3" type="time" value={props.timeFrom} onChange={(e) => props.setDateTime({...props.dateTime, timeFrom: e.target.value})} />
                     </Form.Group>
                     <Form.Group>
                         <Form.Label>To</Form.Label>
-                        <Form.Control className="mb-3" type="date" value={props.dateTo} onChange={(e) => props.setDateTo(e.target.value)} />
-                        <Form.Control className="mb-3" type="time" value={props.timeTo} onChange={(e) => props.setTimeTo(e.target.value)} />
+                        <Form.Control className="mb-3" type="date" value={props.dateTo} onChange={(e) => props.setDateTime({...props.dateTime, dateTo: e.target.value})} />
+                        <Form.Control className="mb-3" type="time" value={props.timeTo} onChange={(e) => props.setDateTime({...props.dateTime, timeTo: e.target.value})} />
                     </Form.Group>
                     <h4>Todo</h4>
                     <Fragment>
@@ -69,10 +69,10 @@ export default function WaypointModal(props) {
             </Modal.Body>
             <Modal.Footer>
                 <div className="d-flex justify-content-evenly">
-                    {!props.edit && props.isOrigin && <Button className="mx-1" variant="dark" onClick={props.addOrigin}>Set Origin</Button>}
-                    {!props.edit && props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addDestination}>Set Destination</Button>}
+                    {props.isOrigin && <Button className="mx-1" variant="dark" onClick={props.addOrigin}>Set Origin</Button>}
+                    {props.isDestination && <Button className="mx-1" variant="dark" onClick={props.addDestination}>Set Destination</Button>}
                     {!props.edit && !props.isDestination && !props.isOrigin && <Button className="mx-1" variant="dark" onClick={props.addStopover}>Add Point</Button>}
-                    {props.edit && !props.isDestination && !props.isOrigin && <Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
+                    {props.edit && <Button className="mx-1" variant="dark" onClick={() => props.modifyWaypoint(props.index)}>Edit <FontAwesomeIcon icon={faPen} style={{color : 'white'}} /></Button>}
                 </div>
             </Modal.Footer>
         </Modal>

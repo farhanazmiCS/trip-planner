@@ -22,12 +22,19 @@ export default function Trip(props) {
     // To redirect back 
     const navigate = useNavigate();
 
-    const { myTripInviteRequests, setMyTripInviteRequests, 
+    const { 
+        waypoints,
+        setWaypoints,
+        myTripInviteRequests, 
+        setMyTripInviteRequests, 
+        titleFieldStyle, 
+        setTitleFieldStyle,
+        titleField, 
+        setTitleField,
+        error, 
+        setError 
+    } = props;
     
-        titleFieldStyle, setTitleFieldStyle,
-        titleField, setTitleField,
-        error, setError } = props;
-
     // Users
     const users = JSON.parse(sessionStorage.getItem('users'));
 
@@ -45,6 +52,14 @@ export default function Trip(props) {
     // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
     let trip = getTrip(trips, parseInt(params.tripId));
+
+    // Reference for waypoints to compare with edited trip
+    let waypointsRef = [];
+    waypointsRef.push(trip.origin);
+    for (let s = 0; s < trip.waypoints.length; s++) {
+        waypointsRef.push(trip.waypoints[s]);
+    }
+    waypointsRef.push(trip.destination);
 
     const [titleEdit, setTitleEdit] = useState(trip.name);
 

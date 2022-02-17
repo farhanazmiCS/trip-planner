@@ -11,6 +11,9 @@ import Profile from './pages/Profile';
 import Notifications from './pages/Notifications'
 import FindUsers from './pages/FindUsers';
 
+// Function to format date and time
+import { formatDateTime } from './helper';
+
 // FOR CSRF TOKEN: src: https://docs.djangoproject.com/en/3.2/ref/csrf/
 function getCookie(name) {
   let cookieValue = null;
@@ -42,6 +45,9 @@ export default function App() {
   // State of username and password fields for login form
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+
+  // Trip state. Stores all the waypoints, for edit trip function. To be passed down to CreateTrip and Trip.
+  const [waypoints, setWaypoints] = useState([]);
 
   // State of fields form register form
   const [emailRegister, setEmailRegister] = useState('');
@@ -75,36 +81,13 @@ export default function App() {
   
   // Array to store the requests
   var requests = [];
-
-  /**
-   * Function to format date and time from YYYY-MM-DD HH:MM:SS,
-   * to DD/MM/YYYY, HH:MM(AM/PM)
-   * @return {string}
-   */
-  function formatDateTime(dateTime) {
-    let year = dateTime.slice(0, 4);
-    let month = dateTime.slice(5, 7);
-    let day = dateTime.slice(8, 10);
-    let hour = dateTime.slice(11, 13);
-    let minute = dateTime.slice(14, 16);
-    if (Number(hour) > 12) {
-      var ampm = 'pm';
-      hour = Number(hour) - 12;
-      return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
-    }
-    else if (Number(hour) === 12) {
-      ampm = 'pm';
-      return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
-    }
-    ampm = 'am';
-    return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
-  }
   
   /**
    * Function to handle submission of the login form. If response status is 200,
    * saves the username and response token to sessionStorage, and navigates the user to 
    * the '/trips' page.
    * url: endpoint for login.
+   * @param {object} e - Event.
    * @return {undefined}
    */
   function handleLogin(e) {
@@ -149,7 +132,7 @@ export default function App() {
   /**
    * Function to handle logout. Clears sessionStorage on successful logout.
    * url: endpoint for logging out.
-   * @return {undefined}
+   * @returns {undefined}
    */
   function handleLogout() {
     let url = 'http://127.0.0.1:8000/api/logout';
@@ -177,7 +160,8 @@ export default function App() {
    * Function that is called once the registration form is submitted. Saves the username and user token
    * to sessionStorage if response status is 200.
    * url: endpoint for registering a user.
-   * @return {undefined}
+   * @param {object} e - Event.
+   * @returns {undefined}
    */
   function handleRegister(e) {
     let url = 'http://127.0.0.1:8000/users/register/';
@@ -231,7 +215,7 @@ export default function App() {
    * requestNotifications: request object for urlNotifications.
    * requestMyRequestsFriends: request object for urlMyRequestsFriends.
    * requestMyRequestsTrips: request object for urlMyRequestsTrips
-   * @return {undefined}
+   * @returns {undefined}
    */
   function onLoadOrRefresh() {
     // Retrieves the username, if any, from the session storage
@@ -289,7 +273,7 @@ export default function App() {
   /**
    * Function to fetch the authentication status of the user. If the response status is 200,
    * call the functions that are defined below to fetch the information.
-   * @return {undefined}
+   * @returns {undefined}
    */
   function fetchAuthStatus() {
     fetch(requests[0])
@@ -317,7 +301,7 @@ export default function App() {
   /**
    * A function that fetches all of the user's trips.
    * trip: maps through the response and sets it into a React Hook, myTrips, as well as into sessionStorage.
-   * @return {undefined}
+   * @returns {undefined}
    */
   function fetchTrips() {
     fetch(requests[1])
@@ -377,7 +361,7 @@ export default function App() {
 
   /**
    * A function that fetches all the users and saves them in sessionStorage.
-   * @return {undefined}
+   * @returns {undefined}
    */
   function fetchUsers() {
     fetch(requests[2])
@@ -393,7 +377,7 @@ export default function App() {
    * notifications: A JSON object that contains a list of notification objects.
    * friend_requests: An array that is initialised to store all the friend request notifications
    * trip_invites: An array that is initialised to store all the trip invite notifications
-   * @return {undefined}
+   * @returns {undefined}
    */
   function fetchNotifications() {
     fetch(requests[3])
@@ -426,7 +410,7 @@ export default function App() {
   /**
    * Function to fetch the friend requests sent by me to other users and save it in a React Hook and sessionStorage
    * myFriendRequests: an array object that stores the friend request objects
-   * @return {undefined}
+   * @returns {undefined}
    */
   function fetchMyRequestsFriends() {
     fetch(requests[4])
@@ -449,7 +433,7 @@ export default function App() {
   /**
    * Function to fetch the trip requests made by me to other users and saves it in a React Hook and sessionStorage
    * myTripRequests: an array object that stores the request objects.
-   * @return {undefined}
+   * @returns {undefined}
    */
   function fetchMyRequestsTrips() {
     fetch(requests[5])
@@ -474,7 +458,7 @@ export default function App() {
   /** 
    * Function to update the title of a trip
    * To be passed down to CreateTrip component
-   * @return {undefined}
+   * @returns {undefined}
    */
   function updateTitle(e) {
     setTitle(e.target.value);
@@ -502,6 +486,8 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/create-trip" 
           element={<CreateTrip
+            waypoints={waypoints}
+            setWaypoints={setWaypoints}
             users={users} 
             tripCounter={tripCounter}
             setTripCounter={setTripCounter}
@@ -528,7 +514,9 @@ export default function App() {
           />} 
         />
         <Route path="/trips/:tripId" 
-          element={<Trip 
+          element={<Trip
+            waypoints={waypoints}
+            setWaypoints={setWaypoints} 
             myTripInviteRequests={myTripInviteRequests}
             setMyTripInviteRequests={setMyTripInviteRequests}
             titleFieldStyle={titleFieldStyle}
