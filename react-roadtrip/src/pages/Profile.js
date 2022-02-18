@@ -231,12 +231,10 @@ export default function Profile(props) {
                     {/* If friend request is sent */}
                     {isRequested && 
                         <>
-                            <div className="row">
-                                <Container className="d-grid gap-2 mt-3">
-                                    <Button variant={buttonVariant}>{buttonContent}</Button>
-                                </Container>
-                            </div>
-                            <hr />
+                            <Container className="d-grid mt-2">
+                                <Button variant={buttonVariant}>{buttonContent}</Button>
+                                <hr />
+                            </Container>
                             <div className="row mt-5">
                                 <h1 style={{textAlign: 'center'}}><FontAwesomeIcon icon={faLock} style={{textAlign: 'center'}} /></h1>
                                 <h3 style={{textAlign: 'center'}}>This profile is private.</h3>

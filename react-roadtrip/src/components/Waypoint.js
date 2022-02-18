@@ -56,7 +56,7 @@ export default function Waypoint(props) {
                             {props.todo.length > 0 && <Card.Title style={{fontWeight: 'bold'}}>Todos</Card.Title>}
                             <ol style={{paddingLeft: '18px'}}>
                             {props.todo.map((todoItem, index) => (
-                                <li key={index}>{todoItem.value}</li>
+                                <li key={index}>{todoItem}</li>
                             ))}
                             </ol>
                         </div>
