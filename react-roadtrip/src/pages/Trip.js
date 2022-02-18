@@ -6,13 +6,11 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faPlus, faTimes, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
 
-// To get trip objects, if available
-import { trips } from './Profile';
 import Waypoint from '../components/Waypoint';
 
 // For Trip component
-function getTrip(trips, id) {
-    trips = (trips.length !== 0) ? trips.concat(JSON.parse(sessionStorage.getItem('cached_trips'))) : JSON.parse(sessionStorage.getItem('cached_trips'));
+function getTrip(id) {
+    let trips = JSON.parse(sessionStorage.getItem('cached_trips'));
     return trips.find(
         trip => trip.id === id
     );
@@ -51,7 +49,7 @@ export default function Trip(props) {
 
     // "trips" array is used when viewing the trips for a particular profile. "myTrips" is used for viewing logged user's trips.
     let params = useParams();
-    let trip = getTrip(trips, parseInt(params.tripId));
+    let trip = getTrip(parseInt(params.tripId));
 
     // Reference for waypoints to compare with edited trip
     let waypointsRef = [];

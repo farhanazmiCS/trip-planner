@@ -11,9 +11,6 @@ function getUser(users, id) {
     )
 }
 
-// All of the profile's trips
-export var trips = [];
-
 export default function Profile(props) {
     // State of isRequested
     const [isRequested, setIsRequested] = useState(false);
@@ -145,14 +142,20 @@ export default function Profile(props) {
                     }
                 });
                 setProfileTrips(trip);
-                // To export
-                trips = [...trip];
+                // Make a copy of the profile's trips
+                let trips = [...trip];
+                // Retrieve cached trips
                 const cached_trips = JSON.parse(sessionStorage.getItem('cached_trips'));
-                cached_trips.concat(trip);
-                sessionStorage.setItem('cached_trips', JSON.stringify(cached_trips));
+                // Retrieve the id of all the cached trips (All the logged user's trips)
+                let tripsId = cached_trips.map(trip => trip.id);
+                // Exclude the logged user's trips (if present on the viewed profile's trips) --> Exclude duplicates
+                trips = trips.filter(trip => !tripsId.includes(trip.id));
+                // Concatenate the viewed user's trips and the logged user's trips together, and then set it to sessionStorage (cached_trips)
+                let all = trips.concat(cached_trips);
+                sessionStorage.setItem('cached_trips', JSON.stringify(all));
             })
         }
-    }, [props, profile.id, props.users]);
+    }, [profile.id, props.users]);
 
     // Add Friend button handler
     function addFriend() {

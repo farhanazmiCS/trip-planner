@@ -355,7 +355,11 @@ export default function App() {
       });
       setMyTrips(trip);
       // Cache the trips
-      sessionStorage.setItem('cached_trips', JSON.stringify(trip));
+      let currentTrips = sessionStorage.getItem('cached_trips');
+      // If no trips are cached, cache it. 
+      if (currentTrips === null) {
+        sessionStorage.setItem('cached_trips', JSON.stringify(trip));
+      }
     })
   }
 
