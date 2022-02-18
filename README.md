@@ -239,6 +239,15 @@ They are utilised by the "pages".
 </div>
 <br />
 
+### Other Files
+#### Helper File
+* The `helper.js` file contains four helper functions:
+
+  1. `todayDateAndTime()` - This function creates a new `Date` object and will return an array containing today's date, `todayDate` and current time, `timeNow`. 
+  2. `formatDateTime()` - This function takes the date and time formatted in HTML and formats it to a string that can be understood by Python. Returns a string type.
+  3. `dateFormatter()` - Formats the date from numbers to characters. For example, _2022-02-18_ will become _18 February, 2022_. Returns a string.
+  4. `timeFormatter()` - Formats 24 hour time to 12 hour time. For example, _13:24_ will become _01:24 PM_. Returns a string.
+
 ### Backend (Django-REST Framework)
 
 The backend utilises Django-REST Framework, a Django extension used to develop a Representational State Transfer (REST) API. The backend does not perform any rendering of the data into HTML, but handles the data, serializes them into JSON and providing a response back to the client.
