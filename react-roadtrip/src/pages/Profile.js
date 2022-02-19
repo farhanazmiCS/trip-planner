@@ -24,7 +24,13 @@ export default function Profile(props) {
     const username = sessionStorage.getItem('username');
     let params = useParams();
     let profile = getUser(JSON.parse(sessionStorage.getItem('users')), parseInt(params.userId));
-    
+
+    if (profile.username === sessionStorage.getItem('username')) {
+        document.title = 'RoadTrip: My Profile';
+    }
+    else {
+        document.title = `RoadTrip User: ${profile.username[0].toUpperCase() + profile.username.slice(1)}`;
+    }    
     // Returns an array, if the 'friends' array includes the logged on user's username
     const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'));
 
@@ -81,6 +87,7 @@ export default function Profile(props) {
                 setButtonContent('Add Friend');
             }
         })
+    // eslint-disable-next-line
     }, [isRequested, params.userId])
     
     useEffect(() => {
@@ -155,6 +162,7 @@ export default function Profile(props) {
                 sessionStorage.setItem('cached_trips', JSON.stringify(all));
             })
         }
+        // eslint-disable-next-line
     }, [profile.id, props.users]);
 
     // Add Friend button handler

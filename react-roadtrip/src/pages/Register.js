@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
 
 export default function Register(props) {
+    document.title = 'RoadTrip: Register';
     return(
         <Container>
             <Container className="pt-3">

@@ -51,6 +51,8 @@ export default function Trip(props) {
     let params = useParams();
     let trip = getTrip(parseInt(params.tripId));
 
+    document.title = `RoadTrip: ${trip.name}`;
+
     // Reference for waypoints to compare with edited trip
     let waypointsRef = [];
     waypointsRef.push(trip.origin);
@@ -181,6 +183,7 @@ export default function Trip(props) {
         setTitleEdit(e.target.value);
         setError(null);
     }
+    // eslint-disable-next-line
     useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
     return (
         <Container key={trip.id}>

@@ -14,6 +14,7 @@ import { faCheck, faMapMarkerAlt, faPen } from '@fortawesome/free-solid-svg-icon
 import todayDateAndTime from '../helper';
 
 export default function CreateTrip(props) {
+    document.title = 'RoadTrip: Create Trip';
     // Username and token for auth
     const username = sessionStorage.getItem('username');
     const auth_token = sessionStorage.getItem(username);

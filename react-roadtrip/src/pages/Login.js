@@ -9,6 +9,7 @@ import { faCar } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 export default function Login(props) {
+    document.title = 'RoadTrip: Login';
     return(
         <Container>
             <Container className="pt-3">
