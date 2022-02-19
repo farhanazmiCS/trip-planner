@@ -17,7 +17,7 @@ export default function FriendsListModal(props) {
             </Modal.Header>
             <Modal.Body>
                 {friends.length !== 0 && friends.map(friend => (
-                    <div onClick={() => profilePage(friend.id)}>
+                    <div key={friend.username + ' ' + friend.id} onClick={() => profilePage(friend.id)}>
                         <p style={{fontWeight: 'bold', fontSize: '18px'}}>{friend.username[0].toUpperCase() + friend.username.slice(1)}</p>
                     </div>
                 ))}
