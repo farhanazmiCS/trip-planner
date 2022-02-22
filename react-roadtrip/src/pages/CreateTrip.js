@@ -10,9 +10,6 @@ import { InputGroup } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheck, faMapMarkerAlt, faPen } from '@fortawesome/free-solid-svg-icons';
 
-// Default date helper function
-import todayDateAndTime from '../helper';
-
 export default function CreateTrip(props) {
     document.title = 'RoadTrip: Create Trip';
     // Username and token for auth
@@ -22,14 +19,15 @@ export default function CreateTrip(props) {
     // Mapbox access token
     const access_token = 'API_KEY';
     
-    // Modal Control
-    const [show, setShow] = useState(false);
     /**
      * Function that allows the user to add an origin waypoint
      */
     function addOriginModal() {
         setShow(true);
-        setIsOrigin(true);
+        setWaypointType({
+            isOrigin: true,
+            isDestination: false
+        });
         setSingleOption([]);
     }
     /**
@@ -44,38 +42,18 @@ export default function CreateTrip(props) {
      */
     function addDestinationModal() {
         setShow(true);
-        setIsDestination(true);
+        setWaypointType({
+            isOrigin: false,
+            isDestination: true
+        });
         setSingleOption([]);
     }
-    /**
-     * A function that displays the 'edit' modal, along with the waypoint's information
-     * @param {Number} key 
-     */
-    function editModal(key) {
-        setShow(true);
-        showEdit(true);
-        setKey(key);
-        setSingleOption([waypoints[key]]);
-        setDateTime({
-            dateFrom: waypoints[key].dateFrom,
-            timeFrom: waypoints[key].timeFrom,
-            dateTo: waypoints[key].dateTo,
-            timeTo: waypoints[key].timeTo
-        })
-        setTodoObjects(waypoints[key].todo);
-    }
-    /**
-     * A function that hides the modal and resets the fields
-     */
-    function hideModal() {
-        setShow(false);
-        showEdit(false);
-        setKey(null);
-        setIsOrigin(false);
-        setIsDestination(false);
-        setDateTime(defaultDateTime);
-        setTodoObjects([]);
-    }
+    
+    // editModal function, inherited from App.
+    const editModal = props.editModal;
+
+    // hideModal function, inherited from App.
+    const hideModal = props.hideModal;
 
     // API endpoint
     const endpoint = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
@@ -85,7 +63,8 @@ export default function CreateTrip(props) {
 
     // Options for location
     const [options, setOptions] = useState([]);
-    const [singleOption, setSingleOption] = useState([]);
+    const singleOption = props.singleOption;
+    const setSingleOption = props.setSingleOption;
 
     // Handle location search
     const handleSearch = (query) => {
@@ -114,55 +93,39 @@ export default function CreateTrip(props) {
     // Returns 'true' to bypass client-side filtering, as results are already filtered by API endpoint.
     const filterBy = () => true;
 
+    // Status of modal
+    const show = props.show;
+    const setShow = props.setShow;
+
+    // Key, for editing waypoint
+    const key = props.k;
+
+    // dateTime
+    const dateTime = props.dateTime;
+    const setDateTime = props.setDateTime;
+
     // Todo objects
-    const [todoObjects, setTodoObjects] = useState([]);
+    const todoObjects = props.todoObjects;
 
     // Add Todo objects
-    const addTodo = () => {
-        setTodoObjects([...todoObjects, {value: ''}]);
-    }
+    const addTodo = props.addTodo;
 
     // Handle Todo input field change
-    // Inspired by https://codesandbox.io/s/o54n9zwnly?file=/src/index.js. @u/jenovs
-    const onTodoChange = (event, index) => {
-        // Set the value to the updated field's value
-        todoObjects[index].value = event.target.value;
-        // Update the todoObjects array
-        setTodoObjects([...todoObjects]);
-    }
+    const onTodoChange = props.onTodoChange;
 
     // Remove Todo objects
-    const removeTodo = (key) => {
-        todoObjects.splice(key, 1);
-        setTodoObjects([...todoObjects]);
-    }
-    
-    // Get current date and time
-    const [date, now] = todayDateAndTime();
-    // Save the default dateTime
-    const defaultDateTime = {
-        dateFrom: date,
-        timeFrom: now,
-        dateTo: date,
-        timeTo: now
-    }
-    // Initialise current date and time for the 'to' and 'from' fields
-    const [dateTime, setDateTime] = useState(defaultDateTime);
-
-    // Current key
-    const [key, setKey] = useState(null);
-
-    // Edit button state, and functions to show and hide the edit button (Also used to show/hide the add button)
-    const [edit, showEdit] = useState(false);
-
+    const removeTodo = props.removeTodo;
+        
     // State of waypoint(s)
-    const waypoints = props.waypoints
-    const setWaypoints = props.setWaypoints
+    const waypoints = props.waypoints;
+    const setWaypoints = props.setWaypoints;
 
-    // State to identify origin waypoint
-    const [isOrigin, setIsOrigin] = useState(false);
-    // State to identify destination waypoint
-    const [isDestination, setIsDestination] = useState(false);
+    // Waypoint type, when editing waypoint
+    const waypointType = props.waypointType;
+    const setWaypointType = props.setWaypointType;
+
+    // Edit, if true, shows the edit button on a modal
+    const edit = props.edit;
 
     // Error message
     const [error, setError] = useState(null);
@@ -170,12 +133,12 @@ export default function CreateTrip(props) {
     const me = props.users.find(user => user.username === sessionStorage.getItem('username'));
     
     // Inherit title props from App component
-    const title = props.title
+    const title = props.title;
     const updateTitle = props.updateTitle;
-    const titleFieldStyle = props.titleFieldStyle
-    const setTitleFieldStyle = props.setTitleFieldStyle
-    const titleField = props.titleField
-    const setTitleField = props.setTitleField
+    const titleFieldStyle = props.titleFieldStyle;
+    const setTitleFieldStyle = props.setTitleFieldStyle;
+    const titleField = props.titleField;
+    const setTitleField = props.setTitleField;
 
     const addOrigin = () => {
         waypoints.push({
@@ -192,8 +155,6 @@ export default function CreateTrip(props) {
         })
         setWaypoints([...waypoints]);
         hideModal();
-        // Setting modal fields back to default
-        setTodoObjects([]);
     }
 
     const addDestination = () => {
@@ -211,8 +172,6 @@ export default function CreateTrip(props) {
         })
         setWaypoints([...waypoints]);
         hideModal();
-        // Setting modal fields back to default
-        setTodoObjects([]);
     }
 
     // Create waypoint event handler
@@ -247,8 +206,6 @@ export default function CreateTrip(props) {
         }
         setWaypoints([...waypoints]);
         hideModal();
-        // Setting modal fields back to default
-        setTodoObjects([]);
     }
 
     // Edit waypoint event handler
@@ -378,8 +335,8 @@ export default function CreateTrip(props) {
                         options={options}
                         index={key}             
                         edit={edit}  
-                        isOrigin={isOrigin}    
-                        isDestination={isDestination}
+                        isOrigin={waypointType.isOrigin}    
+                        isDestination={waypointType.isDestination}
                         singleOption={singleOption}
                         setSingleOption={setSingleOption}  
                     />

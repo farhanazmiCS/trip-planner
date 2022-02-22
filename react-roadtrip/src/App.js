@@ -13,6 +13,7 @@ import FindUsers from './pages/FindUsers';
 
 // Function to format date and time
 import { formatDateTime } from './helper';
+import todayDateAndTime from './helper';
 
 // FOR CSRF TOKEN: src: https://docs.djangoproject.com/en/3.2/ref/csrf/
 function getCookie(name) {
@@ -81,6 +82,87 @@ export default function App() {
   
   // Array to store the requests
   var requests = [];
+
+  // Props for editing trip control (For CreateTrip and Trip components)
+  const [show, setShow] = useState(false);
+  const [edit, showEdit] = useState(false);
+  const [key, setKey] = useState(null);
+  const [singleOption, setSingleOption] = useState([]);
+  // Today date and time
+  const [date, now] = todayDateAndTime();
+  const defaultDateTime = {
+    dateFrom: date,
+    timeFrom: now,
+    dateTo: date,
+    timeTo: now
+  }
+  const [dateTime, setDateTime] = useState(defaultDateTime);
+  // TodoObjects: An array of todos, for each waypoint
+  const [todoObjects, setTodoObjects] = useState([]);
+  // Waypoint state. Destination or Origin?
+  const [waypointType, setWaypointType] = useState({
+    isOrigin: false,
+    isDestination: false
+  });
+
+  /**
+     * A function that displays the 'edit' modal, along with the waypoint's information
+     * @param {Number} key 
+     */
+  function editModal(key) {
+    setShow(true);
+    showEdit(true);
+    setKey(key);
+    setSingleOption([waypoints[key]]);
+    setDateTime({
+      dateFrom: waypoints[key].dateFrom,
+      timeFrom: waypoints[key].timeFrom,
+      dateTo: waypoints[key].dateTo,
+      timeTo: waypoints[key].timeTo
+    })
+    setTodoObjects(waypoints[key].todo);
+  }
+
+  /**
+   * A function that hides the modal and resets the fields
+   */
+  function hideModal() {
+    setShow(false);
+    showEdit(false);
+    setKey(null);
+    setWaypointType({
+      isOrigin: false,
+      isDestination: false
+    })
+    setDateTime(defaultDateTime);
+    setTodoObjects([]);
+  }
+  /**
+   * Function to add todo items to a waypoint
+   */
+  function addTodo() {
+    setTodoObjects([...todoObjects, {value: ''}]);
+  }
+
+  /**
+   * Function to handle change in the todo input field
+   * @param {Number} index
+   */
+  function onTodoChange(e, index) {
+    // Set the value to the updated field's value
+    todoObjects[index].value = e.target.value;
+    // Update the todoObjects array
+    setTodoObjects([...todoObjects]);
+  }
+
+  /**
+   * Function to remove todo objects from a waypoint
+   * @param {Number} key
+   */
+  function removeTodo(key) {
+    todoObjects.splice(key, 1);
+    setTodoObjects([...todoObjects]);
+  }
   
   /**
    * Function to handle submission of the login form. If response status is 200,
@@ -492,6 +574,23 @@ export default function App() {
         <Route path="/" element={<Home />} />
         <Route path="/create-trip" 
           element={<CreateTrip
+            show={show}
+            setShow={setShow}
+            edit={edit}
+            k={key}
+            singleOption={singleOption}
+            setSingleOption={setSingleOption}
+            dateTime={dateTime}
+            setDateTime={setDateTime}
+            todoObjects={todoObjects}
+            setTodoObjects={setTodoObjects}
+            editModal={editModal}
+            hideModal={hideModal}
+            addTodo={addTodo}
+            onTodoChange={onTodoChange}
+            removeTodo={removeTodo}
+            waypointType={waypointType}
+            setWaypointType={setWaypointType}
             waypoints={waypoints}
             setWaypoints={setWaypoints}
             users={users} 
