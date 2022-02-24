@@ -103,25 +103,44 @@ export function dateFormatter(date) {
  * @returns {string}
  */
 export function timeFormatter(time) {
-    if (time.length === 5) {
-        var hours = time.slice(0, time.indexOf(':'));
-        var minutes = time.slice(time.indexOf(':') + 1);
-        // To determine AM or PM
-        if (Number(time.slice(0, 2)) < 12) {
-            var ampm = 'AM';
-        }
-        else if (Number(time.slice(0, 2) > 12)) {
-            hours = Number(hours) - 12;
-            ampm = 'PM';
-        }
-        else {
-            ampm = 'PM';
-        }
+    var hours = time.slice(0, time.indexOf(':'));
+    var minutes = time.slice(time.indexOf(':') + 1, time.indexOf(':') + 3);
+    // To determine AM or PM
+    if (Number(hours) > 12) {
+        hours = String(Number(hours) - 12);
+        var ampm = 'PM';
     }
     else {
-        hours = time.slice(0, time.indexOf(':'));
-        minutes = time.slice(time.indexOf(':') + 1, time.indexOf(':') + 3);
-        ampm = time.slice(-2).toUpperCase();
+        // Add a leading zero for hours below 12
+        ampm = 'AM';
     }
     return `${hours}:${minutes} ${ampm}`;
+}
+/**
+ * Function that takes the cached date and formats it to HTML date
+ * @param {string} cachedDateTime 
+ * @returns {Array}
+ */
+export function toHTMLDate(cachedDateTime) {
+    let day = cachedDateTime.slice(0, 2);
+    let month = cachedDateTime.slice(3, 5);
+    let year = cachedDateTime.slice(6, 10);
+    return `${year}-${month}-${day}`
+}
+
+/**
+ * Function that takes the cached time and formats it to HTML time
+ * @param {string} time 
+ * @returns {string}
+ */
+export function toHTMLTime(time) {
+    var hour = time.slice(12, time.indexOf(':'));
+    if (time.indexOf('p') !== -1) {
+        // hour is greater than 12
+        if (Number(hour) !== 12) {
+            hour = Number(hour) + 12
+        }
+    }
+    var minute = time.slice(time.indexOf(':') + 1, -2);
+    return `${hour}:${minute}`;
 }

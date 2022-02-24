@@ -7,12 +7,9 @@ export default function FindUsers(props) {
     document.title = 'RoadTrip: Find Users';
     // Make a copy of the users array
     const users = [...props.users];
-    // To store the userId
-    var userId = null;
     // To exclude the logged on user
     for (let i = 0; i < users.length; i++) {
         if (users[i].username === sessionStorage.getItem('username')) {
-            userId = users[i].id;
             users.splice(i, 1);
         }
     }

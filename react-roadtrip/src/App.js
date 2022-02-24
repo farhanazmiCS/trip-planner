@@ -87,6 +87,7 @@ export default function App() {
   const [show, setShow] = useState(false);
   const [edit, showEdit] = useState(false);
   const [key, setKey] = useState(null);
+  const [options, setOptions] = useState([]);
   const [singleOption, setSingleOption] = useState([]);
   // Today date and time
   const [date, now] = todayDateAndTime();
@@ -104,6 +105,46 @@ export default function App() {
     isOrigin: false,
     isDestination: false
   });
+
+  // AsyncTypeahead
+  // API endpoint and Access Token
+  const endpoint = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
+  const access_token = 'API_KEY';
+  // State declaration for handling location search
+  const [isLoading, setIsLoading] = useState(false);
+  // Handle location search
+  function handleSearch(query) {
+    setIsLoading(true);
+    fetch(`${endpoint}/${query}.json?limit=10&access_token=${access_token}`)
+    .then(response => response.json())
+    .then(result => {
+      // Contains id, text and place_name
+      const features = result['features'];
+      return features;
+    })
+    .then(features => {
+      const options = features.map((item) => ({
+        id: item.id,
+        text: item.text,
+        place_name: item.place_name,
+        longitude: item.center[0],
+        latitude: item.center[1]
+      }));
+      setOptions(options);
+      setIsLoading(false);
+    });
+  }
+  // Returns 'true' to bypass client-side filtering, as results are already filtered by API endpoint.
+  const filterBy = () => true;
+
+  /**
+   * Function to remove waypoint
+   * @param {Number} key
+   */
+  function removeWaypoint(key) {
+    waypoints.splice(key, 1);
+    setWaypoints([...waypoints]);
+  }
 
   /**
      * A function that displays the 'edit' modal, along with the waypoint's information
@@ -163,7 +204,60 @@ export default function App() {
     todoObjects.splice(key, 1);
     setTodoObjects([...todoObjects]);
   }
-  
+
+  /**
+   * Function to add a stopover waypoint
+   */
+  function addStopover() {
+    if (waypoints.find(waypoint => waypoint.type === 'destination') === undefined) {
+      waypoints.push({
+        type: 'stopover',
+        dateFrom: dateTime.dateFrom,
+        dateTo: dateTime.dateTo,
+        timeFrom: dateTime.timeFrom,
+        timeTo: dateTime.timeTo,
+        text: singleOption[0].text,
+        place_name: singleOption[0].place_name,
+        todo: todoObjects,
+        longitude: singleOption[0].longitude,
+        latitude: singleOption[0].latitude
+      })
+    }
+    else if (waypoints.find(waypoint => waypoint.type === 'destination') !== undefined) {
+      waypoints.splice(waypoints.length - 1, 0, {
+        type: 'stopover',
+        dateFrom: dateTime.dateFrom,
+        dateTo: dateTime.dateTo,
+        timeFrom: dateTime.timeFrom,
+        timeTo: dateTime.timeTo,
+        text: singleOption[0].text,
+        place_name: singleOption[0].place_name,
+        todo: todoObjects,
+        longitude: singleOption[0].longitude,
+        latitude: singleOption[0].latitude
+      });
+    }
+    setWaypoints([...waypoints]);
+    hideModal();
+  }
+
+  /**
+   * Function to modify waypoint.
+   * @param {Number} key 
+   */
+  function modifyWaypoint(key) {
+    waypoints[key].dateFrom = dateTime.dateFrom;
+    waypoints[key].dateTo = dateTime.dateTo;
+    waypoints[key].timeFrom = dateTime.timeFrom;
+    waypoints[key].timeTo = dateTime.timeTo;
+    waypoints[key].todo = todoObjects;
+    waypoints[key].text = singleOption[0].text;
+    waypoints[key].place_name = singleOption[0].place_name;
+    waypoints[key].longitude = singleOption[0].longitude;
+    waypoints[key].latitude = singleOption[0].latitude;
+    setWaypoints([...waypoints]);
+    hideModal();
+  }
   /**
    * Function to handle submission of the login form. If response status is 200,
    * saves the username and response token to sessionStorage, and navigates the user to 
@@ -562,6 +656,7 @@ export default function App() {
   return (
     <>
       {isLoggedIn && <NavigationBar 
+        setWaypoints={setWaypoints}
         navigate={navigate}
         user={sessionStorage.getItem('username')} 
         users={users}
@@ -578,6 +673,8 @@ export default function App() {
             setShow={setShow}
             edit={edit}
             k={key}
+            options={options}
+            setOptions={setOptions}
             singleOption={singleOption}
             setSingleOption={setSingleOption}
             dateTime={dateTime}
@@ -591,6 +688,7 @@ export default function App() {
             removeTodo={removeTodo}
             waypointType={waypointType}
             setWaypointType={setWaypointType}
+            removeWaypoint={removeWaypoint}
             waypoints={waypoints}
             setWaypoints={setWaypoints}
             users={users} 
@@ -610,6 +708,11 @@ export default function App() {
             setTitleFieldStyle={setTitleFieldStyle}
             titleField={titleField}
             setTitleField={setTitleField}
+            addStopover={addStopover}
+            modifyWaypoint={modifyWaypoint}
+            handleSearch={handleSearch}
+            filterBy={filterBy}
+            isLoading={isLoading}
           />} 
         />
         <Route path="/trips" 
@@ -620,6 +723,26 @@ export default function App() {
         />
         <Route path="/trips/:tripId" 
           element={<Trip
+            show={show}
+            setShow={setShow}
+            edit={edit}
+            k={key}
+            options={options}
+            setOptions={setOptions}
+            singleOption={singleOption}
+            setSingleOption={setSingleOption}
+            dateTime={dateTime}
+            setDateTime={setDateTime}
+            todoObjects={todoObjects}
+            setTodoObjects={setTodoObjects}
+            editModal={editModal}
+            hideModal={hideModal}
+            addTodo={addTodo}
+            onTodoChange={onTodoChange}
+            removeTodo={removeTodo}
+            waypointType={waypointType}
+            setWaypointType={setWaypointType}
+            removeWaypoint={removeWaypoint}
             waypoints={waypoints}
             setWaypoints={setWaypoints} 
             myTripInviteRequests={myTripInviteRequests}
@@ -630,6 +753,11 @@ export default function App() {
             setTitleField={setTitleField}
             error={error}
             setError={setError}
+            addStopover={addStopover}
+            modifyWaypoint={modifyWaypoint}
+            handleSearch={handleSearch}
+            filterBy={filterBy}
+            isLoading={isLoading}
           />} 
         />
         <Route path="/users" 

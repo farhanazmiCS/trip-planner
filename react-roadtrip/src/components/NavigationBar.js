@@ -14,6 +14,7 @@ import { NavLink } from 'react-router-dom';
 export default function NavigationBar(props) {
     // Make a copy of the users array
     const users = [...props.users];
+    const setWaypoints = props.setWaypoints;
     // To store the userId
     var userId = null;
     // To exclude the logged on user
@@ -22,6 +23,12 @@ export default function NavigationBar(props) {
             userId = users[i].id;
             users.splice(i, 1);
         }
+    }
+    /**
+     * Function to clear the waypoints array
+     */
+    function clearWaypoints() {
+        setWaypoints([]);
     }
     return(
         <Navbar bg="dark" variant="dark" expand="lg">
@@ -32,8 +39,8 @@ export default function NavigationBar(props) {
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
-                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/trips" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>My Trips</NavLink>
-                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/create-trip" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Create Trip</NavLink>
+                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/trips" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}} onClick={clearWaypoints}>My Trips</NavLink>
+                        <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/create-trip" style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}} onClick={clearWaypoints}>Create Trip</NavLink>
                         <NavLink className={({isActive}) => "mb-2 mt-2 mx-2 " + (!isActive ? "unselected" : "text-white bg-dark")} to="/users"  style={{textDecoration: 'none', color: 'grey', fontSize: '20px'}}>Find Users</NavLink>
                     </Nav>
                     <Nav>

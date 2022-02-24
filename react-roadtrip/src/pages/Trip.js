@@ -7,6 +7,9 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faPlus, faTimes, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
 
 import Waypoint from '../components/Waypoint';
+import WaypointModal from '../components/WaypointModal';
+
+import { toHTMLDate, toHTMLTime } from '../helper';
 
 // For Trip component
 function getTrip(id) {
@@ -21,6 +24,26 @@ export default function Trip(props) {
     const navigate = useNavigate();
 
     const { 
+        show,
+        setShow,
+        edit,
+        k,
+        options,
+        setOptions,
+        singleOption,
+        setSingleOption,
+        dateTime,
+        setDateTime,
+        todoObjects,
+        setTodoObjects,
+        editModal,
+        hideModal,
+        addTodo,
+        onTodoChange,
+        removeTodo,
+        waypointType,
+        setWaypointType,
+        removeWaypoint,
         waypoints,
         setWaypoints,
         myTripInviteRequests, 
@@ -30,7 +53,12 @@ export default function Trip(props) {
         titleField, 
         setTitleField,
         error, 
-        setError 
+        setError,
+        addStopover,
+        modifyWaypoint,
+        handleSearch,
+        filterBy,
+        isLoading
     } = props;
     
     // Users
@@ -185,128 +213,211 @@ export default function Trip(props) {
     }
     // eslint-disable-next-line
     useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
+    // Set the waypoints when viewing a trip
+    useEffect(() => {
+        let waypoints = [];
+        let origin = {
+            type: trip.origin.role,
+            dateFrom: toHTMLDate(trip.origin.dateTimeFrom),
+            dateTo: toHTMLDate(trip.origin.dateTimeTo),
+            timeFrom: toHTMLTime(trip.origin.dateTimeFrom),
+            timeTo: toHTMLTime(trip.origin.dateTimeTo),
+            text: trip.origin.name,
+            place_name: trip.origin.detail,
+            todo: trip.origin.todo,
+            longitude: trip.origin.longitude,
+            latitude: trip.origin.latitude
+        }
+        let stopovers = trip.waypoints.map(w => ({
+            type: 'stopover',
+            dateFrom: toHTMLDate(w.dateTimeFrom),
+            dateTo: toHTMLDate(w.dateTimeTo),
+            timeFrom: toHTMLTime(w.dateTimeFrom),
+            timeTo: toHTMLTime(w.dateTimeTo),
+            text: w.text,
+            place_name: w.place_name,
+            todo: w.todo,
+            longitude: w.longitude,
+            latitude: w.latitude
+        }))
+        let destination = {
+            type: trip.destination.role,
+            dateFrom: toHTMLDate(trip.destination.dateTimeFrom),
+            dateTo: toHTMLDate(trip.destination.dateTimeTo),
+            timeFrom: toHTMLTime(trip.destination.dateTimeFrom),
+            timeTo: toHTMLTime(trip.destination.dateTimeTo),
+            text: trip.destination.name,
+            place_name: trip.destination.detail,
+            todo: trip.destination.todo,
+            longitude: trip.destination.longitude,
+            latitude: trip.destination.latitude
+        }
+        waypoints.push(origin);
+        for (let i = 0; i < stopovers.length; i++) {
+            waypoints.push(stopovers[i]);
+        }
+        waypoints.push(destination);
+        setWaypoints(waypoints);
+        console.log(toHTMLTime(trip.origin.dateTimeFrom))
+        console.log(toHTMLTime(trip.origin.dateTimeTo))
+        // eslint-disable-next-line
+    }, [])
     return (
-        <Container key={trip.id}>
-            <div className="d-flex justify-content-between" style={{paddingTop: '10px', paddingBottom: '0px'}}>
-                <h5 className="pt-2 px-1" style={{textDecoration: 'none', fontSize: '18px'}} onClick={() => navigate(-1)} ><FontAwesomeIcon icon={faChevronLeft} /> Back </h5>
-                {/* Invite friends functionality */}
-                {!collapse && trip.users.find(user => user.username === sessionStorage.getItem('username')) && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'black'}}><FontAwesomeIcon icon={faPlus} /> Add friends to trip</Button>}
-                {collapse && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'red'}}><FontAwesomeIcon icon={faTimes} /> Cancel</Button>}
-            </div>
-            <Collapse in={collapse}>
-                <div id="my-friends">
-                    <div className="mx-3 mt-3">
-                        <h5>Select friends to invite:</h5>
-                            {toInvite.map((friend, index) => (
-                                <Button className="me-2 mb-2" key={friend.id} onClick={inviteBtnClick[index]} variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
-                            ))}
-                        </div>
-                    {toInvite.length === 0 && 
-                    <>
-                        <p className="m-1 mx-3" style={{color: 'grey', fontSize: '16px'}}>No one to invite to this trip.</p>
-                    </>}
-                    <h5 className="mt-4 mb-2 mx-3">Who's coming:</h5>
-                    {trip.users.length !== 0 && 
-                        <div className="mb-2 mx-1">
-                            {me &&  
-                                <>
-                                    <Button 
-                                        variant="link"
-                                        className="mb-0" 
-                                        onClick={() => navigate(`/profile/${me.id}`)}
-                                        style={{color: 'grey', fontSize: '16px', textDecoration: 'none'}} 
-                                        key={me.username}
-                                    >
-                                        {1}. Me
-                                    </Button>
-                                    <br />
-                                </>
-                            }
-                            {trip_users_copy.map((user, index) => (
-                                <>
-                                    {user.username !== sessionStorage.getItem('username') && 
-                                        <>
-                                            <Button 
-                                                variant="link"
-                                                className="mb-0" 
-                                                onClick={() => navigate(`/profile/${user.id}`)}
-                                                style={{color: 'grey', fontSize: '16px', textDecoration: 'none'}} 
-                                                key={user.username}
-                                            >
-                                                {index + 2}. {user.username[0].toUpperCase() + user.username.slice(1)}
-                                            </Button>
-                                            <br />
-                                        </>
-                                    }
-                                </>
-                            ))}
-                        </div>
-                    }  
+        <>
+            <Container key={trip.id}>
+                <div className="d-flex justify-content-between" style={{paddingTop: '10px', paddingBottom: '0px'}}>
+                    <h5 className="pt-2 px-1" style={{textDecoration: 'none', fontSize: '18px'}} onClick={() => navigate(-1)} ><FontAwesomeIcon icon={faChevronLeft} /> Back </h5>
+                    {/* Invite friends functionality */}
+                    {!collapse && trip.users.find(user => user.username === sessionStorage.getItem('username')) && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'black'}}><FontAwesomeIcon icon={faPlus} /> Add friends to trip</Button>}
+                    {collapse && <Button onClick={() => setCollapse(!collapse)} aria-controls="my-friends" aria-expanded={collapse} className="py-0" variant="link" style={{textDecoration: 'none', fontSize: '18px', color: 'red'}}><FontAwesomeIcon icon={faTimes} /> Cancel</Button>}
                 </div>
-            </Collapse>
-            <hr />
-            <p className="mb-0" style={{textAlign: 'center', color: 'grey'}}>Trip</p>
-            {!titleField && titleEdit !== '' && 
-                <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{titleEdit} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
-            }
-            {!titleField && titleEdit === '' && 
-                <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
-            }
-            {titleField && 
-                <Container>
-                    <InputGroup className="my-3">
-                        <FormControl size="lg" className={titleFieldStyle} aria-describedby="done" style={{display: 'inline-block'}} type="text" value={titleEdit} onChange={updateTitle} />
-                        <Button variant="dark" className={titleFieldStyle} id="done" onClick={() => setTitleField(false)}><FontAwesomeIcon icon={faCheck} onClick={() => setTitleField(false)} /></Button>
-                    </InputGroup>
-                </Container>
-            }
-            {error && 
-                <Container>
-                    <Container><p style={{color: 'red'}} className="mb-3">{error}</p></Container>
-                </Container>
-            }
-            {/* Origin */}
-            <Waypoint 
-                key={(trip.origin.name + trip.origin.detail).toUpperCase() + '1'}
-                type={trip.origin.role.toLowerCase()}
-                id={0} 
-                dateFrom={trip.origin.dateTimeFrom.slice(0, 10)} 
-                dateTo={trip.origin.dateTimeTo.slice(0, 10)} 
-                timeFrom={trip.origin.dateTimeFrom.slice(12)} 
-                timeTo={trip.origin.dateTimeTo.slice(12)} 
-                text={trip.origin.name} 
-                place={trip.origin.detail}
-                todo={trip.origin.todo} 
-                me={me}
-            />
-            {trip.waypoints.map((waypoint, index) => (
+                <Collapse in={collapse}>
+                    <div id="my-friends">
+                        <div className="mx-3 mt-3">
+                            <h5>Select friends to invite:</h5>
+                                {toInvite.map((friend, index) => (
+                                    <Button className="me-2 mb-2" key={friend.id} onClick={inviteBtnClick[index]} variant={inviteBtnVar[index]} size="sm">{inviteBtnContent[index]}</Button>
+                                ))}
+                            </div>
+                        {toInvite.length === 0 && 
+                        <>
+                            <p className="m-1 mx-3" style={{color: 'grey', fontSize: '16px'}}>No one to invite to this trip.</p>
+                        </>}
+                        <h5 className="mt-4 mb-2 mx-3">Who's coming:</h5>
+                        {trip.users.length !== 0 && 
+                            <div className="mb-2 mx-1">
+                                {me &&  
+                                    <>
+                                        <Button 
+                                            variant="link"
+                                            className="mb-0" 
+                                            onClick={() => navigate(`/profile/${me.id}`)}
+                                            style={{color: 'grey', fontSize: '16px', textDecoration: 'none'}} 
+                                            key={me.username}
+                                        >
+                                            {1}. Me
+                                        </Button>
+                                        <br />
+                                    </>
+                                }
+                                {trip_users_copy.map((user, index) => (
+                                    <>
+                                        {user.username !== sessionStorage.getItem('username') && 
+                                            <>
+                                                <Button 
+                                                    variant="link"
+                                                    className="mb-0" 
+                                                    onClick={() => navigate(`/profile/${user.id}`)}
+                                                    style={{color: 'grey', fontSize: '16px', textDecoration: 'none'}} 
+                                                    key={user.username}
+                                                >
+                                                    {index + 2}. {user.username[0].toUpperCase() + user.username.slice(1)}
+                                                </Button>
+                                                <br />
+                                            </>
+                                        }
+                                    </>
+                                ))}
+                            </div>
+                        }  
+                    </div>
+                </Collapse>
+                <hr />
+                <p className="mb-0" style={{textAlign: 'center', color: 'grey'}}>Trip</p>
+                {!titleField && titleEdit !== '' && 
+                    <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{titleEdit} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
+                }
+                {!titleField && titleEdit === '' && 
+                    <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
+                }
+                {titleField && 
+                    <Container>
+                        <InputGroup className="my-3">
+                            <FormControl size="lg" className={titleFieldStyle} aria-describedby="done" style={{display: 'inline-block'}} type="text" value={titleEdit} onChange={updateTitle} />
+                            <Button variant="dark" className={titleFieldStyle} id="done" onClick={() => setTitleField(false)}><FontAwesomeIcon icon={faCheck} onClick={() => setTitleField(false)} /></Button>
+                        </InputGroup>
+                    </Container>
+                }
+                {error && 
+                    <Container>
+                        <Container><p style={{color: 'red'}} className="mb-3">{error}</p></Container>
+                    </Container>
+                }
+                {/* Origin */}
                 <Waypoint 
-                    key={(waypoint.name + waypoint.detail).toUpperCase() + '1'}
-                    type={waypoint.role.toLowerCase()}
-                    id={index + 1} 
-                    dateFrom={waypoint.dateTimeFrom.slice(0, 10)} 
-                    dateTo={waypoint.dateTimeTo.slice(0, 10)} 
-                    timeFrom={waypoint.dateTimeFrom.slice(12)} 
-                    timeTo={waypoint.dateTimeTo.slice(12)} 
-                    text={waypoint.name} 
-                    place={waypoint.detail}
-                    todo={waypoint.todo} 
+                    key={0}
+                    type={trip.origin.role.toLowerCase()}
+                    id={0} 
+                    dateFrom={trip.origin.dateTimeFrom.slice(0, 10)} 
+                    dateTo={trip.origin.dateTimeTo.slice(0, 10)} 
+                    timeFrom={toHTMLTime(trip.origin.dateTimeFrom)} 
+                    timeTo={toHTMLTime(trip.origin.dateTimeTo)} 
+                    text={trip.origin.name} 
+                    place={trip.origin.detail}
+                    todo={trip.origin.todo} 
                     me={me}
+                    editWaypoint={editModal}
+                    removeWaypoint={removeWaypoint}
                 />
-            ))}
-            <Waypoint 
-                key={(trip.destination.name + trip.destination.detail).toUpperCase() + '1'}
-                type={trip.destination.role.toLowerCase()}
-                id={trip.waypoints.length + 1} 
-                dateFrom={trip.destination.dateTimeFrom.slice(0, 10)} 
-                dateTo={trip.destination.dateTimeTo.slice(0, 10)} 
-                timeFrom={trip.destination.dateTimeFrom.slice(12)} 
-                timeTo={trip.destination.dateTimeTo.slice(12)} 
-                text={trip.destination.name} 
-                place={trip.destination.detail}
-                todo={trip.destination.todo} 
-                me={me}
+                {trip.waypoints.map((waypoint, index) => (
+                    <Waypoint 
+                        key={index + 1}
+                        type={waypoint.role.toLowerCase()}
+                        id={index + 1} 
+                        dateFrom={waypoint.dateTimeFrom.slice(0, 10)} 
+                        dateTo={waypoint.dateTimeTo.slice(0, 10)} 
+                        timeFrom={toHTMLTime(waypoint.dateTimeFrom)} 
+                        timeTo={toHTMLTime(waypoint.dateTimeTo)} 
+                        text={waypoint.name} 
+                        place={waypoint.detail}
+                        todo={waypoint.todo} 
+                        me={me}
+                        editWaypoint={editModal}
+                        removeWaypoint={removeWaypoint}
+                    />
+                ))}
+                <Waypoint 
+                    key={waypoints.length - 1}
+                    type={trip.destination.role.toLowerCase()}
+                    id={trip.waypoints.length + 1} 
+                    dateFrom={trip.destination.dateTimeFrom.slice(0, 10)} 
+                    dateTo={trip.destination.dateTimeTo.slice(0, 10)} 
+                    timeFrom={toHTMLTime(trip.destination.dateTimeFrom)} 
+                    timeTo={toHTMLTime(trip.destination.dateTimeTo)} 
+                    text={trip.destination.name} 
+                    place={trip.destination.detail}
+                    todo={trip.destination.todo} 
+                    me={me}
+                    editWaypoint={editModal}
+                    removeWaypoint={removeWaypoint}
+                />
+            </Container>
+            <WaypointModal 
+               show={show}
+               onHide={hideModal} 
+               dateTime={dateTime}
+               dateFrom={dateTime.dateFrom}
+               dateTo={dateTime.dateTo}
+               timeFrom={dateTime.timeFrom}
+               timeTo={dateTime.timeTo}
+               setDateTime={setDateTime}
+               addStopover={addStopover}
+               modifyWaypoint={modifyWaypoint}
+               addTodo={addTodo}
+               removeTodo={removeTodo}
+               onTodoChange={onTodoChange}
+               todoObjects={todoObjects}
+               handleSearch={handleSearch}
+               filterBy={filterBy}
+               isLoading={isLoading}
+               options={options}
+               index={k}             
+               edit={edit}  
+               isOrigin={waypointType.isOrigin}    
+               isDestination={waypointType.isDestination}
+               singleOption={singleOption}
+               setSingleOption={setSingleOption}   
             />
-        </Container>
+        </>
     )
 }

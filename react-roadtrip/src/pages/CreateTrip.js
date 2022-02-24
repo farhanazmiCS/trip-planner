@@ -15,9 +15,6 @@ export default function CreateTrip(props) {
     // Username and token for auth
     const username = sessionStorage.getItem('username');
     const auth_token = sessionStorage.getItem(username);
-
-    // Mapbox access token
-    const access_token = 'API_KEY';
     
     /**
      * Function that allows the user to add an origin waypoint
@@ -55,43 +52,21 @@ export default function CreateTrip(props) {
     // hideModal function, inherited from App.
     const hideModal = props.hideModal;
 
-    // API endpoint
-    const endpoint = 'https://api.mapbox.com/geocoding/v5/mapbox.places';
 
     // State declaration for handling location search
-    const [isLoading, setIsLoading] = useState(false);
+    const isLoading = props.isLoading;
 
     // Options for location
-    const [options, setOptions] = useState([]);
+    const options = props.options;
+    const setOptions = props.setOptions;
     const singleOption = props.singleOption;
     const setSingleOption = props.setSingleOption;
 
     // Handle location search
-    const handleSearch = (query) => {
-        setIsLoading(true);
-
-        fetch(`${endpoint}/${query}.json?limit=10&access_token=${access_token}`)
-        .then(response => response.json())
-        .then(result => {
-            // Contains id, text and place_name
-            const features = result['features'];
-            return features;
-        })
-        .then(features => {
-            const options = features.map((item) => ({
-                id: item.id,
-                text: item.text,
-                place_name: item.place_name,
-                longitude: item.center[0],
-                latitude: item.center[1]
-            }));
-            setOptions(options);
-            setIsLoading(false);
-        });
-    }
+    const handleSearch = props.handleSearch;
 
     // Returns 'true' to bypass client-side filtering, as results are already filtered by API endpoint.
-    const filterBy = () => true;
+    const filterBy = props.filterBy;
 
     // Status of modal
     const show = props.show;
@@ -174,60 +149,14 @@ export default function CreateTrip(props) {
         hideModal();
     }
 
-    // Create waypoint event handler
-    const addStopover = () => {
-        if (waypoints.find(waypoint => waypoint.type === 'destination') === undefined) {
-            waypoints.push({
-                type: 'stopover',
-                dateFrom: dateTime.dateFrom,
-                dateTo: dateTime.dateTo,
-                timeFrom: dateTime.timeFrom,
-                timeTo: dateTime.timeTo,
-                text: singleOption[0].text,
-                place_name: singleOption[0].place_name,
-                todo: todoObjects,
-                longitude: singleOption[0].longitude,
-                latitude: singleOption[0].latitude
-            })
-        }
-        else if (waypoints.find(waypoint => waypoint.type === 'destination') !== undefined) {
-            waypoints.splice(waypoints.length - 1, 0, {
-                type: 'stopover',
-                dateFrom: dateTime.dateFrom,
-                dateTo: dateTime.dateTo,
-                timeFrom: dateTime.timeFrom,
-                timeTo: dateTime.timeTo,
-                text: singleOption[0].text,
-                place_name: singleOption[0].place_name,
-                todo: todoObjects,
-                longitude: singleOption[0].longitude,
-                latitude: singleOption[0].latitude
-            });
-        }
-        setWaypoints([...waypoints]);
-        hideModal();
-    }
+    // Create stopover event handler
+    const addStopover = props.addStopover;
 
     // Edit waypoint event handler
-    const modifyWaypoint = (key) => {
-        waypoints[key].dateFrom = dateTime.dateFrom;
-        waypoints[key].dateTo = dateTime.dateTo;
-        waypoints[key].timeFrom = dateTime.timeFrom;
-        waypoints[key].timeTo = dateTime.timeTo;
-        waypoints[key].todo = todoObjects;
-        waypoints[key].text = singleOption[0].text;
-        waypoints[key].place_name = singleOption[0].place_name;
-        waypoints[key].longitude = singleOption[0].longitude;
-        waypoints[key].latitude = singleOption[0].latitude;
-        setWaypoints([...waypoints]);
-        hideModal();
-    }
+    const modifyWaypoint = props.modifyWaypoint;
 
     // Delete waypoint event handler
-    const removeWaypoint = (key) => {
-        waypoints.splice(key, 1);
-        setWaypoints([...waypoints]);
-    }
+    const removeWaypoint = props.removeWaypoint;
 
     // Save the trip
     const saveTrip = (e) => {
@@ -285,7 +214,7 @@ export default function CreateTrip(props) {
                             {waypoints.map((waypoint, index) => (
                                 <Waypoint
                                     me={me}
-                                    key={(waypoint.text + waypoint.place_name).toUpperCase() + index.toString()}
+                                    key={(waypoint.text + waypoint.place_name) + index.toString()}
                                     type={waypoint.type}
                                     id={index} 
                                     dateFrom={waypoint.dateFrom} 
@@ -313,7 +242,8 @@ export default function CreateTrip(props) {
                             </Container>
                         </div>
                     </Container>
-                    <WaypointModal show={show}
+                    <WaypointModal 
+                        show={show}
                         onHide={hideModal} 
                         dateTime={dateTime}
                         dateFrom={dateTime.dateFrom}
