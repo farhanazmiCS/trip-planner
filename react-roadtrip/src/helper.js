@@ -118,13 +118,13 @@ export function timeFormatter(time) {
 }
 /**
  * Function that takes the cached date and formats it to HTML date
- * @param {string} cachedDateTime 
- * @returns {Array}
+ * @param {string} date 
+ * @returns {string}
  */
-export function toHTMLDate(cachedDateTime) {
-    let day = cachedDateTime.slice(0, 2);
-    let month = cachedDateTime.slice(3, 5);
-    let year = cachedDateTime.slice(6, 10);
+export function toHTMLDate(date) {
+    let day = date.slice(0, 2);
+    let month = date.slice(3, 5);
+    let year = date.slice(6, 10);
     return `${year}-${month}-${day}`
 }
 
