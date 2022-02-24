@@ -58,7 +58,7 @@ export default function Waypoint(props) {
                             {props.todo.map((todoItem, index) => (
                                 <>
                                     {todoItem.value !== undefined && <li key={index}>{todoItem.value}</li>}
-                                    {todoItem.value === undefined && <li key={index}>{todoItem.value}</li>}
+                                    {todoItem.value === undefined && <li key={index}>{todoItem}</li>}
                                 </>
                             ))}
                             </ol>

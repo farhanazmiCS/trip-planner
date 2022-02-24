@@ -110,6 +110,9 @@ export function timeFormatter(time) {
         hours = String(Number(hours) - 12);
         var ampm = 'PM';
     }
+    else if (Number(hours) === 12) {
+        ampm = 'PM';
+    }
     else {
         // Add a leading zero for hours below 12
         ampm = 'AM';
