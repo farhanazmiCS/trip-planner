@@ -1,6 +1,7 @@
 /**
  * A function that sets the default date and time to display in the WaypointModal form
  * Returns an array of size two containing two strings, todayDate, and timeNow.
+ * Utilised to set the default date and time in the dateTime React Hook.
  * @returns {Array}
  */
 export default function todayDateAndTime() {
@@ -40,8 +41,9 @@ export default function todayDateAndTime() {
 }
 
 /**
-   * Function to format date and time from YYYY-MM-DD HH:MM:SS,
-   * to DD/MM/YYYY, HH:MM(AM/PM)
+   * Function to format date and time from YYYY-MM-DDTHH:MM:SS+08:00,
+   * to DD/MM/YYYY, HH:MMam(pm)
+   * Used when: Fetch data from Python ---> Saved to a ReactJS Hook
    * @param {string} dateTime - The date and time (combined) in string format.
    * @returns {string}
    */
@@ -51,21 +53,27 @@ export function formatDateTime(dateTime) {
     let day = dateTime.slice(8, 10);
     let hour = dateTime.slice(11, 13);
     let minute = dateTime.slice(14, 16);
+    let ampm = 'pm';
+    // Afternoon, 'pm', subtract by 12 to get 12 hour time
     if (Number(hour) > 12) {
-        var ampm = 'pm';
         hour = Number(hour) - 12;
         return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
     }
+    // 12 noon, indicate as 'pm'
     else if (Number(hour) === 12) {
-        ampm = 'pm';
         return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
     }
-    ampm = 'am';
-    return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+    // Before 12 noon, indicate as 'am'
+    else {
+        ampm = 'am';
+        return `${day}/${month}/${year}, ${hour}:${minute}${ampm}`;
+    }
 }
 
 /**
  * A function that formats the date to DD Month(In Full), YYYY
+ * Used when: When adding a waypoint in CreateTrip, formats the date saved in the Waypoints prop (YYYY-MM-DD) and
+ * formatting the date from the cached trips (DD/MM/YYYY)
  * @param {string} date - The date in string format.
  * @returns {string}
  */
@@ -99,6 +107,7 @@ export function dateFormatter(date) {
 
 /**
  * A function that takes the time (24h) in string format and converts it to 12 hour time.
+ * Used when: Converting the 24h time saved in the Waypoints prop/Cache and converting it to AM/PM format.
  * @param {string} time - The time in string format
  * @returns {string}
  */
@@ -121,6 +130,7 @@ export function timeFormatter(time) {
 }
 /**
  * Function that takes the cached date and formats it to HTML date
+ * Application: Used in Trip page.
  * @param {string} date 
  * @returns {string}
  */
@@ -133,6 +143,7 @@ export function toHTMLDate(date) {
 
 /**
  * Function that takes the cached time and formats it to HTML time
+ *  * Application: Used in Trip page.
  * @param {string} time 
  * @returns {string}
  */

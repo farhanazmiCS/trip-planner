@@ -4,8 +4,7 @@ import Button from 'react-bootstrap/Button';
 import Card from 'react-bootstrap/Card';
 import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faTimesCircle } from '@fortawesome/free-solid-svg-icons';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faTimesCircle, faPen } from '@fortawesome/free-solid-svg-icons';
 
 // Date and time formatter
 import { dateFormatter, timeFormatter } from '../helper';
