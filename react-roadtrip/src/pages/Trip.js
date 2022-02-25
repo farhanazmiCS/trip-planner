@@ -322,12 +322,19 @@ export default function Trip(props) {
                 </Collapse>
                 <hr />
                 <p className="mb-0" style={{textAlign: 'center', color: 'grey'}}>Trip</p>
-                {!titleField && titleEdit !== '' && 
+                {/* When viewing a trip that you're not part of */}
+                {!me && 
+                    <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{titleEdit}</h1>
+                }
+                {/* Viewing a trip that you're part of, field isn't left empty */}
+                {!titleField && titleEdit !== '' && me && 
                     <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{titleEdit} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
                 }
-                {!titleField && titleEdit === '' && 
+                {/* Viewing a trip that you're part of, field is left empty. Set the value to what the value was originally. */}
+                {!titleField && titleEdit === '' && me && 
                     <h1 className="mb-3" style={{fontWeight: 'bolder', textAlign: 'center'}}>{trip.name} <FontAwesomeIcon style={{fontSize: '20px'}} icon={faPen} onClick={() => setTitleField(true)} /></h1>
                 }
+                {/* Show the editable field. */}
                 {titleField && 
                     <Container>
                         <InputGroup className="my-3">
