@@ -229,13 +229,13 @@ export default function Trip(props) {
             latitude: trip.origin.latitude
         }
         let stopovers = trip.waypoints.map(w => ({
-            type: 'stopover',
+            type: 'Stopover',
             dateFrom: toHTMLDate(w.dateTimeFrom),
             dateTo: toHTMLDate(w.dateTimeTo),
             timeFrom: toHTMLTime(w.dateTimeFrom),
             timeTo: toHTMLTime(w.dateTimeTo),
-            text: w.text,
-            place_name: w.place_name,
+            text: w.name,
+            place_name: w.detail,
             todo: w.todo,
             longitude: w.longitude,
             latitude: w.latitude
@@ -258,8 +258,6 @@ export default function Trip(props) {
         }
         waypoints.push(destination);
         setWaypoints(waypoints);
-        console.log(toHTMLTime(trip.origin.dateTimeFrom))
-        console.log(toHTMLTime(trip.origin.dateTimeTo))
         // eslint-disable-next-line
     }, [])
     return (
@@ -345,7 +343,7 @@ export default function Trip(props) {
                 }
                 {/* Origin */}
                 <Waypoint 
-                    key={0}
+                    key={trip.origin.role + ' ' + trip.origin.detail}
                     type={trip.origin.role.toLowerCase()}
                     id={0} 
                     dateFrom={trip.origin.dateTimeFrom.slice(0, 10)} 
@@ -361,7 +359,7 @@ export default function Trip(props) {
                 />
                 {trip.waypoints.map((waypoint, index) => (
                     <Waypoint 
-                        key={index + 1}
+                        key={waypoint.role + ' ' + index + 1 + ' ' + waypoint.detail}
                         type={waypoint.role.toLowerCase()}
                         id={index + 1} 
                         dateFrom={waypoint.dateTimeFrom.slice(0, 10)} 
@@ -377,7 +375,7 @@ export default function Trip(props) {
                     />
                 ))}
                 <Waypoint 
-                    key={waypoints.length - 1}
+                    key={trip.destination.role + ' ' + trip.destination.detail}
                     type={trip.destination.role.toLowerCase()}
                     id={trip.waypoints.length + 1} 
                     dateFrom={trip.destination.dateTimeFrom.slice(0, 10)} 

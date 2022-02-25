@@ -61,10 +61,10 @@ export default function WaypointModal(props) {
                         {props.todoObjects.map((todoObject, index) => (
                             <>
                                 {todoObject.value === undefined && 
-                                    <Todo key={index} id={index} value={todoObject} onChange={(event) => props.onTodoChange(event, index)} removeTodo={props.removeTodo} />
+                                    <Todo key={todoObject + '-key'} id={index} value={todoObject} onChange={(event) => props.onTodoChange(event, index)} removeTodo={props.removeTodo} />
                                 }
                                 {todoObject.value !== undefined && 
-                                    <Todo key={index} id={index} value={todoObject.value} onChange={(event) => props.onTodoChange(event, index)} removeTodo={props.removeTodo} />
+                                    <Todo key={todoObject.value + '-key'} id={index} value={todoObject.value} onChange={(event) => props.onTodoChange(event, index)} removeTodo={props.removeTodo} />
                                 }
                             </>
                         ))}
