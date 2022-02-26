@@ -182,7 +182,7 @@ export default function App() {
    * Function to add todo items to a waypoint
    */
   function addTodo() {
-    setTodoObjects([...todoObjects, {value: ''}]);
+    setTodoObjects([...todoObjects, '']);
   }
 
   /**
@@ -191,7 +191,7 @@ export default function App() {
    */
   function onTodoChange(e, index) {
     // Set the value to the updated field's value
-    todoObjects[index].value = e.target.value;
+    todoObjects[index] = e.target.value
     // Update the todoObjects array
     setTodoObjects([...todoObjects]);
   }
@@ -710,6 +710,7 @@ export default function App() {
             setPassword={setPassword} 
             handleLogin={handleLogin} 
             title={title}
+            setTitle={setTitle}
             updateTitle={updateTitle}
             titleFieldStyle={titleFieldStyle}
             setTitleFieldStyle={setTitleFieldStyle}

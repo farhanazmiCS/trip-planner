@@ -5,6 +5,7 @@ from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.db.models import query
+from django.http import HttpResponse, HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import translation
@@ -72,30 +73,32 @@ class UserViewSet(viewsets.ModelViewSet):
                 'status': 400
             }
             return Response(response, status=400)
-        # Create user instance
-        try:
-            user = User.objects.create_user(
-                email=email,
-                username=username,
-                password=password,
-            )
-            user.save()
-        except IntegrityError:
-            response = {
-                'error': f'Username of name {username} already exists!',
-                'status': 400
-            }
-            return Response(response, status=400)
-        # Create token for user
-        token = Token.objects.create(user=user)
-        # Log the user in
-        login(request, user)
-        response = {
-            'username': request.user.username,
-            'token': token.key,
-            'status': 200
-        }
-        return Response(response, status=200)
+        else:
+            # Create user instance
+            try:
+                user = User.objects.create_user(
+                    email=email,
+                    username=username,
+                    password=password,
+                )
+                user.save()
+            except IntegrityError:
+                response = {
+                    'error': f'Username of name {username} already exists!',
+                    'status': 400
+                }
+                return Response(response, status=400)
+            else:
+                # Create token for user
+                token = Token.objects.create(user=user)
+                # Log the user in
+                login(request, user)
+                response = {
+                    'username': request.user.username,
+                    'token': token.key,
+                    'status': 200
+                }
+                return Response(response, status=200)
 
     # Adding friends
     @action(methods=['PUT'], detail=True)
@@ -137,9 +140,9 @@ class TripViewSet(viewsets.ModelViewSet):
             trips = user.trip.all()
         except Trip.DoesNotExist:
             return Http404
-        
-        serializer = self.serializer_class(trips, many=True)
-        return Response(serializer.data)
+        else:
+            serializer = self.serializer_class(trips, many=True)
+            return Response(serializer.data)
 
     @action(methods=['GET'], detail=True)
     def get_trip(self, request, pk=None):
@@ -156,9 +159,9 @@ class TripViewSet(viewsets.ModelViewSet):
             trips = user.trip.all()
         except Trip.DoesNotExist:
             return Http404
-        
-        serializer = self.serializer_class(trips, many=True)
-        return Response(serializer.data)     
+        else:
+            serializer = self.serializer_class(trips, many=True)
+            return Response(serializer.data)     
        
     # View to save a trip
     @action(methods=['POST'], detail=False)
@@ -176,42 +179,43 @@ class TripViewSet(viewsets.ModelViewSet):
                 'status': 400
             }
             return Response(response, status=400)
-        trip.users.add(request.user)
-        for waypoint in enumerate(data['waypoints']):
-            dateTimeFrom = waypoint[1]['dateFrom'] + ' ' + waypoint[1]['timeFrom']
-            dateTimeTo = waypoint[1]['dateTo'] + ' ' + waypoint[1]['timeTo']
-            # Save waypoint object
-            w = Waypoint(
-                text=waypoint[1]['text'],
-                place_name=waypoint[1]['place_name'],
-                longitude=waypoint[1]['longitude'],
-                latitude=waypoint[1]['latitude'],
-                dateTimeFrom=datetime.strptime(dateTimeFrom, '%Y-%m-%d %H:%M'),
-                dateTimeTo=datetime.strptime(dateTimeTo, '%Y-%m-%d %H:%M'),
-            )
-            w.save()
-            # Add the waypoint to their respective classifications (origin, destination, waypoints)
-            if waypoint[0] == 0:
-                trip.origin = w
-                trip.save()
-            elif waypoint[0] == len(data['waypoints']) - 1:
-                trip.destination = w
-                trip.save()
-            else:
-                trip.waypoint.add(w)
-            # Query todo items, if any
-            todos = waypoint[1]['todo']
-            if todos == []:
-                pass
-            else:
-                for todo in todos:
-                    t = Todo(task=todo['value'])
-                    t.save()
-                    # Add the todo object into the waypoint object
-                    w.todo.add(t)
-        user.tripCounter = len(user.trip.all())
-        user.save()
-        return Response(status=200)
+        else:
+            trip.users.add(request.user)
+            for waypoint in enumerate(data['waypoints']):
+                dateTimeFrom = waypoint[1]['dateFrom'] + ' ' + waypoint[1]['timeFrom']
+                dateTimeTo = waypoint[1]['dateTo'] + ' ' + waypoint[1]['timeTo']
+                # Save waypoint object
+                w = Waypoint(
+                    text=waypoint[1]['text'],
+                    place_name=waypoint[1]['place_name'],
+                    longitude=waypoint[1]['longitude'],
+                    latitude=waypoint[1]['latitude'],
+                    dateTimeFrom=datetime.strptime(dateTimeFrom, '%Y-%m-%d %H:%M'),
+                    dateTimeTo=datetime.strptime(dateTimeTo, '%Y-%m-%d %H:%M'),
+                )
+                w.save()
+                # Add the waypoint to their respective classifications (origin, destination, waypoints)
+                if waypoint[0] == 0:
+                    trip.origin = w
+                    trip.save()
+                elif waypoint[0] == len(data['waypoints']) - 1:
+                    trip.destination = w
+                    trip.save()
+                else:
+                    trip.waypoint.add(w)
+                # Query todo items, if any
+                todos = waypoint[1]['todo']
+                if todos == []:
+                    pass
+                else:
+                    for todo in todos:
+                        t = Todo(task=todo)
+                        t.save()
+                        # Add the todo object into the waypoint object
+                        w.todo.add(t)
+            user.tripCounter = len(user.trip.all())
+            user.save()
+            return Response(status=200)
 
     @action(methods=['PUT'], detail=True)
     def add_friend_to_trip(self, request, pk=None):

@@ -114,16 +114,22 @@ export function dateFormatter(date) {
 export function timeFormatter(time) {
     var hours = time.slice(0, time.indexOf(':'));
     var minutes = time.slice(time.indexOf(':') + 1, time.indexOf(':') + 3);
-    // To determine AM or PM
+    // Case 1: PM, after 12 hours, but not 12pm
     if (Number(hours) > 12) {
         hours = String(Number(hours) - 12);
         var ampm = 'PM';
     }
+    // Case 2: 12 noon
     else if (Number(hours) === 12) {
         ampm = 'PM';
     }
+    // Case 3: Midnight
+    else if (Number(hours) === 0) {
+        hours = 12;
+        ampm = 'AM'
+    }
+    // Case 4: Morning, except for 0000hrs
     else {
-        // Add a leading zero for hours below 12
         ampm = 'AM';
     }
     return `${hours}:${minutes} ${ampm}`;

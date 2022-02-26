@@ -2,7 +2,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 import FormControl from 'react-bootstrap/FormControl';
 import WaypointModal from '../components/WaypointModal';
-import { Fragment, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import Waypoint from '../components/Waypoint';
 import { InputGroup } from 'react-bootstrap';
 
@@ -183,10 +183,11 @@ export default function CreateTrip(props) {
                     return;
                 });
             }
-            props.setTripCounter(props.tripCounter + 1);
-        })
-        .then(() => {
-            props.navigate('/trips');
+            else {
+                props.setTripCounter(props.tripCounter + 1);
+                props.setTitle('Trip Name');
+                props.navigate('/trips');
+            }
         })
         e.preventDefault();
     }

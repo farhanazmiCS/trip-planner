@@ -215,7 +215,7 @@ export default function Trip(props) {
     useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
     // Set the waypoints when viewing a trip
     useEffect(() => {
-        let waypoints = [];
+        let w = [];
         let origin = {
             type: trip.origin.role,
             dateFrom: toHTMLDate(trip.origin.dateTimeFrom),
@@ -252,12 +252,12 @@ export default function Trip(props) {
             longitude: trip.destination.longitude,
             latitude: trip.destination.latitude
         }
-        waypoints.push(origin);
+        w.push(origin);
         for (let i = 0; i < stopovers.length; i++) {
-            waypoints.push(stopovers[i]);
+            w.push(stopovers[i]);
         }
-        waypoints.push(destination);
-        setWaypoints(waypoints);
+        w.push(destination);
+        setWaypoints(w);
         // eslint-disable-next-line
     }, [])
     return (
@@ -353,18 +353,18 @@ export default function Trip(props) {
                     key={trip.origin.role + ' ' + trip.origin.detail}
                     type={trip.origin.role.toLowerCase()}
                     id={0} 
-                    dateFrom={trip.origin.dateTimeFrom.slice(0, 10)} 
-                    dateTo={trip.origin.dateTimeTo.slice(0, 10)} 
-                    timeFrom={toHTMLTime(trip.origin.dateTimeFrom)} 
-                    timeTo={toHTMLTime(trip.origin.dateTimeTo)} 
-                    text={trip.origin.name} 
-                    place={trip.origin.detail}
-                    todo={trip.origin.todo} 
+                    dateFrom={waypoints.length === 0 ? trip.origin.dateTimeFrom.slice(0, 10) : waypoints[0].dateFrom} 
+                    dateTo={waypoints.length === 0 ? trip.origin.dateTimeTo.slice(0, 10) : waypoints[0].dateTo} 
+                    timeFrom={waypoints.length === 0 ? toHTMLTime(trip.origin.dateTimeFrom) : waypoints[0].timeFrom} 
+                    timeTo={waypoints.length === 0 ? toHTMLTime(trip.origin.dateTimeTo) : waypoints[0].timeTo} 
+                    text={waypoints.length === 0 ? trip.origin.name : waypoints[0].text} 
+                    place={waypoints.length === 0 ? trip.origin.detail : waypoints[0].place_name}
+                    todo={waypoints.length === 0 ? trip.origin.todo : waypoints[0].todo} 
                     me={me}
                     editWaypoint={editModal}
                     removeWaypoint={removeWaypoint}
                 />
-                {trip.waypoints.map((waypoint, index) => (
+                {waypoints.length === 0 && trip.waypoints.map((waypoint, index) => (
                     <Waypoint 
                         key={waypoint.role + ' ' + index + 1 + ' ' + waypoint.detail}
                         type={waypoint.role.toLowerCase()}
@@ -381,17 +381,34 @@ export default function Trip(props) {
                         removeWaypoint={removeWaypoint}
                     />
                 ))}
+                {waypoints.length !== 0 && waypoints.slice(1, waypoints.length - 1).map((waypoint, index) => (
+                    <Waypoint 
+                        key={waypoint.type + ' ' + index + 1 + ' ' + waypoint.detail}
+                        type={waypoint.type.toLowerCase()}
+                        id={index + 1} 
+                        dateFrom={waypoints[index + 1].dateFrom} 
+                        dateTo={waypoints[index + 1].dateTo} 
+                        timeFrom={waypoints[index + 1].timeFrom} 
+                        timeTo={waypoints[index + 1].timeTo} 
+                        text={waypoints[index + 1].text} 
+                        place={waypoints[index + 1].place_name}
+                        todo={waypoints[index + 1].todo} 
+                        me={me}
+                        editWaypoint={editModal}
+                        removeWaypoint={removeWaypoint}
+                    />
+                ))}
                 <Waypoint 
                     key={trip.destination.role + ' ' + trip.destination.detail}
                     type={trip.destination.role.toLowerCase()}
-                    id={trip.waypoints.length + 1} 
-                    dateFrom={trip.destination.dateTimeFrom.slice(0, 10)} 
-                    dateTo={trip.destination.dateTimeTo.slice(0, 10)} 
-                    timeFrom={toHTMLTime(trip.destination.dateTimeFrom)} 
-                    timeTo={toHTMLTime(trip.destination.dateTimeTo)} 
-                    text={trip.destination.name} 
-                    place={trip.destination.detail}
-                    todo={trip.destination.todo} 
+                    id={waypoints.length - 1} 
+                    dateFrom={waypoints.length === 0 ? trip.destination.dateTimeFrom.slice(0, 10) : waypoints[waypoints.length - 1].dateFrom} 
+                    dateTo={waypoints.length === 0 ? trip.destination.dateTimeTo.slice(0, 10) : waypoints[waypoints.length - 1].dateTo} 
+                    timeFrom={waypoints.length === 0 ? toHTMLTime(trip.destination.dateTimeFrom) : waypoints[waypoints.length - 1].timeFrom} 
+                    timeTo={waypoints.length === 0 ? toHTMLTime(trip.destination.dateTimeTo) : waypoints[waypoints.length - 1].timeTo} 
+                    text={waypoints.length === 0 ? trip.destination.name : waypoints[waypoints.length - 1].text} 
+                    place={waypoints.length === 0 ? trip.destination.detail : waypoints[waypoints.length - 1].place_name}
+                    todo={waypoints.length === 0 ? trip.destination.todo : waypoints[waypoints.length - 1].todo} 
                     me={me}
                     editWaypoint={editModal}
                     removeWaypoint={removeWaypoint}
