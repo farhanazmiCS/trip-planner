@@ -3,9 +3,9 @@ from os import error, stat
 from datetime import datetime
 from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, PermissionDenied
 from django.db.models import query
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
 from django.http.response import Http404
 from django.shortcuts import get_object_or_404, render
 from django.utils import translation
@@ -138,8 +138,8 @@ class TripViewSet(viewsets.ModelViewSet):
         try:
             user = request.user
             trips = user.trip.all()
-        except Trip.DoesNotExist:
-            return Http404
+        except AttributeError:
+            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
         else:
             serializer = self.serializer_class(trips, many=True)
             return Response(serializer.data)
@@ -157,8 +157,10 @@ class TripViewSet(viewsets.ModelViewSet):
         try:
             user = User.objects.get(pk=pk)
             trips = user.trip.all()
-        except Trip.DoesNotExist:
-            return Http404
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User does not exist!'
+            }, status=404)
         else:
             serializer = self.serializer_class(trips, many=True)
             return Response(serializer.data)     
@@ -257,10 +259,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
         user = request.user 
         try:
             notifications = user.my_notifications.all()
-        except Notification.DoesNotExist:
-            return Http404
-        serializer = self.serializer_class(notifications, many=True)
-        return Response(serializer.data)
+        except AttributeError:
+            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
+        else:
+            serializer = self.serializer_class(notifications, many=True)
+            return Response(serializer.data)
 
     # List the notification requests made by the user
     @action(methods=['GET'], detail=False)
@@ -268,20 +271,22 @@ class NotificationViewSet(viewsets.ModelViewSet):
         user = request.user
         try:
             friend_requests = user.my_requests.filter(is_addFriend=True)
-        except Notification.DoesNotExist:
-            return Http404
-        serializer = self.serializer_class(friend_requests, many=True)
-        return Response(serializer.data)
+        except AttributeError:
+            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
+        else:
+            serializer = self.serializer_class(friend_requests, many=True)
+            return Response(serializer.data)
 
     @action(methods=['GET'], detail=False)
     def my_requests_trips(self, request):
         user = request.user
         try:
             trip_requests = user.my_requests.filter(is_inviteToTrip=True)
-        except Notification.DoesNotExist:
-            return Http404
-        serializer = self.serializer_class(trip_requests, many=True)
-        return Response(serializer.data)
+        except AttributeError:
+            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
+        else:
+            serializer = self.serializer_class(trip_requests, many=True)
+            return Response(serializer.data)
 
     # Sending notification to other user
     @action(methods=['POST'], detail=False)
@@ -325,7 +330,6 @@ class LoginView(APIView):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
-            
         # Verify username
         try:
             User.objects.get(username=username)
@@ -341,14 +345,12 @@ class LoginView(APIView):
                     'status': 404
                 }
             return Response(content, status=404)
-        
         # Authenticate user
         user = authenticate(
             request, 
             username=username, 
             password=password
         )
-
         if user is not None:
             login(request, user)
             # Provide user with auth token
