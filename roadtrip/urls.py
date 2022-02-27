@@ -11,7 +11,6 @@ router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
     path('api/login', views.LoginView.as_view(), name="login"),
-    path('api/logout', views.LogoutView.as_view(), name="logout"),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 

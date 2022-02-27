@@ -318,24 +318,23 @@ export default function App() {
    * @returns {undefined}
    */
   function handleLogout() {
-    let url = 'http://127.0.0.1:8000/api/logout';
+    let url = 'http://127.0.0.1:8000/api/login';
     let request = new Request(url);
+    // Clear session
+    sessionStorage.clear();
+    setIsLoggedIn(false);
+    setUserQuery([]);
+    setMyTrips([]);
+    setMyFriendRequests([]);
+    setMyTripInviteRequests([]);
+    setFriendRequests([]);
+    setTripRequests([]);
+    setUsername('');
+    setPassword('');
+    // Reload page
     fetch(request)
     .then(() => {
       navigate('/login');
-    })
-    .then(() => {
-      // Clear session
-      sessionStorage.clear();
-      setIsLoggedIn(false);
-      setUserQuery([]);
-      setMyTrips([]);
-      setMyFriendRequests([]);
-      setMyTripInviteRequests([]);
-      setFriendRequests([]);
-      setTripRequests([]);
-      setUsername('');
-      setPassword('');
     })
   }
 
@@ -461,23 +460,15 @@ export default function App() {
   function fetchAuthStatus() {
     fetch(requests[0])
     .then(res => {
-      switch(res.status) {
-        case 200:
-          setIsLoggedIn(true);
-          // Fetch Trip(s) from endpoint
-          fetchTrips();
-          // Fetch User(s) from endpoint
-          fetchUsers();
-          // Fetch Notification(s) from endpoint
-          fetchNotifications();
-          // Fetch Friend Requests from endpoint
-          fetchMyRequestsFriends();
-          // Fetch Trip Requests from endpoint
-          fetchMyRequestsTrips();
-          break;
-        default:
-          console.log(res.status);
+      if (res.status === 200) {
+        setIsLoggedIn(true);
+        fetchTrips();  // Fetch Trip(s) from endpoint
+        fetchUsers(); // Fetch User(s) from endpoint
+        fetchNotifications(); // Fetch Notification(s) from endpoint
+        fetchMyRequestsFriends(); // Fetch Friend Requests from endpoint
+        fetchMyRequestsTrips(); // Fetch Trip Requests from endpoint
       }
+      else console.log(res.status);
     })
   }
   
