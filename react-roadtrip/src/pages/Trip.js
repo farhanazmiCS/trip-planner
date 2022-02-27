@@ -250,6 +250,56 @@ export default function Trip(props) {
         setTitleEdit(e.target.value);
         setError(null);
     }
+    /**
+     * Function to save changes made in edit
+     * @param {Number} trip_id
+     */
+    function save_changes(e, trip_id) {
+        let request = new Request(
+            `http://127.0.0.1:8000/trips/${trip_id}/save_changes/`, {
+                headers: {
+                    'Authorization': `Token ${sessionStorage.getItem(sessionStorage.getItem('username'))}`
+                }
+            }
+        );
+        // Both trip name and waypoints modified
+        if (titleEdit !== trip.name && JSON.stringify(waypoints) !== JSON.stringify(defaultWaypoints)) {
+            var changes = {
+                tripName: titleEdit,
+                waypoints: waypoints
+            }
+        }
+        // Only trip name modified
+        else if (titleEdit !== trip.name && JSON.stringify(waypoints) === JSON.stringify(defaultWaypoints)) {
+            changes = {
+                tripName: titleEdit
+            }
+        }
+        // Only waypoints modified
+        else if (titleEdit === trip.name && JSON.stringify(waypoints) !== JSON.stringify(defaultWaypoints)) {
+            changes = {
+                waypoints: waypoints    
+            }
+        }
+        fetch(request, {
+            method: 'PUT',
+            body: JSON.stringify(changes)
+        })
+        .then(response => {
+            if (response.status !== 200) {
+                response.json().then(body => {
+                    setError(body['error']);
+                    setTitleField(true);
+                    setTitleFieldStyle('border border-danger');
+                    return;
+                });
+            }
+            else {
+                alert('Trip saved!');
+            }
+        })
+        e.preventDefault();
+    }
     // eslint-disable-next-line
     useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
     // Set the waypoints when viewing a trip, will be updated on page load.
@@ -416,11 +466,11 @@ export default function Trip(props) {
                         <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
                         {/* For showing the save changes button when the waypoints changes */}
                         {JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints) && 
-                        <Button className="mx-2" variant="danger">Save Changes</Button>
+                        <Button className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
                         }
                         {/* For showing the save changes button when the name of the trip changes */}
                         {defaultTitle !== titleEdit && JSON.stringify(defaultWaypoints) === JSON.stringify(waypoints) && 
-                        <Button className="mx-2" variant="danger">Save Changes</Button>
+                        <Button className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
                         }
                     </Container>
                 </div>

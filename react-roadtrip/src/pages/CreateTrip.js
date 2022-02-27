@@ -153,7 +153,7 @@ export default function CreateTrip(props) {
     const removeWaypoint = props.removeWaypoint;
 
     // Save the trip
-    const saveTrip = (e) => {
+    function saveTrip(e) {
         let request = new Request(
             'http://127.0.0.1:8000/trips/save_trip/', {
                 headers: {

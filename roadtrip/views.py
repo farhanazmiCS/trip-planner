@@ -210,16 +210,14 @@ class TripViewSet(viewsets.ModelViewSet):
             trip.users.add(request.user)
             waypoints = data['waypoints']
             for waypoint in range(len(waypoints)):
-                dateTimeFrom = waypoints[waypoint]['dateFrom'] + ' ' + waypoints[waypoint]['timeFrom']
-                dateTimeTo = waypoints[waypoint]['dateTo'] + ' ' + waypoints[waypoint]['timeTo']
                 # Save waypoint object
                 w = Waypoint(
                     text=waypoints[waypoint]['text'],
                     place_name=waypoints[waypoint]['place_name'],
                     longitude=waypoints[waypoint]['longitude'],
                     latitude=waypoints[waypoint]['latitude'],
-                    dateTimeFrom=datetime.strptime(dateTimeFrom, '%Y-%m-%d %H:%M'),
-                    dateTimeTo=datetime.strptime(dateTimeTo, '%Y-%m-%d %H:%M'),
+                    dateTimeFrom=datetime.strptime(waypoints[waypoint]['dateFrom'] + ' ' + waypoints[waypoint]['timeFrom'], '%Y-%m-%d %H:%M'),
+                    dateTimeTo=datetime.strptime(waypoints[waypoint]['dateTo'] + ' ' + waypoints[waypoint]['timeTo'], '%Y-%m-%d %H:%M'),
                 )
                 w.save()
                 # Add the waypoint to their respective classifications (origin, destination, waypoints)
@@ -244,6 +242,67 @@ class TripViewSet(viewsets.ModelViewSet):
             user.tripCounter = len(user.trip.all())
             user.save()
             return Response(status=200)
+    """
+    Saves any changes made to a trip.
+    pk: id of the trip to be changed.
+    """
+    @action(methods=['PUT'], detail=True)
+    def save_changes(self, request, pk=None):
+        queryset = self.queryset.all()
+        # Load the trip
+        trip = get_object_or_404(queryset, pk=pk)
+        # Load the data
+        data = json.loads(request.body)
+        if data.get('tripName') is not None:
+            # Get the trip name, and assign it
+            trip_name = data['tripName']
+            if trip_name != '':
+                try:
+                    trip.name = trip_name
+                    trip.save()
+                except IntegrityError:
+                    response = {
+                        'error': f'''The title '{data["tripName"]}' has already been used.''',
+                        'status': 400
+                    }
+                    return Response(response, status=400)
+        if data.get('waypoints') is not None:
+            # Clear stopovers, if any
+            trip.waypoint.clear()
+            # Define new waypoints
+            new_waypoints = data['waypoints']
+            # Create new waypoints
+            for waypoint in range(len(new_waypoints)):
+                # Save waypoint object
+                w = Waypoint(
+                    text=new_waypoints[waypoint]['text'],
+                    place_name=new_waypoints[waypoint]['place_name'],
+                    longitude=new_waypoints[waypoint]['longitude'],
+                    latitude=new_waypoints[waypoint]['latitude'],
+                    dateTimeFrom=datetime.strptime(new_waypoints[waypoint]['dateFrom'] + ' ' + new_waypoints[waypoint]['timeFrom'], '%Y-%m-%d %H:%M'),
+                    dateTimeTo=datetime.strptime(new_waypoints[waypoint]['dateTo'] + ' ' + new_waypoints[waypoint]['timeTo'], '%Y-%m-%d %H:%M'),
+                )
+                w.save()
+                # Add the waypoint to their respective classifications (origin, destination, waypoints)
+                if waypoint == 0:
+                    trip.origin = w
+                    trip.save()
+                elif waypoint == len(new_waypoints) - 1:
+                    trip.destination = w
+                    trip.save()
+                else:
+                    trip.waypoint.add(w)
+                # Query todo items, if any
+                todos = new_waypoints[waypoint]['todo']
+                if todos == []:
+                    pass
+                else:
+                    for todo in todos:
+                        t = Todo(task=todo)
+                        t.save()
+                        # Add the todo object into the waypoint object
+                        w.todo.add(t)
+        return Response(status=200)
 
     """
     Adds a user to the 'users' attribute in a trip object.
