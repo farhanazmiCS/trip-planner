@@ -147,6 +147,13 @@ export default function App() {
   }
 
   /**
+     * Function that allows the user to add stopover waypoints
+     */
+  function addStopoverModal() {
+    setShow(true);
+    setSingleOption([]);
+  }
+  /**
      * A function that displays the 'edit' modal, along with the waypoint's information
      * @param {Number} key 
      */
@@ -209,7 +216,7 @@ export default function App() {
    * Function to add a stopover waypoint
    */
   function addStopover() {
-    if (waypoints.find(waypoint => waypoint.type === 'destination') === undefined) {
+    if (waypoints.find(waypoint => waypoint.type === 'destination' || waypoint.type === 'Destination') === undefined) {
       waypoints.push({
         type: 'stopover',
         dateFrom: dateTime.dateFrom,
@@ -223,7 +230,7 @@ export default function App() {
         latitude: singleOption[0].latitude
       })
     }
-    else if (waypoints.find(waypoint => waypoint.type === 'destination') !== undefined) {
+    else if (waypoints.find(waypoint => waypoint.type === 'destination' || waypoint.type === 'Destination') !== undefined) {
       waypoints.splice(waypoints.length - 1, 0, {
         type: 'stopover',
         dateFrom: dateTime.dateFrom,
@@ -698,6 +705,7 @@ export default function App() {
             removeWaypoint={removeWaypoint}
             waypoints={waypoints}
             setWaypoints={setWaypoints}
+            addStopoverModal={addStopoverModal}
             users={users} 
             tripCounter={tripCounter}
             setTripCounter={setTripCounter}
@@ -753,6 +761,7 @@ export default function App() {
             removeWaypoint={removeWaypoint}
             waypoints={waypoints}
             setWaypoints={setWaypoints} 
+            addStopoverModal={addStopoverModal}
             myTripInviteRequests={myTripInviteRequests}
             setMyTripInviteRequests={setMyTripInviteRequests}
             titleFieldStyle={titleFieldStyle}

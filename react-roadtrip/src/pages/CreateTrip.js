@@ -27,13 +27,7 @@ export default function CreateTrip(props) {
         });
         setSingleOption([]);
     }
-    /**
-     * Function that allows the user to add stopover waypoints
-     */
-    function addStopoverModal() {
-        setShow(true);
-        setSingleOption([]);
-    }
+    const addStopoverModal = props.addStopoverModal;
     /**
      * Function that allows the user to add the destination
      */
@@ -191,6 +185,7 @@ export default function CreateTrip(props) {
         })
         e.preventDefault();
     }
+    useEffect(() => console.log(waypoints), [waypoints])
     return (
         <>
             {props.isLoggedIn && 

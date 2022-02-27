@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Container, Collapse, Button, FormControl, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 
 // FontAwesome Icon
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faChevronLeft, faPlus, faTimes, faPen, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faChevronLeft, faPlus, faTimes, faPen, faCheck, faMapMarkerAlt } from '@fortawesome/free-solid-svg-icons';
 
 import Waypoint from '../components/Waypoint';
 import WaypointModal from '../components/WaypointModal';
@@ -46,6 +46,7 @@ export default function Trip(props) {
         removeWaypoint,
         waypoints,
         setWaypoints,
+        addStopoverModal,
         myTripInviteRequests, 
         setMyTripInviteRequests, 
         titleFieldStyle, 
@@ -81,13 +82,49 @@ export default function Trip(props) {
 
     document.title = `RoadTrip: ${trip.name}`;
 
-    // Reference for waypoints to compare with edited trip
-    let waypointsRef = [];
-    waypointsRef.push(trip.origin);
-    for (let s = 0; s < trip.waypoints.length; s++) {
-        waypointsRef.push(trip.waypoints[s]);
+    // An array to have the original waypoints to reference
+    const defaultWaypoints = [];
+    let origin = {
+        type: trip.origin.role.toLowerCase(),
+        dateFrom: toHTMLDate(trip.origin.dateTimeFrom),
+        dateTo: toHTMLDate(trip.origin.dateTimeTo),
+        timeFrom: toHTMLTime(trip.origin.dateTimeFrom),
+        timeTo: toHTMLTime(trip.origin.dateTimeTo),
+        text: trip.origin.name,
+        place_name: trip.origin.detail,
+        todo: trip.origin.todo,
+        longitude: trip.origin.longitude,
+        latitude: trip.origin.latitude
     }
-    waypointsRef.push(trip.destination);
+    let stopovers = trip.waypoints.map(w => ({
+        type: 'stopover',
+        dateFrom: toHTMLDate(w.dateTimeFrom),
+        dateTo: toHTMLDate(w.dateTimeTo),
+        timeFrom: toHTMLTime(w.dateTimeFrom),
+        timeTo: toHTMLTime(w.dateTimeTo),
+        text: w.name,
+        place_name: w.detail,
+        todo: w.todo,
+        longitude: w.longitude,
+        latitude: w.latitude
+    }))
+    let destination = {
+        type: trip.destination.role.toLowerCase(),
+        dateFrom: toHTMLDate(trip.destination.dateTimeFrom),
+        dateTo: toHTMLDate(trip.destination.dateTimeTo),
+        timeFrom: toHTMLTime(trip.destination.dateTimeFrom),
+        timeTo: toHTMLTime(trip.destination.dateTimeTo),
+        text: trip.destination.name,
+        place_name: trip.destination.detail,
+        todo: trip.destination.todo,
+        longitude: trip.destination.longitude,
+        latitude: trip.destination.latitude
+    }
+    defaultWaypoints.push(origin);
+    for (let i = 0; i < stopovers.length; i++) {
+        defaultWaypoints.push(stopovers[i]);
+    }
+    defaultWaypoints.push(destination);
 
     const [titleEdit, setTitleEdit] = useState(trip.name);
 
@@ -213,53 +250,18 @@ export default function Trip(props) {
     }
     // eslint-disable-next-line
     useEffect(initialiseButtons, [toInvite.length, myTripInviteRequests, params.tripId]);
-    // Set the waypoints when viewing a trip
+    // Set the waypoints when viewing a trip, will be updated on page load.
     useEffect(() => {
-        let w = [];
-        let origin = {
-            type: trip.origin.role,
-            dateFrom: toHTMLDate(trip.origin.dateTimeFrom),
-            dateTo: toHTMLDate(trip.origin.dateTimeTo),
-            timeFrom: toHTMLTime(trip.origin.dateTimeFrom),
-            timeTo: toHTMLTime(trip.origin.dateTimeTo),
-            text: trip.origin.name,
-            place_name: trip.origin.detail,
-            todo: trip.origin.todo,
-            longitude: trip.origin.longitude,
-            latitude: trip.origin.latitude
-        }
-        let stopovers = trip.waypoints.map(w => ({
-            type: 'Stopover',
-            dateFrom: toHTMLDate(w.dateTimeFrom),
-            dateTo: toHTMLDate(w.dateTimeTo),
-            timeFrom: toHTMLTime(w.dateTimeFrom),
-            timeTo: toHTMLTime(w.dateTimeTo),
-            text: w.name,
-            place_name: w.detail,
-            todo: w.todo,
-            longitude: w.longitude,
-            latitude: w.latitude
-        }))
-        let destination = {
-            type: trip.destination.role,
-            dateFrom: toHTMLDate(trip.destination.dateTimeFrom),
-            dateTo: toHTMLDate(trip.destination.dateTimeTo),
-            timeFrom: toHTMLTime(trip.destination.dateTimeFrom),
-            timeTo: toHTMLTime(trip.destination.dateTimeTo),
-            text: trip.destination.name,
-            place_name: trip.destination.detail,
-            todo: trip.destination.todo,
-            longitude: trip.destination.longitude,
-            latitude: trip.destination.latitude
-        }
-        w.push(origin);
-        for (let i = 0; i < stopovers.length; i++) {
-            w.push(stopovers[i]);
-        }
-        w.push(destination);
-        setWaypoints(w);
+        setWaypoints([...defaultWaypoints]);
         // eslint-disable-next-line
     }, [])
+    /**
+     * Testing if the waypoints fit the required format to be submitted to backend
+     */
+    useEffect(() => {
+        console.log(waypoints);
+        console.log(defaultWaypoints);
+    }, [waypoints])
     return (
         <>
             <Container key={trip.id}>
@@ -413,6 +415,12 @@ export default function Trip(props) {
                     editWaypoint={editModal}
                     removeWaypoint={removeWaypoint}
                 />
+                <div className="mt-3 mb-3">
+                    <Container className="d-flex justify-content-center">
+                        {/* For only showing Stopover button */}
+                        <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
+                    </Container>
+                </div>
             </Container>
             <WaypointModal 
                show={show}
