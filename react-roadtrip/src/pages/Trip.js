@@ -82,6 +82,8 @@ export default function Trip(props) {
 
     document.title = `RoadTrip: ${trip.name}`;
 
+    // Default title for reference
+    const defaultTitle = trip.name;
     // An array to have the original waypoints to reference
     const defaultWaypoints = [];
     let origin = {
@@ -93,8 +95,8 @@ export default function Trip(props) {
         text: trip.origin.name,
         place_name: trip.origin.detail,
         todo: trip.origin.todo,
-        longitude: trip.origin.longitude,
-        latitude: trip.origin.latitude
+        longitude: Number(trip.origin.longitude),
+        latitude: Number(trip.origin.latitude)
     }
     let stopovers = trip.waypoints.map(w => ({
         type: 'stopover',
@@ -105,8 +107,8 @@ export default function Trip(props) {
         text: w.name,
         place_name: w.detail,
         todo: w.todo,
-        longitude: w.longitude,
-        latitude: w.latitude
+        longitude: Number(w.longitude),
+        latitude: Number(w.latitude)
     }))
     let destination = {
         type: trip.destination.role.toLowerCase(),
@@ -117,8 +119,8 @@ export default function Trip(props) {
         text: trip.destination.name,
         place_name: trip.destination.detail,
         todo: trip.destination.todo,
-        longitude: trip.destination.longitude,
-        latitude: trip.destination.latitude
+        longitude: Number(trip.destination.longitude),
+        latitude: Number(trip.destination.latitude)
     }
     defaultWaypoints.push(origin);
     for (let i = 0; i < stopovers.length; i++) {
@@ -255,13 +257,6 @@ export default function Trip(props) {
         setWaypoints([...defaultWaypoints]);
         // eslint-disable-next-line
     }, [])
-    /**
-     * Testing if the waypoints fit the required format to be submitted to backend
-     */
-    useEffect(() => {
-        console.log(waypoints);
-        console.log(defaultWaypoints);
-    }, [waypoints])
     return (
         <>
             <Container key={trip.id}>
@@ -417,8 +412,16 @@ export default function Trip(props) {
                 />
                 <div className="mt-3 mb-3">
                     <Container className="d-flex justify-content-center">
-                        {/* For only showing Stopover button */}
+                        {/* For showing the add stopover button */}
                         <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
+                        {/* For showing the save changes button when the waypoints changes */}
+                        {JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints) && 
+                        <Button className="mx-2" variant="danger">Save Changes</Button>
+                        }
+                        {/* For showing the save changes button when the name of the trip changes */}
+                        {defaultTitle !== titleEdit && JSON.stringify(defaultWaypoints) === JSON.stringify(waypoints) && 
+                        <Button className="mx-2" variant="danger">Save Changes</Button>
+                        }
                     </Container>
                 </div>
             </Container>
