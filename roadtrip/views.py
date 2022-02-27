@@ -31,6 +31,12 @@ from django.db import IntegrityError
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the User class. 
+
+    Methods: list(), get_user(), register(), add_friend(), 
+             remove_friend()
+    """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     """
@@ -45,7 +51,10 @@ class UserViewSet(viewsets.ModelViewSet):
     
     """
     Retrieves an information of a user.
-    pk: id of the user.
+
+    Params
+        
+        pk: id of the user.
     """
     @action(methods=['GET'], detail=True)
     def get_user(self, request, pk=None):
@@ -110,7 +119,10 @@ class UserViewSet(viewsets.ModelViewSet):
 
     """
     Inserts a new User instance to the 'friends' attribute of a User object.
-    pk: id of the User to be added as a friend.
+    
+    Params
+    
+        pk: id of the User to be added as a friend.
     """
     @action(methods=['PUT'], detail=True)
     def add_friend(self, request, pk=None):
@@ -125,7 +137,10 @@ class UserViewSet(viewsets.ModelViewSet):
     
     """
     This function will remove each user from their friends' list.
-    pk: id of the user to 'unfriend'.
+
+    Params
+        
+        pk: id of the user to 'unfriend'.
     """
     @action(methods=['DELETE'], detail=True)
     def remove_friend(self, request, pk=None):
@@ -145,6 +160,12 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(status=200)
 
 class TripViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the Trip class.
+
+    Methods: list(), get_trip(), list_other_trip(), save_trip(),
+             save_changes(), add_friend_to_trip()
+    """
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
     """
@@ -162,7 +183,10 @@ class TripViewSet(viewsets.ModelViewSet):
 
     """
     Retrieves a trip object.
-    pk: id of the trip object.
+
+    Params
+        
+        pk: id of the trip object.
     """
     @action(methods=['GET'], detail=True)
     def get_trip(self, request, pk=None):
@@ -173,7 +197,10 @@ class TripViewSet(viewsets.ModelViewSet):
 
     """
     Lists the trips of a particular user, given the user's id.
-    pk: The user's id.
+
+    Params
+
+        pk: The user's id.
     """
     @action(methods=['GET'], detail=True)
     def list_other_trip(self, request, pk=None):
@@ -242,9 +269,13 @@ class TripViewSet(viewsets.ModelViewSet):
             user.tripCounter = len(user.trip.all())
             user.save()
             return Response(status=200)
+
     """
-    Saves any changes made to a trip.
-    pk: id of the trip to be changed.
+    Saves any changes made to an existing trip object.
+
+    Params
+        
+        pk: id of the trip to be changed.
     """
     @action(methods=['PUT'], detail=True)
     def save_changes(self, request, pk=None):
@@ -306,7 +337,10 @@ class TripViewSet(viewsets.ModelViewSet):
 
     """
     Adds a user to the 'users' attribute in a trip object.
-    pk: id of the trip object.
+
+    Params
+
+        pk: id of the trip object.
     """
     @action(methods=['PUT'], detail=True)
     def add_friend_to_trip(self, request, pk=None):
@@ -321,6 +355,11 @@ class TripViewSet(viewsets.ModelViewSet):
         return Response(status=200)
 
 class WaypointViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the Waypoint class.
+
+    Methods: get_waypoint()
+    """
     queryset = Waypoint.objects.all()
     serializer_class = WaypointSerializer
     """
@@ -335,11 +374,19 @@ class WaypointViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class TodoViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the Todo class.
+
+    Methods: get_todo()
+    """
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
     """
     Retrieves a todo object.
-    pk: id of the todo object.
+
+    Params
+        
+        pk: id of the todo object.
     """
     @action(methods=['GET'], detail=True)
     def get_todo(self, request, pk=None):
@@ -349,6 +396,12 @@ class TodoViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 class NotificationViewSet(viewsets.ModelViewSet):
+    """
+    ViewSet for the Notification class.
+
+    Methods: list(), my_requests_friends(), my_requests_trips(),
+             send_request(), delete_notification()
+    """
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     """
@@ -423,7 +476,10 @@ class NotificationViewSet(viewsets.ModelViewSet):
 
     """
     Deletes a notification object. Used when a user accepts/decline a notification.
-    pk: id of notification object to delete.
+
+    Params
+
+        pk: id of notification object to delete.
     """
     @action(methods=['DELETE'], detail=True)
     def delete_notification(self, request, pk=None):
@@ -446,9 +502,18 @@ class LoginView(APIView):
             return Response(response, status=200)
     
     """
-    Takes a username and password and verifies it via authenticate().
-    If authenticate() returns None, user credentials are incorrect and login is denied.
-    Else, provide the token for request authentication.
+    Takes the username and password and verifies it.
+
+    If username field is empty, returns 404 along with error message.
+
+    If username does not exist, returns 404, along with error message
+    indicating that user does not exist.
+
+    Username and Password credentials are verified with authenticate(). 
+    If authenticate returns None, user credentials are. Returns 401, and login fails.
+    
+    Else, provide the token for request authentication, and return a
+    response status of 200.
     """
     def post(self, request):
         data = json.loads(request.body)
