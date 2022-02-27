@@ -1,19 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
+from string import punctuation
 
 class MandatoryCharacterValidator:
     """
     Validate whether the password contains at least one uppercase letter, one numeric character, and one special character.
     """
-    symbols = set((
-        '`', '~', '!', '@', '#', 
-        '$', '%', '^', '^', '&', 
-        '*', '(', ')', '-', '_', 
-        '+', '=', '[', ']', '{', 
-        '}', '"\"', '|', ';', ':', 
-        "'", '"', '/', '?', '.', 
-        '>', ',', '<'
-    ))
+    symbols = punctuation
 
     def validate(self, password, user=None):
         # Bool variables to check if conditions are met

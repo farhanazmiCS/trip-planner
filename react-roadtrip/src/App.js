@@ -316,8 +316,6 @@ export default function App() {
    * url: endpoint for logging out.
    */
   function handleLogout() {
-    let url = 'http://127.0.0.1:8000/api/login';
-    let request = new Request(url);
     // Clear session
     sessionStorage.clear();
     setIsLoggedIn(false);
@@ -329,11 +327,7 @@ export default function App() {
     setTripRequests([]);
     setUsername('');
     setPassword('');
-    // Reload page
-    fetch(request)
-    .then(() => {
-      navigate('/login');
-    })
+    navigate('/login');
   }
 
   /** 
@@ -526,7 +520,9 @@ export default function App() {
       let lastTripItem = trip[trip.length - 1];
       // If no trips are cached, cache it. 
       if (sessionStorage.getItem('cached_trips') === null) {
-        sessionStorage.setItem('cached_trips', JSON.stringify(trip));
+        if (trip.length !== 0) {
+          sessionStorage.setItem('cached_trips', JSON.stringify(trip));
+        }
       }
       // When a new trip is saved, add it to the cache.
       else if (JSON.parse(sessionStorage.getItem('cached_trips')).find(t => t.id === lastTripItem.id) === undefined) {

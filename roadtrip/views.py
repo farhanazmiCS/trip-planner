@@ -499,7 +499,7 @@ class LoginView(APIView):
             response = {
                 'status': 'logged out'
             }
-            return Response(response, status=200)
+            return Response(response, status=401)
     
     """
     Takes the username and password and verifies it.
