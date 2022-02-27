@@ -183,30 +183,31 @@ class TripViewSet(viewsets.ModelViewSet):
             return Response(response, status=400)
         else:
             trip.users.add(request.user)
-            for waypoint in enumerate(data['waypoints']):
-                dateTimeFrom = waypoint[1]['dateFrom'] + ' ' + waypoint[1]['timeFrom']
-                dateTimeTo = waypoint[1]['dateTo'] + ' ' + waypoint[1]['timeTo']
+            waypoints = data['waypoints']
+            for waypoint in range(len(waypoints)):
+                dateTimeFrom = waypoints[waypoint]['dateFrom'] + ' ' + waypoints[waypoint]['timeFrom']
+                dateTimeTo = waypoints[waypoint]['dateTo'] + ' ' + waypoints[waypoint]['timeTo']
                 # Save waypoint object
                 w = Waypoint(
-                    text=waypoint[1]['text'],
-                    place_name=waypoint[1]['place_name'],
-                    longitude=waypoint[1]['longitude'],
-                    latitude=waypoint[1]['latitude'],
+                    text=waypoints[waypoint]['text'],
+                    place_name=waypoints[waypoint]['place_name'],
+                    longitude=waypoints[waypoint]['longitude'],
+                    latitude=waypoints[waypoint]['latitude'],
                     dateTimeFrom=datetime.strptime(dateTimeFrom, '%Y-%m-%d %H:%M'),
                     dateTimeTo=datetime.strptime(dateTimeTo, '%Y-%m-%d %H:%M'),
                 )
                 w.save()
                 # Add the waypoint to their respective classifications (origin, destination, waypoints)
-                if waypoint[0] == 0:
+                if waypoint == 0:
                     trip.origin = w
                     trip.save()
-                elif waypoint[0] == len(data['waypoints']) - 1:
+                elif waypoint == len(waypoints) - 1:
                     trip.destination = w
                     trip.save()
                 else:
                     trip.waypoint.add(w)
                 # Query todo items, if any
-                todos = waypoint[1]['todo']
+                todos = waypoints[waypoint]['todo']
                 if todos == []:
                     pass
                 else:
