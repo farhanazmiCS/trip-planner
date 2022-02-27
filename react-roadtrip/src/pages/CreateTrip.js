@@ -185,7 +185,6 @@ export default function CreateTrip(props) {
         })
         e.preventDefault();
     }
-    useEffect(() => console.log(waypoints), [waypoints])
     return (
         <>
             {props.isLoggedIn && 

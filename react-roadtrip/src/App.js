@@ -271,7 +271,6 @@ export default function App() {
    * the '/trips' page.
    * url: endpoint for login.
    * @param {object} e - Event.
-   * @return {undefined}
    */
   function handleLogin(e) {
     // To clear previous user's session
@@ -315,7 +314,6 @@ export default function App() {
   /**
    * Function to handle logout. Clears sessionStorage on successful logout.
    * url: endpoint for logging out.
-   * @returns {undefined}
    */
   function handleLogout() {
     let url = 'http://127.0.0.1:8000/api/login';
@@ -343,7 +341,6 @@ export default function App() {
    * to sessionStorage if response status is 200.
    * url: endpoint for registering a user.
    * @param {object} e - Event.
-   * @returns {undefined}
    */
   function handleRegister(e) {
     let url = 'http://127.0.0.1:8000/users/register/';
@@ -397,7 +394,6 @@ export default function App() {
    * requestNotifications: request object for urlNotifications.
    * requestMyRequestsFriends: request object for urlMyRequestsFriends.
    * requestMyRequestsTrips: request object for urlMyRequestsTrips
-   * @returns {undefined}
    */
   function onLoadOrRefresh() {
     // Retrieves the username, if any, from the session storage
@@ -455,7 +451,6 @@ export default function App() {
   /**
    * Function to fetch the authentication status of the user. If the response status is 200,
    * call the functions that are defined below to fetch the information.
-   * @returns {undefined}
    */
   function fetchAuthStatus() {
     fetch(requests[0])
@@ -475,7 +470,6 @@ export default function App() {
   /**
    * A function that fetches all of the user's trips.
    * trip: maps through the response and sets it into a React Hook, myTrips, as well as into sessionStorage.
-   * @returns {undefined}
    */
   function fetchTrips() {
     fetch(requests[1])
@@ -529,15 +523,14 @@ export default function App() {
       });
       setMyTrips(trip);
       // Cache the trips
-      let currentTrips = sessionStorage.getItem('cached_trips');
       let lastTripItem = trip[trip.length - 1];
       // If no trips are cached, cache it. 
-      if (currentTrips === null) {
+      if (sessionStorage.getItem('cached_trips') === null) {
         sessionStorage.setItem('cached_trips', JSON.stringify(trip));
       }
       // When a new trip is saved, add it to the cache.
-      else if (JSON.parse(currentTrips).find(t => t.id === lastTripItem.id) === undefined) {
-        currentTrips = JSON.parse(currentTrips);
+      else if (JSON.parse(sessionStorage.getItem('cached_trips')).find(t => t.id === lastTripItem.id) === undefined) {
+        let currentTrips = JSON.parse(sessionStorage.getItem('cached_trips'));
         currentTrips.push(lastTripItem);
         sessionStorage.setItem('cached_trips', JSON.stringify(currentTrips));
       }
@@ -546,7 +539,6 @@ export default function App() {
 
   /**
    * A function that fetches all the users and saves them in sessionStorage.
-   * @returns {undefined}
    */
   function fetchUsers() {
     fetch(requests[2])
@@ -562,7 +554,6 @@ export default function App() {
    * notifications: A JSON object that contains a list of notification objects.
    * friend_requests: An array that is initialised to store all the friend request notifications
    * trip_invites: An array that is initialised to store all the trip invite notifications
-   * @returns {undefined}
    */
   function fetchNotifications() {
     fetch(requests[3])
@@ -595,7 +586,6 @@ export default function App() {
   /**
    * Function to fetch the friend requests sent by me to other users and save it in a React Hook and sessionStorage
    * myFriendRequests: an array object that stores the friend request objects
-   * @returns {undefined}
    */
   function fetchMyRequestsFriends() {
     fetch(requests[4])
@@ -618,7 +608,6 @@ export default function App() {
   /**
    * Function to fetch the trip requests made by me to other users and saves it in a React Hook and sessionStorage
    * myTripRequests: an array object that stores the request objects.
-   * @returns {undefined}
    */
   function fetchMyRequestsTrips() {
     fetch(requests[5])
@@ -643,7 +632,6 @@ export default function App() {
   /** 
    * Function to update the title of a trip
    * To be passed down to CreateTrip component
-   * @returns {undefined}
    */
   function updateTitle(e) {
     setTitle(e.target.value);

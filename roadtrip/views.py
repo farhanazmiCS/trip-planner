@@ -417,13 +417,12 @@ class LoginView(APIView):
             password=password
         )
         if user is not None:
-            login(request, user)
             # Provide user with auth token
             token = Token.objects.get(user=user)
             # Successful login, return the token
             content = {
                 'token': token.key,
-                'username': request.user.username,
+                'username': user.username,
                 'message': 'Authentication success!',
                 'status': 200
             }
