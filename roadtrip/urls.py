@@ -10,7 +10,9 @@ router.register(r'todos', views.TodoViewSet)
 router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
+    # For the login endpoint
     path('api/login', views.LoginView.as_view(), name="login"),
+    # For the browsable API 
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
 ]
 
