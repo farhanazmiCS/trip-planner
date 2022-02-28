@@ -264,15 +264,32 @@ export default function Trip(props) {
         );
         // Both trip name and waypoints modified
         if (titleEdit !== trip.name && JSON.stringify(waypoints) !== JSON.stringify(defaultWaypoints)) {
-            var changes = {
-                tripName: titleEdit,
-                waypoints: waypoints
+            if (titleEdit === '') {
+                var changes = {
+                    tripName: trip.name,
+                    waypoints: waypoints
+                }
+                setTitleEdit(trip.name);
+            }
+            else {
+                changes = {
+                    tripName: titleEdit,
+                    waypoints: waypoints
+                }
             }
         }
         // Only trip name modified
         else if (titleEdit !== trip.name && JSON.stringify(waypoints) === JSON.stringify(defaultWaypoints)) {
-            changes = {
-                tripName: titleEdit
+            if (titleEdit === '') {
+                changes = {
+                    tripName: trip.name,
+                }
+                setTitleEdit(trip.name);
+            }
+            else {
+                changes = {
+                    tripName: titleEdit
+                }
             }
         }
         // Only waypoints modified
