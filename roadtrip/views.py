@@ -333,7 +333,9 @@ class TripViewSet(viewsets.ModelViewSet):
                         t.save()
                         # Add the todo object into the waypoint object
                         w.todo.add(t)
-        return Response(status=200)
+        # Provide the updated trip as a response
+        serializer = self.serializer_class(trip)
+        return Response(serializer.data, status=200)
 
     """
     Adds a user to the 'users' attribute in a trip object.

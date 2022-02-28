@@ -636,7 +636,7 @@ export default function App() {
   
   // Call the onLoadOrRefresh function once the states of isLoggedIn and tripCounter are changed.
   // eslint-disable-next-line
-  useEffect(() => onLoadOrRefresh(), [isLoggedIn, tripCounter]);
+  useEffect(() => onLoadOrRefresh(), [isLoggedIn, tripCounter, JSON.stringify(sessionStorage.getItem('cached_trips'))]);
   // Closes the title field once on another page
   useEffect(() => {
     setTitleField(false)

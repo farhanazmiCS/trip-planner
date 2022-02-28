@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Container, Collapse, Button, FormControl, InputGroup } from 'react-bootstrap';
 import { useParams, useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ import { faChevronLeft, faPlus, faTimes, faPen, faCheck, faMapMarkerAlt } from '
 import Waypoint from '../components/Waypoint';
 import WaypointModal from '../components/WaypointModal';
 
-import { toHTMLDate, toHTMLTime } from '../helper';
+import { toHTMLDate, toHTMLTime, formatDateTime } from '../helper';
 
 // For Trip component
 function getTrip(id) {
@@ -83,9 +83,9 @@ export default function Trip(props) {
     document.title = `RoadTrip: ${trip.name}`;
 
     // Default title for reference
-    const defaultTitle = trip.name;
+    var defaultTitle = trip.name;
     // An array to have the original waypoints to reference
-    const defaultWaypoints = [];
+    var defaultWaypoints = [];
     let origin = {
         type: trip.origin.role.toLowerCase(),
         dateFrom: toHTMLDate(trip.origin.dateTimeFrom),
@@ -295,7 +295,69 @@ export default function Trip(props) {
                 });
             }
             else {
-                alert('Trip saved!');
+                // Get the response, to save it in the cache
+                response.json().then(body => {
+                    var t = {
+                        id: body.id,
+                        name: body.name,
+                        origin: {
+                            role: 'Origin',
+                            name: body.origin.text,
+                            detail: body.origin.place_name,
+                            longitude: body.origin.longitude,
+                            latitude: body.origin.latitude,
+                            dateTimeFrom: formatDateTime(body.origin.dateTimeFrom),
+                            dateTimeTo: formatDateTime(body.origin.dateTimeTo),
+                            todo: body.origin.todo.map(t => t.task)
+                        },
+                        destination: {
+                            role: 'Destination',
+                            name: body.destination.text,
+                            detail: body.destination.place_name,
+                            longitude: body.destination.longitude,
+                            latitude: body.destination.latitude,
+                            dateTimeFrom: formatDateTime(body.destination.dateTimeFrom),
+                            dateTimeTo: formatDateTime(body.destination.dateTimeTo),
+                            todo: body.destination.todo.map(t => t.task) 
+                        },
+                        waypoints: body.waypoint.map((w, index) => {
+                            return {
+                                id: w.id,
+                                role: `Stopover ${index + 1}`,
+                                name: w.text,
+                                detail: w.place_name,
+                                longitude: w.longitude,
+                                latitude: w.latitude,
+                                dateTimeFrom: formatDateTime(w.dateTimeFrom),
+                                dateTimeTo: formatDateTime(w.dateTimeTo),
+                                todo: w.todo.map(t => t.task)
+                            }
+                        }),
+                        users: body.users.map(user => {
+                            return {
+                                id: user.id,
+                                username: user.username,
+                                email: user.email
+                            } 
+                        })
+                    }
+                    return t;
+                }).then(t => {
+                    let cached_trips = JSON.parse(sessionStorage.getItem('cached_trips')) // Retrieve the cached trips
+                    let tripIndex = cached_trips.findIndex(t => t.id === trip.id); // Find the index of the trip to edit
+                    if (tripIndex !== -1) {
+                        cached_trips.splice(tripIndex, 1, t); // Update the existing trip object in the cache to the new one
+                        sessionStorage.setItem('cached_trips', JSON.stringify(cached_trips)) // Update the array to the cache
+                    }
+                    if (JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints)) {
+                        defaultWaypoints = [...waypoints]; // Update the defaultWaypoints
+                        setWaypoints(defaultWaypoints); // Re-render the Save Changes button
+                    }
+                    if (defaultTitle !== titleEdit) {
+                        defaultTitle = titleEdit.slice(); // Update the defaultTitle
+                        setWaypoints(defaultWaypoints); // Re-render the Save Changes button
+                    }
+                })
             }
         })
         e.preventDefault();
@@ -464,13 +526,13 @@ export default function Trip(props) {
                     <Container className="d-flex justify-content-center">
                         {/* For showing the add stopover button */}
                         <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
-                        {/* For showing the save changes button when the waypoints changes */}
+                        {/* For showing the save changes button when the waypoints and/or trip title changes */}
                         {JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints) && 
-                        <Button className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
+                        <Button id="num1" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
                         }
-                        {/* For showing the save changes button when the name of the trip changes */}
+                        {/* For showing the save changes button only when the trip title changes */}
                         {defaultTitle !== titleEdit && JSON.stringify(defaultWaypoints) === JSON.stringify(waypoints) && 
-                        <Button className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
+                        <Button id="num2" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
                         }
                     </Container>
                 </div>
