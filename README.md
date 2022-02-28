@@ -20,7 +20,7 @@ NOTE: Before proceeding, please go through `requirements.md` to install the nece
 
 * For this application to run, you would need an __access token__ for the MapBox API. You can generate this by signing up for a MapBox account [here](https://account.mapbox.com/auth/signup/).
 
-* Once the token is generated, you can include the token in line 19 of the `CreateTrip.js` file in the `/react-roadtrip/src/pages` directory, then save the file. 
+* Once the token is generated, you can include the token in line 112 of the `App.js` file in the `/react-roadtrip/src` directory, then save the file. 
   ```js ...
   const access_token = 'YOUR_ACCESS_TOKEN';
   ```
@@ -145,6 +145,22 @@ Depending on whether the authentication token is present in `sessionStorage`, th
   <img width="250" src="https://user-images.githubusercontent.com/68798786/154205988-b2160000-0bf5-4520-84b0-265b92c487ba.gif" alt="todo">
 </div>
 <br />
+
+* In addition user can also edit the properties of the trip, such as modifying the trip name, changing the Origin, Stopover and Destination waypoint properties, and adding new stopovers. This functionality is demonstrated in the gifs below:
+
+  __Changing Trip Name__
+  <div align="center">
+    <img width="250" src="https://user-images.githubusercontent.com/68798786/155937307-369f1c7e-ee37-4ac1-a8c4-3fe263b13b7b.gif" alt="todo">
+  </div>
+  <br />
+
+  __Modifying Waypoints__
+  <div align="center">
+    <img width="250" src="https://user-images.githubusercontent.com/68798786/155937894-494f2294-36c2-4245-b024-39364d64e5a9.gif" alt="todo">
+  </div>
+  <br />
+  
+* When the properties of the trip changes, the __Save Changes__ button appears. On click, this button will send the payload, containing the new trip name and/or the updated waypoints in JSON. The backend will provide the updated trip object as a response.
 
 #### Profile 
 * The __Profile__ component is defined in the `Profile.js` file, displaying information about a queried user.
@@ -313,6 +329,8 @@ The views in the backend are contained in the `views.py` file, which contain sev
   - __get_trip:__ Retrieve a particular trip, given a key (trip id) as a parameter.
   
   - __save_trip:__ Create a new trip object.
+
+  - __save_changes:__ Updates an existing trip object with a new tripName and/or waypoints.
  
   - __add_friend_to_trip:__ Add a user object to the __users__ key in a trip object.
 
