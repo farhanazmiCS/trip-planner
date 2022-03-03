@@ -80,7 +80,7 @@ export default function Trip(props) {
     let params = useParams();
     let trip = getTrip(parseInt(params.tripId));
 
-    document.title = `RoadTrip: ${trip.name}`;
+    document.title = `Trip Planner: ${trip.name}`;
 
     // Default title for reference
     var defaultTitle = trip.name;

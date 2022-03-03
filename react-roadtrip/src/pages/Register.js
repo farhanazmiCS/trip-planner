@@ -8,11 +8,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCar } from '@fortawesome/free-solid-svg-icons';
 
 export default function Register(props) {
-    document.title = 'RoadTrip: Register';
+    document.title = 'Trip Planner: Register';
     return(
         <Container>
             <Container className="pt-3">
-                <h1 className="mb-0" style={{textAlign: 'center'}}><FontAwesomeIcon className="mx-2" icon={faCar} />RoadTrip</h1>
+                <h1 className="mb-0" style={{textAlign: 'center'}}><FontAwesomeIcon className="mx-2" icon={faCar} />Trip Planner</h1>
                 <p style={{textAlign: 'center', color: 'grey'}}>Register for an account.</p>
             </Container>
             <Form onSubmit={props.handleRegister}>

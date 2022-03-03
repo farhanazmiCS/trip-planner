@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Button, ButtonGroup, Container, Card } from "react-bootstrap";
 
 export default function Notifications(props) {
-    document.title = 'RoadTrip: Notifications';
+    document.title = 'Trip Planner: Notifications';
 
     var friendRequestCopy = [...props.friendRequests];
     var tripRequestCopy = [...props.tripRequests];

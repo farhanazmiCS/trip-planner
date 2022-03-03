@@ -5,7 +5,7 @@ import Container from 'react-bootstrap/Container';
 import Button from 'react-bootstrap/Button';
 
 export default function Trips(props) {
-    document.title = 'RoadTrip: My Trips';
+    document.title = 'Trip Planner: My Trips';
     return (
         <>
             {props.isLoggedIn && 

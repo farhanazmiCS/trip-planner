@@ -9,13 +9,13 @@ import { faCar } from '@fortawesome/free-solid-svg-icons';
 import { Link } from 'react-router-dom';
 
 export default function Login(props) {
-    document.title = 'RoadTrip: Login';
+    document.title = 'Trip Planner: Login';
     return(
         <Container>
             <Container className="pt-3">
                 <h1 className="mb-0" style={{textAlign: 'center'}}>
                     <FontAwesomeIcon icon={faCar} className="mx-2" />
-                    RoadTrip
+                    Trip Planner
                 </h1>
                 <p style={{textAlign: 'center', color: 'grey'}}>Login</p>
             </Container>

@@ -26,10 +26,10 @@ export default function Profile(props) {
     let profile = getUser(JSON.parse(sessionStorage.getItem('users')), parseInt(params.userId));
 
     if (profile.username === sessionStorage.getItem('username')) {
-        document.title = 'RoadTrip: My Profile';
+        document.title = 'Trip Planner: My Profile';
     }
     else {
-        document.title = `RoadTrip User: ${profile.username[0].toUpperCase() + profile.username.slice(1)}`;
+        document.title = `Trip Planner User: ${profile.username[0].toUpperCase() + profile.username.slice(1)}`;
     }    
     // Returns an array, if the 'friends' array includes the logged on user's username
     const friends = profile.friends.map(friend => friend.username === sessionStorage.getItem('username'));

@@ -4,7 +4,7 @@ import Container from 'react-bootstrap/Container';
 import { Typeahead, Menu, MenuItem } from 'react-bootstrap-typeahead';
 
 export default function FindUsers(props) {
-    document.title = 'RoadTrip: Find Users';
+    document.title = 'Trip Planner: Find Users';
     // Make a copy of the users array
     const users = [...props.users];
     // To exclude the logged on user
