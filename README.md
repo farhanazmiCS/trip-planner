@@ -9,7 +9,7 @@ __NOTE__: This application will not work with web browsers that utilises Apple's
 ## Getting Started
 
 NOTE: Before proceeding, please go through `requirements.md` to install the necessary packages and libraries.
-* Firstly, download the [source code](https://github.com/farhanazmiCS/RoadTrip/archive/refs/heads/master.zip).
+* Firstly, download the [source code](https://github.com/farhanazmiCS/trip-planner/archive/refs/heads/master.zip).
 
 * Open a terminal window and enter the `capstone` directory by typing `cd capstone`. 
 
