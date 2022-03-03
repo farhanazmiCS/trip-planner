@@ -1,5 +1,5 @@
-# Road Trip
-__Road Trip__ is a web application that let users plan a road trip. 
+# Trip Planner
+__Trip Planner__ is a web application that let users plan a trip, be it a vacation trip, expedition trip or a road trip! 
 
 ## App Demo
 You can try the app yourself [here](https://roadtrip-react-frontend.herokuapp.com/login)! 
