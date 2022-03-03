@@ -2,7 +2,7 @@
 __Trip Planner__ is a web application that let users plan a trip, be it a vacation trip, expedition trip or a road trip! 
 
 ## App Demo
-You can try the app yourself [here](https://roadtrip-react-frontend.herokuapp.com/login)! 
+You can try the app yourself [here](https://holiday-trip-planner.herokuapp.com/login)! 
 
 __NOTE__: This application will not work with web browsers that utilises Apple's WebKit engine (e.g. Safari on the desktop, all web browsers on iOS and iPadOS) due to the incompatibility with the Fetch API. Hence, this application will only work on non-iOS/iPadOS devices.
 
@@ -139,7 +139,7 @@ Depending on whether the authentication token is present in `sessionStorage`, th
 * If the user is in the trip that he or she is viewing, the user can view the users that are following the trip and invite friends to the trip by clicking or pressing the __Invite Friends__ button located at the top right corner of the page. This functionality is demonstrated in the gif below:
 
 <div align="center">
-  <img width="250" src="https://user-images.githubusercontent.com/68798786/154205988-b2160000-0bf5-4520-84b0-265b92c487ba.gif" alt="todo">
+  <img width="250" src="https://user-images.githubusercontent.com/68798786/156515689-a4dc6b89-6fd8-4007-a796-72fee56a30b3.gif" alt="todo">
 </div>
 <br />
 
@@ -147,16 +147,16 @@ Depending on whether the authentication token is present in `sessionStorage`, th
 
   __Changing Trip Name__
   <div align="center">
-    <img width="250" src="https://user-images.githubusercontent.com/68798786/155937307-369f1c7e-ee37-4ac1-a8c4-3fe263b13b7b.gif" alt="todo">
+    <img width="250" src="https://user-images.githubusercontent.com/68798786/156515828-6bb4eb43-ff7c-4e43-8267-ba8e6f8cb579.gif" alt="todo">
   </div>
   <br />
 
   __Modifying Waypoints__
   <div align="center">
-    <img width="250" src="https://user-images.githubusercontent.com/68798786/155937894-494f2294-36c2-4245-b024-39364d64e5a9.gif" alt="todo">
+    <img width="250" src="https://user-images.githubusercontent.com/68798786/156515897-84b6ca7f-e733-4016-997b-1d05bd9b0f52.gif" alt="todo">
   </div>
   <br />
-  
+
 * When the properties of the trip changes, the __Save Changes__ button appears. On click, this button will send the payload, containing the new trip name and/or the updated waypoints in JSON. The backend will provide the updated trip object as a response.
 
 #### Profile 
@@ -168,22 +168,22 @@ Depending on whether the authentication token is present in `sessionStorage`, th
 
   __Scenario 1.__ When __user2__ (logged-on user) is not a friend of __user1__ (profile being viewed), and a friend request has __not__ been sent
    <div align="center">
-      <img width="337" alt="NoRequestNotFriend" src="https://user-images.githubusercontent.com/68798786/148003558-03ef2cc9-160a-44ab-be4b-baa66c33560e.png">
+      <img width="336" alt="Not Friend, No Request" src="https://user-images.githubusercontent.com/68798786/156513085-3fbe3172-1005-4606-bc5b-2a76f66cd1c9.png">
    </div>
    <br />
  
   __Scenario 2.__ When __user2__ is not a friend of __user1__, friend request has been sent
    <div align="center">
-      <img width="339" alt="RequestedNotFriend" src="https://user-images.githubusercontent.com/68798786/148003902-ba72a214-0f86-4530-8bb1-d83668958d71.png">
+       <img width="336" alt="Not Friend, with Request" src="https://user-images.githubusercontent.com/68798786/156513148-97149d6f-b31d-40e2-8b99-fcdadd2ba65a.png">
    </div>
    <br />
- 
+
   __Scenario 3.__ __user2__ is a friend of __user1__. In addition to the button change, the __friend count__ (Displayed as Friends) is updated. __user1's__ trips are also displayed, which allows __user2__ to view them.
    <div align="center">
-      <img width="338" alt="IsFriend" src="https://user-images.githubusercontent.com/68798786/148004162-9039675d-3121-483c-847c-4f13e1d2d7f9.png">
+      <img width="333" alt="Friend" src="https://user-images.githubusercontent.com/68798786/156513199-56985393-fca0-4e21-8ad5-f3f6e95c19c4.png">
    </div>
    <br />
- 
+
 #### Notifications 
 * The __Notifications__ component is defined in the `Notifications.js` file. It displays notifications from other users.
 
@@ -191,10 +191,10 @@ Depending on whether the authentication token is present in `sessionStorage`, th
 
 * For every notification, the user can opt to accept or decline a notification by pressing the __Accept/Decline__ button, like the one shown below.
  <div align="center">
-    <img width="338" alt="requestfriend" src="https://user-images.githubusercontent.com/68798786/148169163-32a1791f-bc05-4dcc-9d93-2b5699a327b4.png">
+    <img width="335" alt="Friend Request Notification" src="https://user-images.githubusercontent.com/68798786/156513390-7acf4c2e-b3d8-44b1-b1c7-3d3ac1844e0c.png">
  </div>
  <br />
- 
+
 #### FindUsers
 * The __FindUsers__ component is defined in the `FindUsers.js` file. It consists of a page that incorporates an `AsyncTypeAhead` input field that allows the user to search for other users.
 
@@ -248,7 +248,7 @@ They are utilised by the "pages".
 * The __FriendsListModal__ component is defined in the `FriendsListModal.js` file. It displays a bootstrap modal component when the user, when viewing a user's profile, presses the number below the 'Friends' header. The user can click on any of the usernames present in the modal to view a profile. The gif below demonstrates this:
 
 <div align="center">
-    <img width="250" src="https://user-images.githubusercontent.com/68798786/154028299-80efdb2f-62a9-4427-b65d-93d35cb534cd.gif" alt="todo">
+    <img width="250" src="https://user-images.githubusercontent.com/68798786/156516133-48d6faaa-f8ad-4b5a-b4b6-3e0130ce4e30.gif" alt="todo">
 </div>
 <br />
 
