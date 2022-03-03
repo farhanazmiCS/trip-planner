@@ -6,9 +6,6 @@ You can try the app yourself [here](https://roadtrip-react-frontend.herokuapp.co
 
 __NOTE__: This application will not work with web browsers that utilises Apple's WebKit engine (e.g. Safari on the desktop, all web browsers on iOS and iPadOS) due to the incompatibility with the Fetch API. Hence, this application will only work on non-iOS/iPadOS devices.
 
-## Video Demo
-You can view the video demo [here](https://youtu.be/aoCXsxqWZzU)!
-
 ## Getting Started
 
 NOTE: Before proceeding, please go through `requirements.md` to install the necessary packages and libraries.
