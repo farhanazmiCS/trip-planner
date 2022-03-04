@@ -39,35 +39,36 @@ class UserViewSet(viewsets.ModelViewSet):
     """
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    """
-    Lists all the users, and their associated information.
-    """
+    
     def list(self, request):
+        """
+        Lists all the users, and their associated information.
+        """
         # queryset.all() is called to update the trip_counter attribute
         # as the queryset is cached.
         queryset = self.queryset.all()
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data)
     
-    """
-    Retrieves an information of a user.
-
-    Params
-        
-        pk: id of the user.
-    """
     @action(methods=['GET'], detail=True)
     def get_user(self, request, pk=None):
+        """
+        Retrieves an information of a user.
+
+        Params
+            
+            pk: id of the user.
+        """
         queryset = self.queryset.all()
         user = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(user)
         return Response(serializer.data)
 
-    """
-    Registers a new user by creating a new User instance.
-    """
     @action(methods=['POST'], detail=False)
     def register(self, request):
+        """
+        Registers a new user by creating a new User instance.
+        """
         data = json.loads(request.body)
         # Retrieve fields
         email = data.get('email')
@@ -117,15 +118,15 @@ class UserViewSet(viewsets.ModelViewSet):
                 }
                 return Response(response, status=200)
 
-    """
-    Inserts a new User instance to the 'friends' attribute of a User object.
-    
-    Params
-    
-        pk: id of the User to be added as a friend.
-    """
     @action(methods=['PUT'], detail=True)
     def add_friend(self, request, pk=None):
+        """
+        Inserts a new User instance to the 'friends' attribute of a User object.
+        
+        Params
+        
+            pk: id of the User to be added as a friend.
+        """
         queryset = self.queryset.all()
         user = get_object_or_404(queryset, pk=pk)
         data = json.loads(request.body)
@@ -135,15 +136,15 @@ class UserViewSet(viewsets.ModelViewSet):
         user.save()
         return Response(status=200)
     
-    """
-    This function will remove each user from their friends' list.
-
-    Params
-        
-        pk: id of the user to 'unfriend'.
-    """
     @action(methods=['DELETE'], detail=True)
     def remove_friend(self, request, pk=None):
+        """
+        This function will remove each user from their friends' list.
+
+        Params
+            
+            pk: id of the user to 'unfriend'.
+        """
         queryset = self.queryset.all()
         # User objects
         user1 = request.user
@@ -168,10 +169,11 @@ class TripViewSet(viewsets.ModelViewSet):
     """
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
-    """
-    Lists all of request.user's trips
-    """
+    
     def list(self, request):
+        """
+        Lists all of request.user's trips
+        """
         try:
             user = request.user
             trips = user.trip.all()
@@ -181,29 +183,29 @@ class TripViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(trips, many=True)
             return Response(serializer.data)
 
-    """
-    Retrieves a trip object.
-
-    Params
-        
-        pk: id of the trip object.
-    """
     @action(methods=['GET'], detail=True)
     def get_trip(self, request, pk=None):
+        """
+        Retrieves a trip object.
+
+        Params
+            
+            pk: id of the trip object.
+        """
         queryset = self.queryset.all()
         trip = get_object_or_404(queryset, pk=pk)    
         serializer = self.serializer_class(trip)
         return Response(serializer.data)   
 
-    """
-    Lists the trips of a particular user, given the user's id.
-
-    Params
-
-        pk: The user's id.
-    """
     @action(methods=['GET'], detail=True)
     def list_other_trip(self, request, pk=None):
+        """
+        Lists the trips of a particular user, given the user's id.
+
+        Params
+
+            pk: The user's id.
+        """
         try:
             user = User.objects.get(pk=pk)
             trips = user.trip.all()
@@ -215,11 +217,11 @@ class TripViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(trips, many=True)
             return Response(serializer.data)     
        
-    """
-    Saves a trip by creating a new trip instance.
-    """
     @action(methods=['POST'], detail=False)
     def save_trip(self, request):
+        """
+        Saves a trip by creating a new trip instance.
+        """
         data = json.loads(request.body)
         # User and trip length
         user = request.user
@@ -270,15 +272,15 @@ class TripViewSet(viewsets.ModelViewSet):
             user.save()
             return Response(status=200)
 
-    """
-    Saves any changes made to an existing trip object.
-
-    Params
-        
-        pk: id of the trip to be changed.
-    """
     @action(methods=['PUT'], detail=True)
     def save_changes(self, request, pk=None):
+        """
+        Saves any changes made to an existing trip object.
+
+        Params
+            
+            pk: id of the trip to be changed.
+        """
         queryset = self.queryset.all()
         # Load the trip
         trip = get_object_or_404(queryset, pk=pk)
@@ -337,15 +339,15 @@ class TripViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(trip)
         return Response(serializer.data, status=200)
 
-    """
-    Adds a user to the 'users' attribute in a trip object.
-
-    Params
-
-        pk: id of the trip object.
-    """
     @action(methods=['PUT'], detail=True)
     def add_friend_to_trip(self, request, pk=None):
+        """
+        Adds a user to the 'users' attribute in a trip object.
+
+        Params
+
+            pk: id of the trip object.
+        """
         queryset = self.queryset.all()
         user = request.user
         trip = get_object_or_404(queryset, pk=pk)
@@ -364,12 +366,13 @@ class WaypointViewSet(viewsets.ModelViewSet):
     """
     queryset = Waypoint.objects.all()
     serializer_class = WaypointSerializer
-    """
-    Retrieve a waypoint object.
-    pk: id of the waypoint object.
-    """
+    
     @action(methods=['GET'], detail=True)
     def get_waypoint(self, request, pk=None):
+        """
+        Retrieve a waypoint object.
+        pk: id of the waypoint object.
+        """
         queryset = self.queryset.all()
         waypoint = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(waypoint)
@@ -383,15 +386,16 @@ class TodoViewSet(viewsets.ModelViewSet):
     """
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
-    """
-    Retrieves a todo object.
 
-    Params
-        
-        pk: id of the todo object.
-    """
     @action(methods=['GET'], detail=True)
     def get_todo(self, request, pk=None):
+        """
+        Retrieves a todo object.
+
+        Params
+            
+            pk: id of the todo object.
+        """
         queryset = self.queryset.all()
         todo = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(todo)
@@ -406,10 +410,11 @@ class NotificationViewSet(viewsets.ModelViewSet):
     """
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
-    """
-    Lists all the notifications for request.user.
-    """
+   
     def list(self, request):
+        """
+        Lists all the notifications for request.user.
+        """
         user = request.user 
         try:
             notifications = user.my_notifications.all()
@@ -419,11 +424,12 @@ class NotificationViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(notifications, many=True)
             return Response(serializer.data)
 
-    """
-    Lists all the friend requests made by request.user.
-    """
+    
     @action(methods=['GET'], detail=False)
     def my_requests_friends(self, request):
+        """
+        Lists all the friend requests made by request.user.
+        """
         user = request.user
         try:
             friend_requests = user.my_requests.filter(is_addFriend=True)
@@ -433,11 +439,12 @@ class NotificationViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(friend_requests, many=True)
             return Response(serializer.data)
 
-    """
-    Lists all the trip invites made by request.user.
-    """
+    
     @action(methods=['GET'], detail=False)
     def my_requests_trips(self, request):
+        """
+        Lists all the trip invites made by request.user.
+        """
         user = request.user
         try:
             trip_requests = user.my_requests.filter(is_inviteToTrip=True)
@@ -447,12 +454,13 @@ class NotificationViewSet(viewsets.ModelViewSet):
             serializer = self.serializer_class(trip_requests, many=True)
             return Response(serializer.data)
 
-    """
-    Send a notification by creating a new notification object, 
-    either a friend request, or a trip invite.
-    """
+    
     @action(methods=['POST'], detail=False)
     def send_request(self, request):
+        """
+        Send a notification by creating a new notification object, 
+        either a friend request, or a trip invite.
+        """
         data = json.loads(request.body)
         # Retrieve user objects
         user = User.objects.get(username=data.get('username'))
@@ -476,25 +484,25 @@ class NotificationViewSet(viewsets.ModelViewSet):
             new_notification.save()
         return Response(status=200)
 
-    """
-    Deletes a notification object. Used when a user accepts/decline a notification.
-
-    Params
-
-        pk: id of notification object to delete.
-    """
     @action(methods=['DELETE'], detail=True)
     def delete_notification(self, request, pk=None):
+        """
+        Deletes a notification object. Used when a user accepts/decline a notification.
+
+        Params
+
+            pk: id of notification object to delete.
+        """
         queryset = self.queryset.all()
         notification = get_object_or_404(queryset, pk=pk)
         notification.delete()
         return Response(status=200)       
 
 class LoginView(APIView):
-    """
-    Verifies if the user is logged in.
-    """
     def get(self, request):
+        """
+        Verifies if the user is logged in.
+        """
         if not request.user.is_anonymous:    
             return Response(status=200)
         else:
@@ -503,21 +511,21 @@ class LoginView(APIView):
             }
             return Response(response, status=401)
     
-    """
-    Takes the username and password and verifies it.
-
-    If username field is empty, returns 404 along with error message.
-
-    If username does not exist, returns 404, along with error message
-    indicating that user does not exist.
-
-    Username and Password credentials are verified with authenticate(). 
-    If authenticate returns None, user credentials are. Returns 401, and login fails.
-    
-    Else, provide the token for request authentication, and return a
-    response status of 200.
-    """
     def post(self, request):
+        """
+        Takes the username and password and verifies it.
+
+        If username field is empty, returns 404 along with error message.
+
+        If username does not exist, returns 404, along with error message
+        indicating that user does not exist.
+
+        Username and Password credentials are verified with authenticate(). 
+        If authenticate returns None, user credentials are. Returns 401, and login fails.
+        
+        Else, provide the token for request authentication, and return a
+        response status of 200.
+        """
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
