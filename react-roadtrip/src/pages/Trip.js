@@ -539,20 +539,22 @@ export default function Trip(props) {
                     editWaypoint={editModal}
                     removeWaypoint={removeWaypoint}
                 />
-                <div className="mt-3 mb-3">
-                    <Container className="d-flex justify-content-center">
-                        {/* For showing the add stopover button */}
-                        <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
-                        {/* For showing the save changes button when the waypoints and/or trip title changes */}
-                        {JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints) && 
-                        <Button id="num1" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
-                        }
-                        {/* For showing the save changes button only when the trip title changes */}
-                        {defaultTitle !== titleEdit && JSON.stringify(defaultWaypoints) === JSON.stringify(waypoints) && 
-                        <Button id="num2" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
-                        }
-                    </Container>
-                </div>
+                {me &&
+                    <div className="mt-3 mb-3">
+                        <Container className="d-flex justify-content-center">
+                            {/* For showing the add stopover button */}
+                            <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
+                            {/* For showing the save changes button when the waypoints and/or trip title changes */}
+                            {JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints) && 
+                            <Button id="num1" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
+                            }
+                            {/* For showing the save changes button only when the trip title changes */}
+                            {defaultTitle !== titleEdit && JSON.stringify(defaultWaypoints) === JSON.stringify(waypoints) && 
+                            <Button id="num2" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
+                            }
+                        </Container>
+                    </div>
+                }
             </Container>
             <WaypointModal 
                show={show}
