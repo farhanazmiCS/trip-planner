@@ -226,8 +226,8 @@ export default function App() {
         text: singleOption[0].text,
         place_name: singleOption[0].place_name,
         todo: todoObjects,
-        longitude: singleOption[0].longitude,
-        latitude: singleOption[0].latitude
+        longitude: Number(singleOption[0].longitude.toFixed(0)),
+        latitude: Number(singleOption[0].latitude.toFixed(0))
       })
     }
     else if (waypoints.find(waypoint => waypoint.type === 'destination' || waypoint.type === 'Destination') !== undefined) {
@@ -240,8 +240,8 @@ export default function App() {
         text: singleOption[0].text,
         place_name: singleOption[0].place_name,
         todo: todoObjects,
-        longitude: singleOption[0].longitude,
-        latitude: singleOption[0].latitude
+        longitude: Number(singleOption[0].longitude.toFixed(0)),
+        latitude: Number(singleOption[0].latitude.toFixed(0))
       });
     }
     setWaypoints([...waypoints]);
@@ -260,8 +260,8 @@ export default function App() {
     waypoints[key].todo = todoObjects;
     waypoints[key].text = singleOption[0].text;
     waypoints[key].place_name = singleOption[0].place_name;
-    waypoints[key].longitude = singleOption[0].longitude;
-    waypoints[key].latitude = singleOption[0].latitude;
+    waypoints[key].longitude = Number(singleOption[0].longitude.toFixed(0));
+    waypoints[key].latitude = Number(singleOption[0].latitude.toFixed(0));
     setWaypoints([...waypoints]);
     hideModal();
   }

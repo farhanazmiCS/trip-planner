@@ -119,8 +119,8 @@ export default function CreateTrip(props) {
             text: singleOption[0].text,
             place_name: singleOption[0].place_name,
             todo: todoObjects,
-            longitude: singleOption[0].longitude,
-            latitude: singleOption[0].latitude
+            longitude: Number(singleOption[0].longitude.toFixed(0)),
+            latitude: Number(singleOption[0].latitude.toFixed(0))
         })
         setWaypoints([...waypoints]);
         hideModal();
@@ -136,8 +136,8 @@ export default function CreateTrip(props) {
             text: singleOption[0].text,
             place_name: singleOption[0].place_name,
             todo: todoObjects,
-            longitude: singleOption[0].longitude,
-            latitude: singleOption[0].latitude
+            longitude: Number(singleOption[0].longitude.toFixed(0)),
+            latitude: Number(singleOption[0].latitude.toFixed(0))
         })
         setWaypoints([...waypoints]);
         hideModal();

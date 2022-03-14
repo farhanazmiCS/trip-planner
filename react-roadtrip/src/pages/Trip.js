@@ -95,8 +95,8 @@ export default function Trip(props) {
         text: trip.origin.name,
         place_name: trip.origin.detail,
         todo: trip.origin.todo,
-        longitude: Number(trip.origin.longitude),
-        latitude: Number(trip.origin.latitude)
+        longitude: Number(Number(trip.origin.longitude).toFixed(0)),
+        latitude: Number(Number(trip.origin.latitude).toFixed(0))
     }
     let stopovers = trip.waypoints.map(w => ({
         type: 'stopover',
@@ -107,8 +107,8 @@ export default function Trip(props) {
         text: w.name,
         place_name: w.detail,
         todo: w.todo,
-        longitude: Number(w.longitude),
-        latitude: Number(w.latitude)
+        longitude: Number(Number(w.longitude).toFixed(0)),
+        latitude: Number(Number(w.latitude).toFixed(0))
     }))
     let destination = {
         type: trip.destination.role.toLowerCase(),
@@ -119,8 +119,8 @@ export default function Trip(props) {
         text: trip.destination.name,
         place_name: trip.destination.detail,
         todo: trip.destination.todo,
-        longitude: Number(trip.destination.longitude),
-        latitude: Number(trip.destination.latitude)
+        longitude: Number(Number(trip.destination.longitude).toFixed(0)),
+        latitude: Number(Number(trip.destination.latitude).toFixed(0))
     }
     defaultWaypoints.push(origin);
     for (let i = 0; i < stopovers.length; i++) {
@@ -321,8 +321,8 @@ export default function Trip(props) {
                             role: 'Origin',
                             name: body.origin.text,
                             detail: body.origin.place_name,
-                            longitude: body.origin.longitude,
-                            latitude: body.origin.latitude,
+                            longitude: Number(Number(body.origin.longitude).toFixed(0)),
+                            latitude: Number(Number(body.origin.latitude).toFixed(0)),
                             dateTimeFrom: formatDateTime(body.origin.dateTimeFrom),
                             dateTimeTo: formatDateTime(body.origin.dateTimeTo),
                             todo: body.origin.todo.map(t => t.task)
@@ -331,8 +331,8 @@ export default function Trip(props) {
                             role: 'Destination',
                             name: body.destination.text,
                             detail: body.destination.place_name,
-                            longitude: body.destination.longitude,
-                            latitude: body.destination.latitude,
+                            longitude: Number(Number(body.destination.longitude).toFixed(0)),
+                            latitude: Number(Number(body.destination.latitude).toFixed(0)),
                             dateTimeFrom: formatDateTime(body.destination.dateTimeFrom),
                             dateTimeTo: formatDateTime(body.destination.dateTimeTo),
                             todo: body.destination.todo.map(t => t.task) 
@@ -343,8 +343,8 @@ export default function Trip(props) {
                                 role: `Stopover ${index + 1}`,
                                 name: w.text,
                                 detail: w.place_name,
-                                longitude: w.longitude,
-                                latitude: w.latitude,
+                                longitude: Number(Number(w.longitude).toFixed(0)),
+                                latitude: Number(Number(w.latitude).toFixed(0)),
                                 dateTimeFrom: formatDateTime(w.dateTimeFrom),
                                 dateTimeTo: formatDateTime(w.dateTimeTo),
                                 todo: w.todo.map(t => t.task)
@@ -368,12 +368,11 @@ export default function Trip(props) {
                     }
                     if (JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints)) {
                         defaultWaypoints = [...waypoints]; // Update the defaultWaypoints
-                        setWaypoints(defaultWaypoints); // Re-render the Save Changes button
                     }
                     if (defaultTitle !== titleEdit) {
                         defaultTitle = titleEdit.slice(); // Update the defaultTitle
-                        setWaypoints(defaultWaypoints); // Re-render the Save Changes button
                     }
+                    setWaypoints(defaultWaypoints); // Re-render the Save Changes button
                 })
             }
         })
@@ -544,12 +543,8 @@ export default function Trip(props) {
                         <Container className="d-flex justify-content-center">
                             {/* For showing the add stopover button */}
                             <Button className="mx-2" variant="dark" onClick={addStopoverModal}>Add Stopovers <FontAwesomeIcon icon={faMapMarkerAlt} /></Button>
-                            {/* For showing the save changes button when the waypoints and/or trip title changes */}
-                            {JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints) && 
-                            <Button id="num1" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
-                            }
-                            {/* For showing the save changes button only when the trip title changes */}
-                            {defaultTitle !== titleEdit && JSON.stringify(defaultWaypoints) === JSON.stringify(waypoints) && 
+                            {/* For showing the save changes button when the trip title or waypoint changes */}
+                            {(defaultTitle !== titleEdit || JSON.stringify(defaultWaypoints) !== JSON.stringify(waypoints)) && 
                             <Button id="num2" className="mx-2" variant="danger" onClick={(e) => save_changes(e, trip.id)}>Save Changes</Button>
                             }
                         </Container>
