@@ -353,9 +353,6 @@ The views in the backend are contained in the `views.py` file, which contain sev
 
   - __post:__ Takes the login form and processes it. Returns a user object if matching credentials found, else returns `404` if no user found with the queried username, or `401` if the password is incorrect.
 
-- `LogoutView`
-  - __get:__ Calls the `logout()` function and logs the user out.
-
 #### Models
 The models below are defined in the `models.py` file:
 - __User__
