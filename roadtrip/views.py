@@ -109,8 +109,7 @@ class UserViewSet(viewsets.ModelViewSet):
             else:
                 # Create token for user
                 token = Token.objects.create(user=user)
-                # Log the user in
-                login(request, user)
+                # Provide a response to the client
                 response = {
                     'username': request.user.username,
                     'token': token.key,
