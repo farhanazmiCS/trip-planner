@@ -24,6 +24,9 @@ Trip Planner is a web application that allows users to plan a trip. For each tri
 ### Database
 ![](https://img.shields.io/badge/Database-SQLite-informational?style=for-the-badge&logo=sqlite&color=57a5f2)
 
+### Libraries
+![](https://img.shields.io/badge/Libraries-Bootstrap-informational?style=for-the-badge&logo=bootstrap&color=7714a8)
+
 ## Getting Started
 
 NOTE: Before proceeding, please go through `requirements.md` to install the necessary packages and libraries.
