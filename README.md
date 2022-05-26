@@ -6,6 +6,24 @@ You can try the app yourself [here](https://holiday-trip-planner.herokuapp.com/l
 
 __NOTE__: This application will not work with web browsers that utilises Apple's WebKit engine (e.g. Safari on the desktop, all web browsers on iOS and iPadOS) due to the incompatibility with the Fetch API. Hence, this application will only work on non-iOS/iPadOS devices.
 
+## Introduction
+Trip Planner is a web application that allows users to plan a trip. For each trip, users are able to create a new trip, set the origin, stopover(s), and destination waypoints, as well as the location, date, time, and tasks at each waypoint. In addition, users can also add friends and invite them to trips.
+
+## Technologies Used
+
+### Frameworks
+![](https://img.shields.io/badge/Backend_Framework-Django_REST_Framework-informational?style=for-the-badge&logo=django&color=006106)
+![](https://img.shields.io/badge/Frontend_Framework-ReactJS-informational?style=for-the-badge&logo=react&color=4dd8ff)
+
+### Languages
+![](https://img.shields.io/badge/Backend_Language-Python3-informational?style=for-the-badge&logo=python&color=blue)
+![](https://img.shields.io/badge/Frontend_Language-JavaScript-informational?style=for-the-badge&logo=javascript&color=ffdd00)
+![](https://img.shields.io/badge/Frontend_Language-HTML5-informational?style=for-the-badge&logo=html5&color=ff6338)
+![](https://img.shields.io/badge/Frontend_Language-CSS3-informational?style=for-the-badge&logo=css3&color=386aff)
+
+### Database
+![](https://img.shields.io/badge/Database-SQLite-informational?style=for-the-badge&logo=sqlite&color=57a5f2)
+
 ## Getting Started
 
 NOTE: Before proceeding, please go through `requirements.md` to install the necessary packages and libraries.
