@@ -6,7 +6,7 @@ You can try the app yourself [here](https://holiday-trip-planner.herokuapp.com/l
 
 __NOTE__: This application will not work with web browsers that utilises Apple's WebKit engine (e.g. Safari on the desktop, all web browsers on iOS and iPadOS) due to the incompatibility with the Fetch API. Hence, this application will only work on non-iOS/iPadOS devices.
 
-## Introduction
+## Summary
 Trip Planner is a web application that allows users to plan a trip. For each trip, users are able to create a new trip, set the origin, stopover(s), and destination waypoints, as well as the location, date, time, and tasks at each waypoint. In addition, users can also add friends and invite them to trips.
 
 ## Technologies Used
