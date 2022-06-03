@@ -58,7 +58,8 @@ At this point, you're all set! You can now proceed to `http://localhost:3000` (t
 Listed below are the functions and components of the web application necessary for it to function, for both the client
 and server-side.
 
-### Index and App files (JavaScript - React)
+### Index and App files
+> Path: `react-roadtrip/src/`
 
 #### Index
 The `index.js` file renders the `<App />` component inside the `div` element of id `root` in the `index.html` page by calling the `ReactDom.render` function.
@@ -92,12 +93,11 @@ The __App__ component will return several components. Below is the list of compo
   * __Route path `/login`:__ Loads the __Login__ component when queried `http://localhost:3000/login`.
   
   * __Route path `/register`:__ Loads the __Register__ component when queried `http://localhost:3000/register`.
-  
-  * __Route path `/logout`:__ Loads the __Logout__ component when queried `http://localhost:3000/logout`.
-  
+    
   * __Route path `*`:__ A wildcard route for a route that is not defined by any of the routes listed above.
 
-### Pages (JavaScript - React)
+### Pages 
+> Path: `react-roadtrip/src/pages`
 
 The following items are the "pages" of the web application. They are ultimately React components.
 
@@ -219,7 +219,8 @@ Depending on whether the authentication token is present in `sessionStorage`, th
 #### FindUsers
 * The __FindUsers__ component is defined in the `FindUsers.js` file. It consists of a page that incorporates an `AsyncTypeAhead` input field that allows the user to search for other users.
 
-### Components (JavaScript - React)
+### Components
+> Path: `react-roadtrip/src/components/`
 
 The following items are the "components" of the React portion of the web application.
 They are utilised by the "pages".
@@ -275,14 +276,16 @@ They are utilised by the "pages".
 
 ### Other Files
 #### Helper File
-* The `helper.js` file contains four helper functions:
+> Path: `react-roadtrip/src/`
+
+The `helper.js` file contains four helper functions:
 
   1. `todayDateAndTime()` - This function creates a new `Date` object and will return an array containing today's date, `todayDate` and current time, `timeNow`. 
   2. `formatDateTime()` - This function takes the date and time formatted in HTML and formats it to a string that can be understood by Python. Returns a string type.
   3. `dateFormatter()` - Formats the date from numbers to characters. For example, _2022-02-18_ will become _18 February, 2022_. Returns a string.
   4. `timeFormatter()` - Formats 24 hour time to 12 hour time. For example, _13:24_ will become _01:24 PM_. Returns a string.
 
-### Backend (Django-REST Framework)
+### Backend
 
 The backend utilises Django-REST Framework, a Django extension used to develop a Representational State Transfer (REST) API. The backend does not perform any rendering of the data into HTML, but handles the data, serializes them into JSON and providing a response back to the client.
 
@@ -314,7 +317,7 @@ The `settings.py` file sets the parameters of the application. Listed below are 
  
     - _rest_framework.authtoken_: For DRF token authentication
    
-    - _corsheaders_: To enable CORS requests 
+    - _corsheaders_: To enable [Cross-Origin Resource Sharing (CORS)](https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS) requests 
 
 - `AUTH_PASSWORD_VALIDATORS`: Defines the password validators used when a password is being created for a user. On top of the default validator classes included in Django, an additional validator class, `MandatoryCharacterValidator`, is defined. This will be further explained in the __Validators__ section.
 
@@ -329,11 +332,20 @@ The additional validator class, `MandatoryCharacterValidator`, is defined in the
 #### Views
 The views in the backend are contained in the `views.py` file, which contain several class-based views. Listed below are the views, as well as their associated methods:
 - `UserViewSet`
-  - __list:__ List down all the users.
+  - __list__ 
+    > Queries and list all the registered users.
   
-  - __get_user:__ Retrieves the information of a particular user.
+  - __get_user__ 
+    > Retrieves the information of a particular user using the `get_object_or_404` function, with the queryset as a parameter. If the queried user does not exist, raises a `Http404` exception.
 
-  - __register:__ Create a new account.
+  - __register__ 
+    > This method is used to create a new user account. The program takes `email`, `username`, `password` and `confirm` as input. Afterwards, the program checks if the `password` and the `confirm` fields are the same. If not, the program will return a HTTP `400` code and return an error message. If so, the program will then call the `validate_password` function.
+ 
+    > The `validate_password` function checks the password against the password validators declared in `settings.py`. If the validation fails, the program will raise a `ValidationError` and return an HTTP status of `400` and return an error message. If the validation passes, the program will attempt to create a new user instance.
+
+    > As the program attempts to create a new user instance using the `AUTH_USER_MODEL` declared in `settings.py`, the program will check if the username already exists in the database. If it does, the program will raise an `IntegrityError`, return an HTTP status code of `404` and an error message. Otherwise, the program generates a new token for the user, for the [token-based authentication](https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication).
+
+    > After generating a new token for the user object, the user registration process is considered successful, and returns a response dictionary containing the user's `username`, `token` and a status code of `200`.
 
   - __add_friend:__ Adds a user to the logged-on user's friends list.
 
