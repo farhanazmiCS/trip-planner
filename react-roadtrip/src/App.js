@@ -819,7 +819,6 @@ export default function App() {
             handleRegister={handleRegister} 
           />} 
         />
-        <Route path="/logout" element={<Navigate replace to="/login" />} />
         <Route path="*" />
       </Routes>
     </>
