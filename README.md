@@ -306,7 +306,7 @@ There are several parts in the backend that needs to be discussed, namely:
 The `settings.py` file sets the parameters of the application. Listed below are some parameters modified for use in this application:
 - `ALLOWED_HOSTS`: Defines the servers that can host the backend.
 
-- `AUTH_USER_MODEL`: Defines the model for user authentication.
+- `AUTH_USER_MODEL`: Defines the model for authentication. In this case, the auth user model is the `User` class, defined in `models.py`.
 
 - `CORS_ALLOWED_ORIGINS`: Defines the url that can make requests to the backend.
 
@@ -331,38 +331,42 @@ The additional validator class, `MandatoryCharacterValidator`, is defined in the
 
 #### Views
 The views in the backend are contained in the `views.py` file, which contain several class-based views. Listed below are the views, as well as their associated methods:
-- `UserViewSet`
-  - __list__ 
-    > Queries and list all the registered users.
   
-  - __get_user__ 
-    > Retrieves the information of a particular user using the `get_object_or_404` function, with the queryset as a parameter. If the queried user does not exist, raises a `Http404` exception.
+  **`UserViewSet`**
+  
+  | Method  |  Parameters (Except for `self` and `request`) | How it works 
+  |---|---|---|
+  | `list` |  None |  Queries and list all the registered users. |
+  | `get_user`  |  `pk` | Retrieves the information of a particular user using the `get_object_or_404` function, with the queryset and an user id `pk` as                           a parameter. If the queried user does not exist, raises a `Http404` exception.  |
+  | `register`  | `pk`  | This method is used to create a new user account. The program takes `email`, `username`, `password` and `confirm` as input.       Afterwards, the program checks if the `password` and the `confirm` fields are the same. If the `password` and `confirm` fields                             are not the same, the program will return a HTTP `400` code and an error message. Otherwise, the program will then call the                               `validate_password` function.<br /><br /> The `validate_password` function checks the password against the password validators declared in `settings.py`. If the validation fails, the program will raise a `ValidationError` and return an HTTP status of `400` and return              an error message. Otherwise, the program will attempt to create a new user instance.<br /><br /> As the program attempts to create a new                    user instance using the `AUTH_USER_MODEL` declared in `settings.py`, the program will check if the username already exists in                             the database. If it does, the program will raise an `IntegrityError`, return a `404` HTTP status code and an error message.                               Otherwise, the program generates a new token for the user, for the [token-based authentication](https://www.django-restframework.org/api-guide/authentication/#tokenauthentication).<br /><br /> After generating a new token for the user object, the user                                   registration process is considered successful and returns a dictionary response containing the user's `username`, `token` and a                           `200` HTTP status code. |
+  | `add_friend`| `pk`  | This method is used when accepting a user's friend request. When a user accepts a friend request, two request payloads are         submitted to the server to this method. The `pk` is an id of either the "requester" and the "requestee". The JSON payload                                 contains the data of the other user (e.g. if `pk` is user 1, the JSON payload contains the data for user 2, and vice-versa). The                           program then takes the id from the payload and adds it into each of the users' `friends` many-to-many attribute.<br /><br />In addition,                   both of the users' `friendCounter` attribute will be set to the length of each of their many-to-many attribute. Afterwards, both                           of the users' user instance are saved using the `save()` method and the program returns a HTTP `200` response.  |
+  | `remove_friend` | `pk` | Removes a user from the logged-on user's friends list. |
 
-  - __register__ 
-    > This method is used to create a new user account. The program takes `email`, `username`, `password` and `confirm` as input. Afterwards, the program checks if the `password` and the `confirm` fields are the same. If not, the program will return a HTTP `400` code and return an error message. If so, the program will then call the `validate_password` function.
+**`TripViewSet`**
+  
+  `list()` 
+  
+  Lists all the logged-on user's trips.
+  
+  `list_other_trip(pk)` 
+  
+  Lists the trips of a user, given a key (user id) as a parameter.
+  
+  `get_trip(pk)` 
+  
+  Retrieve a particular trip, given a key (trip id) as a parameter.
+  
+  `save_trip()` 
+  
+  Create a new trip object.
+
+  `save_changes(pk)` 
+  
+  Updates an existing trip object with a new tripName and/or waypoints.
  
-    > The `validate_password` function checks the password against the password validators declared in `settings.py`. If the validation fails, the program will raise a `ValidationError` and return an HTTP status of `400` and return an error message. If the validation passes, the program will attempt to create a new user instance.
-
-    > As the program attempts to create a new user instance using the `AUTH_USER_MODEL` declared in `settings.py`, the program will check if the username already exists in the database. If it does, the program will raise an `IntegrityError`, return an HTTP status code of `404` and an error message. Otherwise, the program generates a new token for the user, for the [token-based authentication](https://www.django-rest-framework.org/api-guide/authentication/#tokenauthentication).
-
-    > After generating a new token for the user object, the user registration process is considered successful, and returns a response dictionary containing the user's `username`, `token` and a status code of `200`.
-
-  - __add_friend:__ Adds a user to the logged-on user's friends list.
-
-  - __remove_friend:__ Removes a user from the logged-on user's friends list.
-
-- `TripViewSet`
-  - __list:__ Lists all the logged-on user's trips.
+  `add_friend_to_trip()` 
   
-  - __list_other_trip:__ Lists the trips of a user, given a key (user id) as a parameter.
-  
-  - __get_trip:__ Retrieve a particular trip, given a key (trip id) as a parameter.
-  
-  - __save_trip:__ Create a new trip object.
-
-  - __save_changes:__ Updates an existing trip object with a new tripName and/or waypoints.
- 
-  - __add_friend_to_trip:__ Add a user object to the __users__ key in a trip object.
+  Add a user object to the __users__ key in a trip object.
 
 - `WaypointViewSet`
   - __get_waypoint:__ Retrieve a waypoint object, given a key (waypoind id) as a parameter.
