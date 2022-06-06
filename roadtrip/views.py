@@ -1,6 +1,7 @@
 import json
 from os import error, stat
 from datetime import datetime
+from time import strptime
 from django.contrib import auth
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError, PermissionDenied
@@ -242,21 +243,13 @@ class TripViewSet(viewsets.ModelViewSet):
                 w = Waypoint(
                     text=waypoints[waypoint]['text'],
                     place_name=waypoints[waypoint]['place_name'],
-                    longitude=waypoints[waypoint]['longitude'],
-                    latitude=waypoints[waypoint]['latitude'],
-                    dateTimeFrom=datetime.strptime(waypoints[waypoint]['dateFrom'] + ' ' + waypoints[waypoint]['timeFrom'], '%Y-%m-%d %H:%M'),
-                    dateTimeTo=datetime.strptime(waypoints[waypoint]['dateTo'] + ' ' + waypoints[waypoint]['timeTo'], '%Y-%m-%d %H:%M'),
+                    dateFrom=datetime.strptime(waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
+                    timeFrom=datetime.strptime(waypoints[waypoint]['timeFrom'], '%H:%M'),
+                    dateTo=datetime.strptime(waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
+                    timeTo=datetime.strptime(waypoints[waypoint]['timeTo'], '%H:%M')
                 )
-                w.save()
-                # Add the waypoint to their respective classifications (origin, destination, waypoints)
-                if waypoint == 0:
-                    trip.origin = w
-                    trip.save()
-                elif waypoint == len(waypoints) - 1:
-                    trip.destination = w
-                    trip.save()
-                else:
-                    trip.waypoint.add(w)
+                w.save()  
+                trip.waypoint.add(w)
                 # Query todo items, if any
                 todos = waypoints[waypoint]['todo']
                 if todos == []:
@@ -267,7 +260,6 @@ class TripViewSet(viewsets.ModelViewSet):
                         t.save()
                         # Add the todo object into the waypoint object
                         w.todo.add(t)
-            user.tripCounter = len(user.trip.all())
             user.save()
             return Response(status=200)
 
@@ -309,21 +301,13 @@ class TripViewSet(viewsets.ModelViewSet):
                 w = Waypoint(
                     text=new_waypoints[waypoint]['text'],
                     place_name=new_waypoints[waypoint]['place_name'],
-                    longitude=new_waypoints[waypoint]['longitude'],
-                    latitude=new_waypoints[waypoint]['latitude'],
-                    dateTimeFrom=datetime.strptime(new_waypoints[waypoint]['dateFrom'] + ' ' + new_waypoints[waypoint]['timeFrom'], '%Y-%m-%d %H:%M'),
-                    dateTimeTo=datetime.strptime(new_waypoints[waypoint]['dateTo'] + ' ' + new_waypoints[waypoint]['timeTo'], '%Y-%m-%d %H:%M'),
+                    dateFrom=datetime.strptime(new_waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
+                    timeFrom=datetime.strptime(new_waypoints[waypoint]['timeFrom'], '%H:%M'),
+                    dateTo=datetime.strptime(new_waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
+                    timeTo=datetime.strptime(new_waypoints[waypoint]['timeTo'], '%H:%M')
                 )
                 w.save()
-                # Add the waypoint to their respective classifications (origin, destination, waypoints)
-                if waypoint == 0:
-                    trip.origin = w
-                    trip.save()
-                elif waypoint == len(new_waypoints) - 1:
-                    trip.destination = w
-                    trip.save()
-                else:
-                    trip.waypoint.add(w)
+                trip.waypoint.add(w)
                 # Query todo items, if any
                 todos = new_waypoints[waypoint]['todo']
                 if todos == []:

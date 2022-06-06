@@ -1,26 +1,23 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from datetime import date, time
 
 # Create your models here.
 class User(AbstractUser):
     friends = models.ManyToManyField('User', related_name='friend')
-    friendCounter = models.IntegerField(default=0)
-    tripCounter = models.IntegerField(default=0)
 
 class Trip(models.Model):
     name = models.TextField(unique=True)
-    origin = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True, related_name='origin')
-    destination = models.ForeignKey('Waypoint', on_delete=models.CASCADE, null=True, related_name='destination')
-    waypoint = models.ManyToManyField('Waypoint', related_name='waypoint')
+    waypoints = models.ManyToManyField('Waypoint', related_name='waypoint')
     users = models.ManyToManyField(User, related_name='trip')
 
 class Waypoint(models.Model):
     text = models.TextField(null=True)
     place_name = models.TextField(null=True)
-    longitude = models.DecimalField(decimal_places=4, max_digits=10, null=True)
-    latitude = models.DecimalField(decimal_places=4, max_digits=10, null=True)
-    dateTimeFrom = models.DateTimeField(default=None, null=True)
-    dateTimeTo = models.DateTimeField(default=None, null=True)
+    dateFrom = models.DateField(default=None, null=True)
+    timeFrom = models.TimeField()
+    dateTo = models.DateField(default=None, null=True)
+    timeTo = models.TimeField()
     todo = models.ManyToManyField('Todo')
 
 class Todo(models.Model):
