@@ -132,7 +132,6 @@ class UserViewSet(viewsets.ModelViewSet):
         data = json.loads(request.body)
         friend = data.get('friend')
         user.friends.add(friend['id'])
-        user.friendCounter = len(user.friends.all())
         user.save()
         return Response(status=200)
     
@@ -152,9 +151,6 @@ class UserViewSet(viewsets.ModelViewSet):
         # Remove the user objects from both users
         user1.friends.remove(user2)
         user2.friends.remove(user1)
-        # Update friendCounter
-        user1.friendCounter = len(user1.friends.all())
-        user2.friendCounter = len(user2.friends.all())
         # Save changes
         user1.save()
         user2.save()
