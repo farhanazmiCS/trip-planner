@@ -15,9 +15,9 @@ class Waypoint(models.Model):
     text = models.TextField(null=True)
     place_name = models.TextField(null=True)
     dateFrom = models.DateField(default=None, null=True)
-    timeFrom = models.TimeField()
+    timeFrom = models.TimeField(default=None, null=True)
     dateTo = models.DateField(default=None, null=True)
-    timeTo = models.TimeField()
+    timeTo = models.TimeField(default=None, null=True)
     todo = models.ManyToManyField('Todo')
 
 class Todo(models.Model):
