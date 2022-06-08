@@ -51,7 +51,7 @@ class UserTestCase(TestCase):
         self.assertEqual(user1.friends.count(), 0)
         self.assertEqual(user2.friends.count(), 0)
 
-class TripViewSet(TestCase):
+class TripTestCase(TestCase):
     def setUp(self):
         """ Create new waypoint object(s) and a trip object """
         self.w1 = Waypoint(
@@ -93,13 +93,13 @@ class TripViewSet(TestCase):
         self.assertEqual(time, datetime(1900, 1, 1, 19, 48))
 
     def test_get_trip(self):
-        """ Retrieve a trip """
+        """ Test retrieving a trip """
         trip = self.t
         trip_shortcut = get_object_or_404(self.trip, name='Test trip')
         self.assertEqual(trip, trip_shortcut)
 
     def test_add_waypoint(self):
-        """ Add waypoint to a trip """
+        """ Test adding a waypoint to a trip """
         w1 = self.w1
         w2 = self.w2
         trip = self.t
