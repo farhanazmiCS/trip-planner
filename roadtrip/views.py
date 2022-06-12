@@ -70,7 +70,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Registers a new user by creating a new User instance.
         """
-        data = json.loads(request.body)
+        data = request.POST
         # Retrieve fields
         email = data.get('email')
         username = data.get('username')
@@ -104,9 +104,9 @@ class UserViewSet(viewsets.ModelViewSet):
             except IntegrityError:
                 response = {
                     'error': f'Username of name {username} already exists!',
-                    'status': 400
+                    'status': 409
                 }
-                return Response(response, status=400)
+                return Response(response, status=409)
             else:
                 # Create token for user
                 token = Token.objects.create(user=user)
@@ -114,9 +114,9 @@ class UserViewSet(viewsets.ModelViewSet):
                 response = {
                     'username': request.user.username,
                     'token': token.key,
-                    'status': 200
+                    'status': 201
                 }
-                return Response(response, status=200)
+                return Response(response, status=201)
 
     @action(methods=['PUT'], detail=True)
     def add_friend(self, request, pk=None):

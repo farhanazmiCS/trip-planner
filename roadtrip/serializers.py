@@ -20,8 +20,6 @@ class UserSerializer(serializers.ModelSerializer):
             'username', 
             'email', 
             'friends', 
-            'friendCounter', 
-            'tripCounter'
         ]
 
 class TodoSerializer(serializers.ModelSerializer):
@@ -37,10 +35,10 @@ class WaypointSerializer(serializers.ModelSerializer):
             'id', 
             'text', 
             'place_name', 
-            'longitude', 
-            'latitude', 
-            'dateTimeFrom', 
-            'dateTimeTo', 
+            'dateFrom', 
+            'timeFrom',
+            'dateTo',
+            'timeTo', 
             'todo'
         ]
 class TripSerializer(serializers.ModelSerializer):
@@ -53,8 +51,6 @@ class TripSerializer(serializers.ModelSerializer):
         fields = [
             'id', 
             'name',
-            'origin',
-            'destination',
             'waypoint',
             'users'
         ]
