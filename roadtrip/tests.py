@@ -268,6 +268,7 @@ class TripTestCase(APITestCase):
         response = self.client.put(f'/trips/{self.trip.id}/save_changes/', payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], 'Test Trip') # Test for trip_name change
+        self.assertEqual(response.data['waypoints'][1]['dateFrom'], payload['waypoints'][1]['dateFrom']) # Test for dateFrom change and adding a waypoint
         self.assertEqual(response.data['waypoints'][0]['timeFrom'][:5], payload['waypoints'][0]['timeFrom']) # Test for timeFrom change
         self.assertEqual(response.data['waypoints'][2]['todo'][0]['task'], payload['waypoints'][2]['todo'][0]) # Test for todo change
 

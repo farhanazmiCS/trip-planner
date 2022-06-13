@@ -332,7 +332,6 @@ class TripViewSet(viewsets.ModelViewSet):
         trip = get_object_or_404(queryset, pk=pk)
         # Add user into the trip
         trip.users.add(user)
-        # Update user trip counter
         user.save()
         return Response(status=200)
 
