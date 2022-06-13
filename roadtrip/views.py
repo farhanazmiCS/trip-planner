@@ -223,7 +223,7 @@ class TripViewSet(viewsets.ModelViewSet):
         user = request.user
         # Create new trip instance, save it, then add the logged user
         try:
-            trip = Trip(name=data['tripName'])
+            trip = Trip(name=data['trip_name'])
             trip.save()
         except IntegrityError:
             response = {
@@ -245,7 +245,7 @@ class TripViewSet(viewsets.ModelViewSet):
                     timeTo=datetime.strptime(waypoints[waypoint]['timeTo'], '%H:%M')
                 )
                 w.save()  
-                trip.waypoint.add(w)
+                trip.waypoints.add(w)
                 # Query todo items, if any
                 todos = waypoints[waypoint]['todo']
                 if todos == []:
@@ -257,7 +257,7 @@ class TripViewSet(viewsets.ModelViewSet):
                         # Add the todo object into the waypoint object
                         w.todo.add(t)
             user.save()
-            return Response(status=200)
+            return Response(status=201)
 
     @action(methods=['PUT'], detail=True)
     def save_changes(self, request, pk=None):
@@ -273,22 +273,22 @@ class TripViewSet(viewsets.ModelViewSet):
         trip = get_object_or_404(queryset, pk=pk)
         # Load the data
         data = json.loads(request.body)
-        if data.get('tripName') is not None:
+        if data.get('trip_name') is not None:
             # Get the trip name, and assign it
-            trip_name = data['tripName']
+            trip_name = data['trip_name']
             if trip_name != '':
                 try:
                     trip.name = trip_name
                     trip.save()
                 except IntegrityError:
                     response = {
-                        'error': f'''The title '{data["tripName"]}' has already been used.''',
+                        'error': f'''The title '{data["trip_name"]}' has already been used.''',
                         'status': 400
                     }
                     return Response(response, status=400)
         if data.get('waypoints') is not None:
             # Clear stopovers, if any
-            trip.waypoint.clear()
+            trip.waypoints.clear()
             # Define new waypoints
             new_waypoints = data['waypoints']
             # Create new waypoints
@@ -303,7 +303,7 @@ class TripViewSet(viewsets.ModelViewSet):
                     timeTo=datetime.strptime(new_waypoints[waypoint]['timeTo'], '%H:%M')
                 )
                 w.save()
-                trip.waypoint.add(w)
+                trip.waypoints.add(w)
                 # Query todo items, if any
                 todos = new_waypoints[waypoint]['todo']
                 if todos == []:
@@ -333,7 +333,6 @@ class TripViewSet(viewsets.ModelViewSet):
         # Add user into the trip
         trip.users.add(user)
         # Update user trip counter
-        user.tripCounter = len(user.trip.all())
         user.save()
         return Response(status=200)
 

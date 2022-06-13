@@ -42,16 +42,14 @@ class WaypointSerializer(serializers.ModelSerializer):
             'todo'
         ]
 class TripSerializer(serializers.ModelSerializer):
-    waypoint = WaypointSerializer(many=True, read_only=True)
-    origin = WaypointSerializer(read_only=True)
-    destination = WaypointSerializer(read_only=True)
+    waypoints = WaypointSerializer(many=True, read_only=True)
     users = UserSerializer(many=True, read_only=True)
     class Meta:
         model = Trip()
         fields = [
             'id', 
             'name',
-            'waypoint',
+            'waypoints',
             'users'
         ]
 
