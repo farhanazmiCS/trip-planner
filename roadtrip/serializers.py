@@ -63,7 +63,7 @@ class NotificationSerializer(serializers.ModelSerializer):
             'id',
             'frm',
             'to',
-            'is_addFriend',
-            'is_inviteToTrip',
+            'add_friend',
+            'invite_to_trip',
             'trip'
         ]

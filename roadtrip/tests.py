@@ -1,14 +1,8 @@
-import json
-
-from django.urls import reverse
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
 
-from roadtrip.models import User, Trip, Waypoint, Todo
-from roadtrip.serializers import UserSerializer
-
-from rest_framework.test import force_authenticate
+from roadtrip.models import Notification, Todo, Trip, User, Waypoint
 
 class UserTestCase(APITestCase):
     def setUp(self):
@@ -303,4 +297,143 @@ class TodoTestCase(APITestCase):
         self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
 
 class NotificationTestCase(APITestCase):
-    pass
+    def setUp(self):
+        """ Setup user profile(s) """
+        self.user1 = User.objects.create_user(
+            email='user1@test.com',
+            username='user1',
+            password='Iamacunt123!'
+        )
+        self.token1 = Token.objects.create(user=self.user1)
+
+        self.user2 = User.objects.create_user(
+            email='user2@test.com',
+            username='user2',
+            password='Iamacunt123!'
+        )
+        self.token2 = Token.objects.create(user=self.user2)
+
+        self.user3 = User.objects.create_user(
+            email='user3@test.com',
+            username='user3',
+            password='Iamacunt123!'
+        )
+        self.token3 = Token.objects.create(user=self.user3)
+
+        """ Setup trip, waypoints and todo objects """
+        self.trip = Trip.objects.create(name='Test trip')
+        self.trip.users.add(self.user2)
+        self.w1 = Waypoint.objects.create(
+            text='Singapore',
+            place_name='Singapore',
+            dateFrom='2022-06-13',
+            timeFrom='09:00',
+            dateTo='2022-06-13',
+            timeTo='09:30',
+        )
+        self.w2 = Waypoint.objects.create(
+            text='Switzerland',
+            place_name='Zurich',
+            dateFrom='2022-06-14',
+            timeFrom='09:00',
+            dateTo='2022-06-14',
+            timeTo='09:30'
+        )
+        self.todo1 = Todo.objects.create(task='task 1')
+        self.todo2 = Todo.objects.create(task='task 2')
+        self.w1.todo.add(self.todo1)
+        self.w2.todo.add(self.todo2)
+
+        """ Setup friend request and trip invite notification """
+        self.notification1 = Notification.objects.create(
+            frm=self.user2,
+            to=self.user1,
+            add_friend=True,
+            invite_to_trip=False
+        )
+        self.notification2 = Notification.objects.create(
+            frm=self.user2,
+            to=self.user1,
+            add_friend=False,
+            invite_to_trip=True,
+            trip=self.trip
+        )
+
+    def api_authenticate_user(self, token):
+        """ For user1 authorization headers """
+        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+
+    def test_list(self):
+        """ Test the list() function, list all notifications RECEIVED by user1 """
+        self.api_authenticate_user(self.token1)
+        request = self.client.get('/notifications/')
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user1.my_notifications.count(), 2)
+    
+    def test_my_requests_friends(self):
+        """ Test the my_requests_friends() function """
+        self.api_authenticate_user(self.token2)
+        request = self.client.get('/notifications/my_requests_friends/')
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user2.my_requests.filter(add_friend=True).count(), 1)
+       
+        """ Test for unauthenticated users """
+        self.client.force_authenticate(user=None)
+        self.assertEqual(self.client.get('/notifications/my_requests_friends/').status_code, status.HTTP_302_FOUND)
+
+    def test_my_requests_trips(self):
+        """ Test the my_requests_trips() function """
+        self.api_authenticate_user(self.token2)
+        request = self.client.get('/notifications/my_requests_trips/')
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(self.user2.my_requests.filter(invite_to_trip=True).count(), 1)
+
+        """ Test for unauthenticated users """
+        self.client.force_authenticate(user=None)
+        self.assertEqual(self.client.get('/notifications/my_requests_trips/').status_code, status.HTTP_302_FOUND)
+
+    def test_send_request(self):
+        """ Test sending a friend request """
+        payload_friend_request = {
+            'username': self.user3.username,
+            'toAddUsername': self.user1.username,
+            'add_friend': 'True'
+        }
+        response = self.client.post('/notifications/send_request/', payload_friend_request, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        """ Test sending a trip invite """
+        payload_trip_invite = {
+            'username': self.user2.username,
+            'toAddUsername': self.user3.username,
+            'invite_to_trip': 'True',
+            'trip': self.trip.id
+        }
+        response = self.client.post('/notifications/send_request/', payload_trip_invite, format='json')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        """ Test for no users payload """
+        payload_no_users = {
+            'abnormal': 'Not normal'
+        }
+        response = self.client.post('/notifications/send_request/', payload_no_users, format='json')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+        """ Test if program raises key error if no trip id specified """
+        payload_no_trip_specified = {
+            'username': self.user2.username,
+            'toAddUsername': self.user1.username,
+            'invite_to_trip': 'True'
+        }
+        response = self.client.post('/notifications/send_request/', payload_no_trip_specified, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_delete_notification(self):
+        """ Notification exists """
+        response = self.client.delete(f'/notifications/{self.notification1.id}/delete_notification/')
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+        """ Notification does not exist """
+        response = self.client.delete(f'/notifications/{self.notification2.id + 1}/delete_notification/')
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        

@@ -440,25 +440,27 @@ class NotificationViewSet(viewsets.ModelViewSet):
         """
         data = json.loads(request.body)
         # Retrieve user objects
-        user = User.objects.get(username=data.get('username'))
-        userToAdd = User.objects.get(username=data.get('toAddUsername'))
+        user = get_object_or_404(User.objects.all(), username=data.get('username'))
+        userToAdd = get_object_or_404(User.objects.all(), username=data.get('toAddUsername'))
         if data.get('add_friend') is not None:
-            new_notification = Notification(
+            Notification.objects.create(
                 frm=user,
                 to=userToAdd,
                 add_friend=True
             )
-            new_notification.save()
         elif data.get('invite_to_trip') is not None:
             # Retrieve trip id
-            trip = data['trip']
-            new_notification = Notification(
-                frm=user,
-                to=userToAdd,
-                invite_to_trip=True,
-                trip=Trip.objects.get(id=trip)
-            )
-            new_notification.save()
+            try:
+                trip = data['trip']
+            except KeyError:
+                return Response(status=400)
+            else:
+                Notification.objects.create(
+                    frm=user,
+                    to=userToAdd,
+                    invite_to_trip=True,
+                    trip=Trip.objects.get(id=trip)
+                )
         return Response(status=200)
 
     @action(methods=['DELETE'], detail=True)

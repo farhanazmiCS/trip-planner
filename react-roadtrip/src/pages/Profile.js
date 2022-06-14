@@ -178,7 +178,7 @@ export default function Profile(props) {
             body: JSON.stringify({
                 username: username,
                 toAddUsername: profile.username,
-                is_addFriend: 'True'
+                add_friend: 'True'
             })
         })
         .then(res => res.status)

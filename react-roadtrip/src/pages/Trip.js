@@ -192,7 +192,7 @@ export default function Trip(props) {
             body: JSON.stringify({
                 username: sessionStorage.getItem('username'),
                 toAddUsername: friend.username,
-                is_inviteToTrip: 'True',
+                invite_to_trip: 'True',
                 trip: trip.id
             })
         })
