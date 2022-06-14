@@ -26,6 +26,6 @@ class Todo(models.Model):
 class Notification(models.Model):
     frm = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_requests')
     to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_notifications')
-    is_addFriend = models.BooleanField(default=False)
-    is_inviteToTrip = models.BooleanField(default=False)
+    add_friend = models.BooleanField(default=False)
+    invite_to_trip = models.BooleanField(default=False)
     trip = models.ForeignKey(Trip, on_delete=models.CASCADE, null=True, related_name='trip')

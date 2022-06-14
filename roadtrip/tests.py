@@ -278,3 +278,29 @@ class TripTestCase(APITestCase):
         response = self.client.put(f'/trips/{self.trip.id}/add_friend_to_trip/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.trip.users.count(), 2)
+
+class WaypointTestCase(APITestCase):
+    def test_get_waypoint(self):
+        waypoint = Waypoint.objects.create(
+            text='Switzerland',
+            place_name='Zurich',
+            dateFrom='2022-06-14',
+            timeFrom='09:00',
+            dateTo='2022-06-14',
+            timeTo='09:30'
+        )
+        request_ok = self.client.get(f'/waypoints/{waypoint.id}/get_waypoint/')
+        request_not_found = self.client.get(f'/waypoints/{waypoint.id + 1}/get_waypoint/')
+        self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
+        self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
+
+class TodoTestCase(APITestCase):
+    def test_get_todo(self):
+        todo = Todo.objects.create(task='Hello')
+        request_ok = self.client.get(f'/todos/{todo.id}/get_todo/')
+        request_not_found = self.client.get(f'/todos/{todo.id + 1}/get_todo/')
+        self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
+        self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
+
+class NotificationTestCase(APITestCase):
+    pass

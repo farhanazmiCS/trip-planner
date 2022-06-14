@@ -409,7 +409,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         """
         user = request.user
         try:
-            friend_requests = user.my_requests.filter(is_addFriend=True)
+            friend_requests = user.my_requests.filter(add_friend=True)
         except AttributeError:
             return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
         else:
@@ -424,7 +424,7 @@ class NotificationViewSet(viewsets.ModelViewSet):
         """
         user = request.user
         try:
-            trip_requests = user.my_requests.filter(is_inviteToTrip=True)
+            trip_requests = user.my_requests.filter(invite_to_trip=True)
         except AttributeError:
             return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
         else:
@@ -442,20 +442,20 @@ class NotificationViewSet(viewsets.ModelViewSet):
         # Retrieve user objects
         user = User.objects.get(username=data.get('username'))
         userToAdd = User.objects.get(username=data.get('toAddUsername'))
-        if data.get('is_addFriend') is not None:
+        if data.get('add_friend') is not None:
             new_notification = Notification(
                 frm=user,
                 to=userToAdd,
-                is_addFriend=True
+                add_friend=True
             )
             new_notification.save()
-        elif data.get('is_inviteToTrip') is not None:
+        elif data.get('invite_to_trip') is not None:
             # Retrieve trip id
             trip = data['trip']
             new_notification = Notification(
                 frm=user,
                 to=userToAdd,
-                is_inviteToTrip=True,
+                invite_to_trip=True,
                 trip=Trip.objects.get(id=trip)
             )
             new_notification.save()
