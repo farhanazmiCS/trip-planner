@@ -13,9 +13,10 @@ from rest_framework.authentication import authenticate
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Notification, Todo, Trip, User, Waypoint
-from .serializers import (NotificationSerializer, TodoSerializer,
+from .models import Todo, Trip, User, Waypoint
+from .serializers import (TodoSerializer,
                           TripSerializer, UserSerializer, WaypointSerializer)
 
 
@@ -97,54 +98,11 @@ class UserViewSet(viewsets.ModelViewSet):
                 }
                 return Response(response, status=409)
             else:
-                token_endpoint = 'http://127.0.0.1:8000/api/token/'
-                data = {
-                    'username': username,
-                    'password': password
-                }
-                token = requests.post(token_endpoint, data).json()
+                refresh = RefreshToken.for_user(user)
                 return Response({
-                    'access': token.get('access'),
-                    'refresh': token.get('refresh')
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token)
                 }, status=201)
-
-    @action(methods=['PUT'], detail=True)
-    def add_friend(self, request, pk=None):
-        """
-        Inserts a new User instance to the 'friends' attribute of a User object.
-        
-        Params
-        
-            pk: id of the User to be added as a friend.
-        """
-        queryset = self.queryset.all()
-        user = get_object_or_404(queryset, pk=pk)
-        data = json.loads(request.body)
-        friend = data.get('friend')
-        user.friends.add(friend['id'])
-        user.save()
-        return Response(status=200)
-    
-    @action(methods=['DELETE'], detail=True)
-    def remove_friend(self, request, pk=None):
-        """
-        This function will remove each user from their friends' list.
-
-        Params
-            
-            pk: id of the user to 'unfriend'.
-        """
-        queryset = self.queryset.all()
-        # User objects
-        user1 = request.user
-        user2 = get_object_or_404(queryset, pk=pk)
-        # Remove the user objects from both users
-        user1.friends.remove(user2)
-        user2.friends.remove(user1)
-        # Save changes
-        user1.save()
-        user2.save()
-        return Response(status=200)
 
 class TripViewSet(viewsets.ModelViewSet):
     """
@@ -305,23 +263,6 @@ class TripViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(trip)
         return Response(serializer.data, status=200)
 
-    @action(methods=['PUT'], detail=True)
-    def add_friend_to_trip(self, request, pk=None):
-        """
-        Adds a user to the 'users' attribute in a trip object.
-
-        Params
-
-            pk: id of the trip object.
-        """
-        queryset = self.queryset.all()
-        user = request.user
-        trip = get_object_or_404(queryset, pk=pk)
-        # Add user into the trip
-        trip.users.add(user)
-        user.save()
-        return Response(status=200)
-
 class WaypointViewSet(viewsets.ModelViewSet):
     """
     ViewSet for the Waypoint class.
@@ -363,106 +304,7 @@ class TodoViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.all()
         todo = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(todo)
-        return Response(serializer.data)
-
-class NotificationViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for the Notification class.
-
-    Methods: list(), my_requests_friends(), my_requests_trips(),
-             send_request(), delete_notification()
-    """
-    queryset = Notification.objects.all()
-    serializer_class = NotificationSerializer
-   
-    def list(self, request):
-        """
-        Lists all the notifications for request.user.
-        """
-        user = request.user 
-        try:
-            notifications = user.my_notifications.all()
-        except AttributeError:
-            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
-        else:
-            serializer = self.serializer_class(notifications, many=True)
-            return Response(serializer.data)
-
-    
-    @action(methods=['GET'], detail=False)
-    def my_requests_friends(self, request):
-        """
-        Lists all the friend requests made by request.user.
-        """
-        user = request.user
-        try:
-            friend_requests = user.my_requests.filter(add_friend=True)
-        except AttributeError:
-            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
-        else:
-            serializer = self.serializer_class(friend_requests, many=True)
-            return Response(serializer.data)
-
-    
-    @action(methods=['GET'], detail=False)
-    def my_requests_trips(self, request):
-        """
-        Lists all the trip invites made by request.user.
-        """
-        user = request.user
-        try:
-            trip_requests = user.my_requests.filter(invite_to_trip=True)
-        except AttributeError:
-            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
-        else:
-            serializer = self.serializer_class(trip_requests, many=True)
-            return Response(serializer.data)
-
-    
-    @action(methods=['POST'], detail=False)
-    def send_request(self, request):
-        """
-        Send a notification by creating a new notification object, 
-        either a friend request, or a trip invite.
-        """
-        data = json.loads(request.body)
-        # Retrieve user objects
-        user = get_object_or_404(User.objects.all(), username=data.get('username'))
-        userToAdd = get_object_or_404(User.objects.all(), username=data.get('toAddUsername'))
-        if data.get('add_friend') is not None:
-            Notification.objects.create(
-                frm=user,
-                to=userToAdd,
-                add_friend=True
-            )
-        elif data.get('invite_to_trip') is not None:
-            # Retrieve trip id
-            try:
-                trip = data['trip']
-            except KeyError:
-                return Response(status=400)
-            else:
-                Notification.objects.create(
-                    frm=user,
-                    to=userToAdd,
-                    invite_to_trip=True,
-                    trip=Trip.objects.get(id=trip)
-                )
-        return Response(status=200)
-
-    @action(methods=['DELETE'], detail=True)
-    def delete_notification(self, request, pk=None):
-        """
-        Deletes a notification object. Used when a user accepts/decline a notification.
-
-        Params
-
-            pk: id of notification object to delete.
-        """
-        queryset = self.queryset.all()
-        notification = get_object_or_404(queryset, pk=pk)
-        notification.delete()
-        return Response(status=200)       
+        return Response(serializer.data)      
 
 class LoginView(APIView):
     def get(self, request):
@@ -517,15 +359,10 @@ class LoginView(APIView):
             password=password
         )
         if user is not None:
-            token_endpoint = 'http://127.0.0.1:8000/api/token/'
-            data = {
-                'username': username,
-                'password': password
-            }
-            token = requests.post(token_endpoint, data).json()
+            refresh = RefreshToken.for_user(user)
             return Response({
-                'access': token.get('access'),
-                'refresh': token.get('refresh')
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
             }, status=200)
         else:
             content = {

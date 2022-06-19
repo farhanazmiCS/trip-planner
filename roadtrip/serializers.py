@@ -52,18 +52,3 @@ class TripSerializer(serializers.ModelSerializer):
             'waypoints',
             'users'
         ]
-
-class NotificationSerializer(serializers.ModelSerializer):
-    frm = UserSerializer(read_only=True)
-    to = UserSerializer(read_only=True)
-    trip = TripSerializer(read_only=True)
-    class Meta:
-        model = Notification()
-        fields = [
-            'id',
-            'frm',
-            'to',
-            'add_friend',
-            'invite_to_trip',
-            'trip'
-        ]

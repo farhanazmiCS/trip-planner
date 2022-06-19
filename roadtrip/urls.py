@@ -7,7 +7,6 @@ router.register(r'users', views.UserViewSet)
 router.register(r'trips', views.TripViewSet)
 router.register(r'waypoints', views.WaypointViewSet)
 router.register(r'todos', views.TodoViewSet)
-router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
     # For the login endpoint
