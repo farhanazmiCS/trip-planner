@@ -1,3 +1,4 @@
+import requests
 from rest_framework import status
 from rest_framework.authtoken.models import Token
 from rest_framework.test import APITestCase
@@ -11,20 +12,21 @@ class UserTestCase(APITestCase):
             username='user1',
             password='Iamacunt123!'
         )
-        self.token1 = Token.objects.create(user=self.user1)
 
         self.user2 = User.objects.create_user(
             email='user2@test.com',
             username='user2',
             password='Iamacunt123!'
         )
-        self.token2 = Token.objects.create(user=self.user2)
 
-        self.api_authenticate_user1()
-
-    def api_authenticate_user1(self):
-        """ Authenticates test account, user1 for testing """
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {self.token1.key}")
+    def auth_user1(self):
+        """ Authenticate user1 """
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': self.user1.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ' + data["access"])
 
     def test_list(self):
         """Test list function """
@@ -40,7 +42,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123!' 
         }
-        response = self.client.post('/users/register/', data)
+        response = self.client.post('/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_register_username_already_exists(self):
@@ -51,7 +53,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123!' 
         }
-        response = self.client.post('/users/register/', data)
+        response = self.client.post('/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     def test_register_password_validation_fail(self):
@@ -62,7 +64,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123',
             'confirm': 'Iamacunt123' 
         }
-        response = self.client.post('/users/register/', data)
+        response = self.client.post('/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_register_password_not_same(self):
@@ -73,7 +75,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123' 
         }
-        response = self.client.post('/users/register/', data)
+        response = self.client.post('/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_user_exists(self):
@@ -101,7 +103,8 @@ class UserTestCase(APITestCase):
         self.assertEqual(self.add_friend().status_code, status.HTTP_200_OK)
 
     def test_remove_friend(self):
-        """ Test remove_friend() function """
+        """ Test remove_friend() function """  
+        self.auth_user1()      
         self.add_friend()
         response = self.client.delete(f'/users/{2}/remove_friend/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
@@ -115,7 +118,7 @@ class TripTestCase(APITestCase):
             password='Iamacunt123!'
         )
         self.token = Token.objects.create(user=self.user)
-        self.api_authenticate_user(self.token)
+        self.api_authenticate_user(self.user)
 
         """ Setup user2, for testing add_friend_to_trip() function """
         self.user2 = User.objects.create_user(
@@ -149,9 +152,14 @@ class TripTestCase(APITestCase):
         self.w1.todo.add(self.todo1)
         self.w2.todo.add(self.todo2)
 
-    def api_authenticate_user(self, token):
+    def api_authenticate_user(self, user):
         """ Authenticates the test user """
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': user.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ' + data["access"])
 
     def test_list(self):
         """ Test listing the logged on user's trips """
@@ -268,7 +276,7 @@ class TripTestCase(APITestCase):
 
     def test_add_friend_to_trip(self):
         """ Test add_friend_to_trip() function """
-        self.api_authenticate_user(self.token2) # user2 will now be request.user
+        self.api_authenticate_user(self.user2) # user2 will now be request.user
         response = self.client.put(f'/trips/{self.trip.id}/add_friend_to_trip/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(self.trip.users.count(), 2)
@@ -304,21 +312,18 @@ class NotificationTestCase(APITestCase):
             username='user1',
             password='Iamacunt123!'
         )
-        self.token1 = Token.objects.create(user=self.user1)
 
         self.user2 = User.objects.create_user(
             email='user2@test.com',
             username='user2',
             password='Iamacunt123!'
         )
-        self.token2 = Token.objects.create(user=self.user2)
 
         self.user3 = User.objects.create_user(
             email='user3@test.com',
             username='user3',
             password='Iamacunt123!'
         )
-        self.token3 = Token.objects.create(user=self.user3)
 
         """ Setup trip, waypoints and todo objects """
         self.trip = Trip.objects.create(name='Test trip')
@@ -359,20 +364,25 @@ class NotificationTestCase(APITestCase):
             trip=self.trip
         )
 
-    def api_authenticate_user(self, token):
-        """ For user1 authorization headers """
-        self.client.credentials(HTTP_AUTHORIZATION=f"Token {token.key}")
+    def api_authenticate_user(self, user):
+        """ Authenticates the test user """
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': user.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer ' + data["access"])
 
     def test_list(self):
         """ Test the list() function, list all notifications RECEIVED by user1 """
-        self.api_authenticate_user(self.token1)
+        self.api_authenticate_user(self.user1)
         request = self.client.get('/notifications/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(self.user1.my_notifications.count(), 2)
     
     def test_my_requests_friends(self):
         """ Test the my_requests_friends() function """
-        self.api_authenticate_user(self.token2)
+        self.api_authenticate_user(self.user2)
         request = self.client.get('/notifications/my_requests_friends/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(self.user2.my_requests.filter(add_friend=True).count(), 1)
@@ -383,7 +393,7 @@ class NotificationTestCase(APITestCase):
 
     def test_my_requests_trips(self):
         """ Test the my_requests_trips() function """
-        self.api_authenticate_user(self.token2)
+        self.api_authenticate_user(self.user2)
         request = self.client.get('/notifications/my_requests_trips/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(self.user2.my_requests.filter(invite_to_trip=True).count(), 1)

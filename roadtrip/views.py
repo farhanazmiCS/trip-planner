@@ -1,34 +1,23 @@
 import json
-from os import error, stat
 from datetime import datetime
-from time import strptime
-from django.contrib import auth
-from django.contrib.auth.models import AnonymousUser
-from django.core.exceptions import ValidationError, PermissionDenied
-from django.db.models import query
-from django.http import HttpResponse, HttpResponseForbidden, HttpResponseNotFound, HttpResponseRedirect
-from django.http.response import Http404
-from django.shortcuts import get_object_or_404, render
-from django.utils import translation
+
+import requests
+from django.contrib.auth.password_validation import (
+    password_validators_help_texts, validate_password)
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError
+from django.http import HttpResponseRedirect
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
-from rest_framework import permissions
+from rest_framework.authentication import authenticate
+from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication, TokenAuthentication
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.authtoken.models import Token
-from rest_framework.decorators import action, api_view, authentication_classes, permission_classes
-from rest_framework.reverse import reverse
-from rest_framework.authentication import authenticate
 
-from django.contrib.auth import login, logout
+from .models import Notification, Todo, Trip, User, Waypoint
+from .serializers import (NotificationSerializer, TodoSerializer,
+                          TripSerializer, UserSerializer, WaypointSerializer)
 
-from .models import Notification, User, Trip, Waypoint, Todo
-from .serializers import NotificationSerializer, TodoSerializer, UserSerializer, TripSerializer, WaypointSerializer
-from roadtrip import serializers
-
-from django.contrib.auth.password_validation import password_validators_help_texts, validate_password
-from django.db import IntegrityError
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
@@ -70,7 +59,7 @@ class UserViewSet(viewsets.ModelViewSet):
         """
         Registers a new user by creating a new User instance.
         """
-        data = request.POST
+        data = json.loads(request.body)
         # Retrieve fields
         email = data.get('email')
         username = data.get('username')
@@ -108,15 +97,16 @@ class UserViewSet(viewsets.ModelViewSet):
                 }
                 return Response(response, status=409)
             else:
-                # Create token for user
-                token = Token.objects.create(user=user)
-                # Provide a response to the client
-                response = {
-                    'username': request.user.username,
-                    'token': token.key,
-                    'status': 201
+                token_endpoint = 'http://127.0.0.1:8000/api/token/'
+                data = {
+                    'username': username,
+                    'password': password
                 }
-                return Response(response, status=201)
+                token = requests.post(token_endpoint, data).json()
+                return Response({
+                    'access': token.get('access'),
+                    'refresh': token.get('refresh')
+                }, status=201)
 
     @action(methods=['PUT'], detail=True)
     def add_friend(self, request, pk=None):
@@ -223,11 +213,10 @@ class TripViewSet(viewsets.ModelViewSet):
         user = request.user
         # Create new trip instance, save it, then add the logged user
         try:
-            trip = Trip(name=data['trip_name'])
-            trip.save()
+            trip = Trip.objects.create(name=data['trip_name'])
         except IntegrityError:
             response = {
-                'error': f'''The title '{data["tripName"]}' has already been used.''',
+                'error': f'''The title '{data["trip_name"]}' has already been used.''',
                 'status': 400
             }
             return Response(response, status=400)
@@ -236,7 +225,7 @@ class TripViewSet(viewsets.ModelViewSet):
             waypoints = data['waypoints']
             for waypoint in range(len(waypoints)):
                 # Save waypoint object
-                w = Waypoint(
+                w = Waypoint.objects.create(
                     text=waypoints[waypoint]['text'],
                     place_name=waypoints[waypoint]['place_name'],
                     dateFrom=datetime.strptime(waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
@@ -244,7 +233,6 @@ class TripViewSet(viewsets.ModelViewSet):
                     dateTo=datetime.strptime(waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
                     timeTo=datetime.strptime(waypoints[waypoint]['timeTo'], '%H:%M')
                 )
-                w.save()  
                 trip.waypoints.add(w)
                 # Query todo items, if any
                 todos = waypoints[waypoint]['todo']
@@ -252,8 +240,7 @@ class TripViewSet(viewsets.ModelViewSet):
                     pass
                 else:
                     for todo in todos:
-                        t = Todo(task=todo)
-                        t.save()
+                        t = Todo.objects.create(task=todo)
                         # Add the todo object into the waypoint object
                         w.todo.add(t)
             user.save()
@@ -530,22 +517,18 @@ class LoginView(APIView):
             password=password
         )
         if user is not None:
-            # Provide user with auth token
-            token = Token.objects.get(user=user)
-            # Successful login, return the token
-            content = {
-                'token': token.key,
-                'username': user.username,
-                'message': 'Authentication success!',
-                'status': 200
+            token_endpoint = 'http://127.0.0.1:8000/api/token/'
+            data = {
+                'username': username,
+                'password': password
             }
-            return Response(content, status=200)
+            token = requests.post(token_endpoint, data).json()
+            return Response({
+                'access': token.get('access'),
+                'refresh': token.get('refresh')
+            }, status=200)
         else:
-            message = 'Password is incorrect. Try again.'
             content = {
-                'user': str(request.user),  # returns AnonymousUser instance if not authenticated
-                'auth': str(request.auth),  # None
-                'message': message,
-                'status': 401
+                'message': 'Password is incorrect. Try again.',
             }
             return Response(content, status=401)     

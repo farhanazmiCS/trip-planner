@@ -11,9 +11,9 @@ router.register(r'notifications', views.NotificationViewSet)
 
 urlpatterns = [
     # For the login endpoint
-    path('api/login', views.LoginView.as_view(), name="login"),
+    path('api/login/', views.LoginView.as_view(), name="login"),
     # For the browsable API 
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
 
 urlpatterns += router.urls
