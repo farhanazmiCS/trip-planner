@@ -16,8 +16,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import Todo, Trip, User, Waypoint
-from .serializers import (TodoSerializer,
-                          TripSerializer, UserSerializer, WaypointSerializer)
+from .serializers import (TodoSerializer, TripSerializer, UserSerializer,
+                          WaypointSerializer)
 
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
