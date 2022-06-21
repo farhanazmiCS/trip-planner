@@ -108,7 +108,7 @@ export default function Register() {
                 Create Account
               </Button>
               <Or />
-              <div style={{textAlign: 'center', marginTop: '12px'}}>
+              <div style={{textAlign: 'center', marginTop: '12px', marginBottom: '32px' }}>
                 <RouterLink to="/login" style={{
                   color: '#1976d2'
                 }}>
