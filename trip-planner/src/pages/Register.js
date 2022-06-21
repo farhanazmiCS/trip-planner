@@ -9,7 +9,6 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Or from '../components/Or';
-import Copyright from '../components/Copyright';
 import { Link as RouterLink } from 'react-router-dom';
 
 const theme = createTheme();
@@ -109,7 +108,7 @@ export default function Register() {
                 Create Account
               </Button>
               <Or />
-              <div style={{textAlign: 'center'}}>
+              <div style={{textAlign: 'center', marginTop: '12px'}}>
                 <RouterLink to="/login" style={{
                   color: '#1976d2'
                 }}>
@@ -118,7 +117,6 @@ export default function Register() {
               </div>
             </Box>
           </Box>
-          <Copyright sx={{ mt: 8, mb: 2 }} />
         </Grid>
       </Grid>
     </ThemeProvider>

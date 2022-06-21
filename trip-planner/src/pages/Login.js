@@ -10,7 +10,6 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Or from '../components/Or';
 import { Link as RouterLink } from 'react-router-dom';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import Copyright from '../components/Copyright';
 
 const theme = createTheme();
 
@@ -90,7 +89,7 @@ export default function SignInSide() {
               >
                 Log In
               </Button>
-              <div style={{ textAlign: 'center', marginTop: '8px' }}>
+              <div style={{ textAlign: 'center', marginTop: '12px', marginBottom: '12px' }}>
                 <RouterLink to="/" style={{
                   color: '#1976d2'
                 }}>
@@ -115,7 +114,6 @@ export default function SignInSide() {
               </RouterLink>
             </Box>
           </Box>
-          <Copyright sx={{ mt: 8, mb: 2 }} />
         </Grid>
       </Grid>
     </ThemeProvider>
