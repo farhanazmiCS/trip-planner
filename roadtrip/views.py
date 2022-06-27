@@ -1,7 +1,6 @@
 import json
 from datetime import datetime
 
-import requests
 from django.contrib.auth.password_validation import (
     password_validators_help_texts, validate_password)
 from django.core.exceptions import ValidationError
@@ -22,19 +21,12 @@ from .serializers import (TodoSerializer, TripSerializer, UserSerializer,
 
 # UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for the User class. 
-
-    Methods: list(), get_user(), register(), add_friend(), 
-             remove_friend()
-    """
+    """ ViewSet for the User class. """
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
     def list(self, request):
-        """
-        Lists all the users, and their associated information.
-        """
+        """ Lists all the users, and their associated information. """
         # queryset.all() is called to update the trip_counter attribute
         # as the queryset is cached.
         queryset = self.queryset.all()
@@ -43,13 +35,7 @@ class UserViewSet(viewsets.ModelViewSet):
     
     @action(methods=['GET'], detail=True)
     def get_user(self, request, pk=None):
-        """
-        Retrieves an information of a user.
-
-        Params
-            
-            pk: id of the user.
-        """
+        """ Detailed API view of a user object. pk is the id of the user. """
         queryset = self.queryset.all()
         user = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(user)
@@ -57,9 +43,7 @@ class UserViewSet(viewsets.ModelViewSet):
 
     @action(methods=['POST'], detail=False)
     def register(self, request):
-        """
-        Registers a new user by creating a new User instance.
-        """
+        """ Creates a new user instance. """
         data = json.loads(request.body)
         # Retrieve fields
         email = data.get('email')
@@ -105,19 +89,12 @@ class UserViewSet(viewsets.ModelViewSet):
                 }, status=201)
 
 class TripViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for the Trip class.
-
-    Methods: list(), get_trip(), list_other_trip(), save_trip(),
-             save_changes(), add_friend_to_trip()
-    """
+    """ ViewSet for the Trip class. """
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
     
     def list(self, request):
-        """
-        Lists all of request.user's trips
-        """
+        """ Lists all of the logged-on user's trips. """
         try:
             user = request.user
             trips = user.trip.all()
@@ -129,13 +106,7 @@ class TripViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], detail=True)
     def get_trip(self, request, pk=None):
-        """
-        Retrieves a trip object.
-
-        Params
-            
-            pk: id of the trip object.
-        """
+        """ Detailed view of a trip object. pk is the id of the trip. """
         queryset = self.queryset.all()
         trip = get_object_or_404(queryset, pk=pk)    
         serializer = self.serializer_class(trip)
@@ -143,13 +114,7 @@ class TripViewSet(viewsets.ModelViewSet):
 
     @action(methods=['GET'], detail=True)
     def list_other_trip(self, request, pk=None):
-        """
-        Lists the trips of a particular user, given the user's id.
-
-        Params
-
-            pk: The user's id.
-        """
+        """ Lists the trips of a user. pk is the id of a User instance. """
         try:
             user = User.objects.get(pk=pk)
             trips = user.trip.all()
@@ -163,9 +128,7 @@ class TripViewSet(viewsets.ModelViewSet):
        
     @action(methods=['POST'], detail=False)
     def save_trip(self, request):
-        """
-        Saves a trip by creating a new trip instance.
-        """
+        """ Creates and saves a Trip object. """
         data = json.loads(request.body)
         # User and trip length
         user = request.user
@@ -212,13 +175,7 @@ class TripViewSet(viewsets.ModelViewSet):
 
     @action(methods=['PUT'], detail=True)
     def save_changes(self, request, pk=None):
-        """
-        Saves any changes made to an existing trip object.
-
-        Params
-            
-            pk: id of the trip to be changed.
-        """
+        """ Updates a trip object. """
         queryset = self.queryset.all()
         # Load the trip
         trip = get_object_or_404(queryset, pk=pk)
@@ -276,43 +233,26 @@ class TripViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=200)
 
 class WaypointViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for the Waypoint class.
-
-    Methods: get_waypoint()
-    """
+    """ ViewSet for the Waypoint class. """
     queryset = Waypoint.objects.all()
     serializer_class = WaypointSerializer
     
     @action(methods=['GET'], detail=True)
     def get_waypoint(self, request, pk=None):
-        """
-        Retrieve a waypoint object.
-        pk: id of the waypoint object.
-        """
+        """ Detailed view of a Waypoint object. pk is the id of the Waypoint object. """
         queryset = self.queryset.all()
         waypoint = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(waypoint)
         return Response(serializer.data)
 
 class TodoViewSet(viewsets.ModelViewSet):
-    """
-    ViewSet for the Todo class.
-
-    Methods: get_todo()
-    """
+    """ ViewSet for the Todo class. """
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
     @action(methods=['GET'], detail=True)
     def get_todo(self, request, pk=None):
-        """
-        Retrieves a todo object.
-
-        Params
-            
-            pk: id of the todo object.
-        """
+        """ Detailed view of a Todo object. pk is the id of the Todo object. """
         queryset = self.queryset.all()
         todo = get_object_or_404(queryset, pk=pk)
         serializer = self.serializer_class(todo)
@@ -320,9 +260,7 @@ class TodoViewSet(viewsets.ModelViewSet):
 
 class LoginView(APIView):
     def get(self, request):
-        """
-        Verifies if the user is logged in.
-        """
+        """ Endpoint to check if a user is logged in or not. """
         if not request.user.is_anonymous:    
             return Response(status=200)
         else:
@@ -332,20 +270,8 @@ class LoginView(APIView):
             return Response(response, status=401)
     
     def post(self, request):
-        """
-        Takes the username and password and verifies it.
-
-        If username field is empty, returns 404 along with error message.
-
-        If username does not exist, returns 404, along with error message
-        indicating that user does not exist.
-
-        Username and Password credentials are verified with authenticate(). 
-        If authenticate returns None, user credentials are. Returns 401, and login fails.
-        
-        Else, provide the token for request authentication, and return a
-        response status of 200.
-        """
+        """ Takes in the user's username and password via the POST request method and 
+        verifies it. """
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
@@ -355,12 +281,12 @@ class LoginView(APIView):
         except User.DoesNotExist:
             if username == '':
                 content = {
-                    'message': "Username field empty.",
+                    'message': "Username field is empty.",
                     'status': 404
                 }
             else:
                 content = {
-                    'message': f"User of username '{username}' does not exist.",
+                    'message': "User does not exist.",
                     'status': 404
                 }
             return Response(content, status=404)
