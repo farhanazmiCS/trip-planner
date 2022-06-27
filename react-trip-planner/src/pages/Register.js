@@ -1,4 +1,5 @@
-import * as React from 'react';
+import { useState } from 'react';
+// Material UI
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -9,19 +10,51 @@ import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Or from '../components/Or';
-import { Link as RouterLink } from 'react-router-dom';
+// Axios
+import axiosInstance from '../axios';
+// React-Router-DOM
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 const theme = createTheme();
 
 export default function Register() {
+  const navigate = useNavigate();
+  const initialFormData = Object.freeze({
+    email: '',
+    username: '',
+    password: '',
+    confirm: '',
+  });
+
+  const [formData, updateFormData] = useState(initialFormData);
+
+  const handleChange = (event) => {
+    updateFormData({
+      ...formData,
+      // Trim the whitespace of the changed field (The name parameter of the field is used as a key)
+      [event.target.name]: event.target.value.trim(),
+    });
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    console.log(formData);
+
+    axiosInstance
+      .post(`/users/register/`, {
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+        confirm: formData.confirm,
+      })
+      .then((response) => {
+        localStorage.setItem('access', response.data.access);
+        localStorage.setItem('refresh', response.data.refresh);
+        axiosInstance.defaults.headers['Authorization'] = 
+          'JWT ' + localStorage.getItem('access');
+        navigate('/');
+      });
+  }
 
   return (
     <ThemeProvider theme={theme}>
@@ -69,6 +102,7 @@ export default function Register() {
                 label="Email Address"
                 name="email"
                 autoComplete="email"
+                onChange={handleChange}
                 autoFocus
               />
               <TextField
@@ -78,6 +112,7 @@ export default function Register() {
                 label="Username"
                 name="username"
                 autoComplete="username"
+                onChange={handleChange}
               />
               <TextField
                 margin="normal"
@@ -87,6 +122,7 @@ export default function Register() {
                 type="password"
                 id="password"
                 autoComplete="password"
+                onChange={handleChange}
               />
               <TextField
                 margin="normal"
@@ -96,6 +132,7 @@ export default function Register() {
                 type="password"
                 id="confirm"
                 autoComplete="confirm"
+                onChange={handleChange}
               />
               <Button
                 color="success"

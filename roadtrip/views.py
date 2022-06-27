@@ -69,7 +69,7 @@ class UserViewSet(viewsets.ModelViewSet):
         # Check if passwords match
         if password != confirm:
             response = {
-                'error': 'Passwords must match!',
+                'message': 'Passwords must match.',
                 'status': 400
             }
             return Response(response, status=400)
@@ -78,7 +78,7 @@ class UserViewSet(viewsets.ModelViewSet):
             validate_password(password)
         except ValidationError:
             response = {
-                'error': password_validators_help_texts(),
+                'message': password_validators_help_texts(),
                 'status': 400
             }
             return Response(response, status=400)
@@ -93,7 +93,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 user.save()
             except IntegrityError:
                 response = {
-                    'error': f'Username of name {username} already exists!',
+                    'message': f'Username and email already used.',
                     'status': 409
                 }
                 return Response(response, status=409)
@@ -155,7 +155,7 @@ class TripViewSet(viewsets.ModelViewSet):
             trips = user.trip.all()
         except User.DoesNotExist:
             return Response({
-                'error': 'User does not exist!'
+                'message': 'User does not exist!'
             }, status=404)
         else:
             serializer = self.serializer_class(trips, many=True)
@@ -174,7 +174,7 @@ class TripViewSet(viewsets.ModelViewSet):
             trip = Trip.objects.create(name=data['trip_name'])
         except IntegrityError:
             response = {
-                'error': f'''The title '{data["trip_name"]}' has already been used.''',
+                'message': f'''The title '{data["trip_name"]}' has already been used.''',
                 'status': 400
             }
             return Response(response, status=400)
@@ -183,14 +183,20 @@ class TripViewSet(viewsets.ModelViewSet):
             waypoints = data['waypoints']
             for waypoint in range(len(waypoints)):
                 # Save waypoint object
-                w = Waypoint.objects.create(
-                    text=waypoints[waypoint]['text'],
-                    place_name=waypoints[waypoint]['place_name'],
-                    dateFrom=datetime.strptime(waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
-                    timeFrom=datetime.strptime(waypoints[waypoint]['timeFrom'], '%H:%M'),
-                    dateTo=datetime.strptime(waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
-                    timeTo=datetime.strptime(waypoints[waypoint]['timeTo'], '%H:%M')
-                )
+                try:
+                    w = Waypoint.objects.create(
+                        text=waypoints[waypoint]['text'],
+                        place_name=waypoints[waypoint]['place_name'],
+                        dateFrom=datetime.strptime(waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
+                        timeFrom=datetime.strptime(waypoints[waypoint]['timeFrom'], '%H:%M'),
+                        dateTo=datetime.strptime(waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
+                        timeTo=datetime.strptime(waypoints[waypoint]['timeTo'], '%H:%M')
+                    )
+                except KeyError:
+                    w = Waypoint.objects.create(
+                        text=waypoints[waypoint]['text'],
+                        place_name=waypoints[waypoint]['place_name']
+                    )
                 trip.waypoints.add(w)
                 # Query todo items, if any
                 todos = waypoints[waypoint]['todo']
@@ -227,7 +233,7 @@ class TripViewSet(viewsets.ModelViewSet):
                     trip.save()
                 except IntegrityError:
                     response = {
-                        'error': f'''The title '{data["trip_name"]}' has already been used.''',
+                        'message': f'''The title '{data["trip_name"]}' has already been used.''',
                         'status': 400
                     }
                     return Response(response, status=400)
@@ -239,14 +245,20 @@ class TripViewSet(viewsets.ModelViewSet):
             # Create new waypoints
             for waypoint in range(len(new_waypoints)):
                 # Save waypoint object
-                w = Waypoint(
-                    text=new_waypoints[waypoint]['text'],
-                    place_name=new_waypoints[waypoint]['place_name'],
-                    dateFrom=datetime.strptime(new_waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
-                    timeFrom=datetime.strptime(new_waypoints[waypoint]['timeFrom'], '%H:%M'),
-                    dateTo=datetime.strptime(new_waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
-                    timeTo=datetime.strptime(new_waypoints[waypoint]['timeTo'], '%H:%M')
-                )
+                try:
+                    w = Waypoint(
+                        text=new_waypoints[waypoint]['text'],
+                        place_name=new_waypoints[waypoint]['place_name'],
+                        dateFrom=datetime.strptime(new_waypoints[waypoint]['dateFrom'], '%Y-%m-%d'),
+                        timeFrom=datetime.strptime(new_waypoints[waypoint]['timeFrom'], '%H:%M'),
+                        dateTo=datetime.strptime(new_waypoints[waypoint]['dateTo'], '%Y-%m-%d'),
+                        timeTo=datetime.strptime(new_waypoints[waypoint]['timeTo'], '%H:%M')
+                    )
+                except KeyError:
+                    w = Waypoint(
+                        text=new_waypoints[waypoint]['text'],
+                        place_name=new_waypoints[waypoint]['place_name']
+                    )
                 w.save()
                 trip.waypoints.add(w)
                 # Query todo items, if any

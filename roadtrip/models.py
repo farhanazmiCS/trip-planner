@@ -1,10 +1,11 @@
-from django.db import models
 from django.contrib.auth.models import AbstractUser
-from datetime import date, time
+from django.db import models
+from django.utils import timezone
+from django.utils.translation import gettext_lazy as _
 
-# Create your models here.
+
 class User(AbstractUser):
-    friends = models.ManyToManyField('User', related_name='friend')
+    email = models.EmailField(_('email address'), blank=True, unique=True)
 
 class Trip(models.Model):
     name = models.TextField(unique=True)
@@ -14,18 +15,11 @@ class Trip(models.Model):
 class Waypoint(models.Model):
     text = models.TextField(null=True)
     place_name = models.TextField(null=True)
-    dateFrom = models.DateField(default=None, null=True)
-    timeFrom = models.TimeField(default=None, null=True)
-    dateTo = models.DateField(default=None, null=True)
-    timeTo = models.TimeField(default=None, null=True)
+    dateFrom = models.DateField(default=timezone.now, null=True)
+    timeFrom = models.TimeField(default=timezone.now, null=True)
+    dateTo = models.DateField(default=timezone.now, null=True)
+    timeTo = models.TimeField(default=timezone.now, null=True)
     todo = models.ManyToManyField('Todo')
 
 class Todo(models.Model):
     task = models.TextField(null=True)
-
-class Notification(models.Model):
-    frm = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_requests')
-    to = models.ForeignKey(User, on_delete=models.CASCADE, related_name='my_notifications')
-    add_friend = models.BooleanField(default=False)
-    invite_to_trip = models.BooleanField(default=False)
-    trip = models.ForeignKey(Trip, on_delete=models.CASCADE, null=True, related_name='trip')

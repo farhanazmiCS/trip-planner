@@ -1,4 +1,6 @@
-import * as React from 'react';
+import { useState } from 'react';
+
+// MUI components
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -7,21 +9,69 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Or from '../components/Or';
-import { Link as RouterLink } from 'react-router-dom';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+
+import Or from '../components/Or';
+
+// react-router-dom
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import axiosInstance from '../axios';
 
 const theme = createTheme();
 
-export default function SignInSide() {
+export default function Login() {
+  const navigate = useNavigate();
+  const initialFormData = Object.freeze({
+    username: '',
+    password: '',
+  });
+
+  const [formData, updateFormData] = useState(initialFormData);
+
+  const handleChange = (event) => {
+    updateFormData({
+      ...formData,
+      // Trim the whitespace of the changed field (The name parameter of the field is used as a key)
+      [event.target.name]: event.target.value.trim(),
+    });
+  }
+
   const handleSubmit = (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
-  };
+    console.log(formData);
+
+    axiosInstance
+      .post(`/login/`, {
+        username: formData.username,
+        password: formData.password
+      })
+      .then((response) => {
+        localStorage.setItem('access', response.data.access);
+        localStorage.setItem('refresh', response.data.refresh);
+        axiosInstance.defaults.headers['Authorization'] = 
+          'JWT ' + localStorage.getItem('access');
+        navigate('/');
+      })
+      .catch((error) => {
+        if (error.response.status === 404) {
+          setErrorStatus({
+            username_not_exist: true, 
+            message_username_not_exist: error.response.data.message,
+          });
+        }
+        else {
+          setErrorStatus({
+            password_wrong: true, 
+            message_password_wrong: error.response.data.message,
+          });
+        }
+      })
+  }
+
+  const [errorStatus, setErrorStatus] = useState({
+    username_not_exist: null,
+    password_wrong: null,
+  });
 
   return (
     <ThemeProvider theme={theme}>
@@ -63,15 +113,19 @@ export default function SignInSide() {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
               <TextField
+                error={errorStatus.username_not_exist}
                 margin="normal"
                 fullWidth
                 id="username"
                 label="Username"
                 name="username"
                 autoComplete="username"
+                onChange={handleChange}
+                helperText={errorStatus.message_username_not_exist}
                 autoFocus
               />
               <TextField
+                error={errorStatus.password_wrong}
                 margin="normal"
                 fullWidth
                 name="password"
@@ -79,6 +133,8 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="password"
+                onChange={handleChange}
+                helperText={errorStatus.message_password_wrong}
               />
               <Button
                 size="large"

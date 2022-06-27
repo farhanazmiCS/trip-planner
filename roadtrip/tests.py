@@ -1,7 +1,11 @@
+from datetime import datetime
+
+from django.utils import timezone
 from rest_framework import status
 from rest_framework.test import APITestCase
 
 from roadtrip.models import Todo, Trip, User, Waypoint
+
 
 class UserTestCase(APITestCase):
     def setUp(self):
@@ -19,7 +23,7 @@ class UserTestCase(APITestCase):
 
     def test_list(self):
         """Test list function """
-        request = self.client.get('/users/')
+        request = self.client.get('/api/users/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(len(request.data), 2)
 
@@ -31,7 +35,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123!' 
         }
-        response = self.client.post('/users/register/', data, format='json')
+        response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_register_username_already_exists(self):
@@ -42,7 +46,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123!' 
         }
-        response = self.client.post('/users/register/', data, format='json')
+        response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     def test_register_password_validation_fail(self):
@@ -53,7 +57,7 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123',
             'confirm': 'Iamacunt123' 
         }
-        response = self.client.post('/users/register/', data, format='json')
+        response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_register_password_not_same(self):
@@ -64,17 +68,17 @@ class UserTestCase(APITestCase):
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123' 
         }
-        response = self.client.post('/users/register/', data, format='json')
+        response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_user_exists(self):
         """ Tests get_user() function """
-        request = self.client.get(f'/users/{self.user1.id}/')
+        request = self.client.get(f'/api/users/{self.user1.id}/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
 
     def test_user_does_not_exist(self):
         """ Test get_user() function where user does not exist """
-        request = self.client.get(f'/users/{3}/')
+        request = self.client.get(f'/api/users/{3}/')
         self.assertEqual(request.status_code, status.HTTP_404_NOT_FOUND)
 
 class TripTestCase(APITestCase):
@@ -125,26 +129,26 @@ class TripTestCase(APITestCase):
             'password': 'Iamacunt123!'
         }, format='json')
         data = login_request.data
-        self.client.credentials(HTTP_AUTHORIZATION=f'Bearer {data["access"]}')
+        self.client.credentials(HTTP_AUTHORIZATION=f'JWT {data["access"]}')
 
     def test_list(self):
         """ Test listing the logged on user's trips """
-        request = self.client.get('/trips/')
+        request = self.client.get('/api/trips/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(len(request.data), 1)
 
     def test_other_list(self):
         """ Test list_other_trip() function """
         self.client.force_authenticate(user=None)
-        request_user_present = self.client.get(f'/trips/{self.user.id}/list_other_trip/')
-        request_not_user_present = self.client.get(f'/trips/{len(User.objects.all()) + 1}/list_other_trip/')
+        request_user_present = self.client.get(f'/api/trips/{self.user.id}/list_other_trip/')
+        request_not_user_present = self.client.get(f'/api/trips/{len(User.objects.all()) + 1}/list_other_trip/')
         self.assertEqual(request_user_present.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_user_present.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_trip(self):
         """ Test get_trip() function """
-        request_exists = self.client.get(f'/trips/{self.trip.id}/')
-        request_not_exists = self.client.get(f'/trips/{2}/')
+        request_exists = self.client.get(f'/api/trips/{self.trip.id}/')
+        request_not_exists = self.client.get(f'/api/trips/{2}/')
         self.assertEqual(request_exists.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_exists.status_code, status.HTTP_404_NOT_FOUND)
     
@@ -153,10 +157,6 @@ class TripTestCase(APITestCase):
         payload = {
             'trip_name': 'My first trip',
             'waypoints': [{
-                'dateFrom': '2022-06-08',
-                'timeFrom': '09:00',
-                'dateTo': '2022-06-08',
-                'timeTo': '09:30',
                 'text': 'Singapore',
                 'place_name': 'Singapore',
                 'todo': [
@@ -187,7 +187,7 @@ class TripTestCase(APITestCase):
                 ]
             }]
         }
-        response = self.client.post('/trips/save_trip/', payload, format='json')
+        response = self.client.post('/api/trips/save_trip/', payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         
     def test_save_changes(self):
@@ -196,10 +196,6 @@ class TripTestCase(APITestCase):
         payload = {
             'trip_name': 'Test Trip',
             'waypoints': [{
-                'dateFrom': '2022-06-08',
-                'timeFrom': '10:00',
-                'dateTo': '2022-06-08',
-                'timeTo': '10:30',
                 'text': 'Singapore',
                 'place_name': 'Singapore',
                 'todo': [
@@ -233,11 +229,11 @@ class TripTestCase(APITestCase):
                 ]
             }]
         }
-        response = self.client.put(f'/trips/{self.trip.id}/save_changes/', payload, format='json')
+        response = self.client.put(f'/api/trips/{self.trip.id}/save_changes/', payload, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['name'], 'Test Trip') # Test for trip_name change
         self.assertEqual(response.data['waypoints'][1]['dateFrom'], payload['waypoints'][1]['dateFrom']) # Test for dateFrom change and adding a waypoint
-        self.assertEqual(response.data['waypoints'][0]['timeFrom'][:5], payload['waypoints'][0]['timeFrom']) # Test for timeFrom change
+        self.assertEqual(response.data['waypoints'][0]['timeFrom'][:5], datetime.strftime(timezone.now(), '%H:%M')) # Test for timeFrom when key does not exist
         self.assertEqual(response.data['waypoints'][2]['todo'][0]['task'], payload['waypoints'][2]['todo'][0]) # Test for todo change
 
 class WaypointTestCase(APITestCase):
@@ -250,15 +246,15 @@ class WaypointTestCase(APITestCase):
             dateTo='2022-06-14',
             timeTo='09:30'
         )
-        request_ok = self.client.get(f'/waypoints/{waypoint.id}/get_waypoint/')
-        request_not_found = self.client.get(f'/waypoints/{waypoint.id + 1}/get_waypoint/')
+        request_ok = self.client.get(f'/api/waypoints/{waypoint.id}/get_waypoint/')
+        request_not_found = self.client.get(f'/api/waypoints/{waypoint.id + 1}/get_waypoint/')
         self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
 
 class TodoTestCase(APITestCase):
     def test_get_todo(self):
         todo = Todo.objects.create(task='Hello')
-        request_ok = self.client.get(f'/todos/{todo.id}/get_todo/')
-        request_not_found = self.client.get(f'/todos/{todo.id + 1}/get_todo/')
+        request_ok = self.client.get(f'/api/todos/{todo.id}/get_todo/')
+        request_not_found = self.client.get(f'/api/todos/{todo.id + 1}/get_todo/')
         self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)

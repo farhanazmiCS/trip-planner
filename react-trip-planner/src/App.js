@@ -4,8 +4,6 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Home from './pages/Home';
 import NotFound from './pages/NotFound';
-import NavBar from './components/NavBar';
-import { checkLoginStatus } from './helper';
 
 export default function App() {
   return <Router>
@@ -15,6 +13,5 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       <Route path="*" element={<NotFound /> } />
     </Routes>
-    {!checkLoginStatus && <NavBar />}
   </Router>
 }
