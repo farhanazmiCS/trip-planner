@@ -32,11 +32,11 @@ class MandatoryCharacterValidator:
         
         if not (status[0] and status[1] and status[2] and status[3]):
             raise ValidationError(
-                _("Your password must contain a lowercase letter (e.g a - z), capital letter (e.g A - Z), a numeric character (e.g 0 - 9), and a symbol (e.g $, @, !)."),
+                _("Your password must contain a lowercase letter, an uppercase letter, a number, and a symbol."),
                 code='password_no_mandatory_characters',
             )
 
     def get_help_text(self):
         return _(
-            'Your password must contain a lowercase letter (e.g a - z), capital letter (e.g A - Z), a numeric character (e.g 0 - 9), and a symbol (e.g $, @, !).'
+            'Your password must contain a lowercase letter, an uppercase letter, a number, and a symbol.'
         )

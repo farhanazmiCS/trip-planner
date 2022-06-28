@@ -1,5 +1,9 @@
 import { useState } from 'react';
 // Material UI
+import Visibility from '@mui/icons-material/Visibility';
+import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputAdornment from '@mui/material/InputAdornment';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
@@ -8,12 +12,16 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import Typography from '@mui/material/Typography';
+import FormControl from '@mui/material/FormControl';
+import IconButton from '@mui/material/IconButton';
+import InputLabel from '@mui/material/InputLabel';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Or from '../components/Or';
 // Axios
 import axiosInstance from '../axios';
 // React-Router-DOM
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+// User defined components
+import Or from '../components/Or';
 
 const theme = createTheme();
 
@@ -55,6 +63,11 @@ export default function Register() {
         navigate('/');
       });
   }
+
+  const [passwordVisibility, setPasswordVisibility] = useState(false);
+  const togglePasswordVisibility = () => {
+    setPasswordVisibility(!passwordVisibility);
+  };
 
   return (
     <ThemeProvider theme={theme}>
@@ -114,26 +127,50 @@ export default function Register() {
                 autoComplete="username"
                 onChange={handleChange}
               />
-              <TextField
-                margin="normal"
-                fullWidth
-                name="password"
-                label="Password"
-                type="password"
-                id="password"
-                autoComplete="password"
-                onChange={handleChange}
-              />
-              <TextField
-                margin="normal"
-                fullWidth
-                name="confirm"
-                label="Confirm Password"
-                type="password"
-                id="confirm"
-                autoComplete="confirm"
-                onChange={handleChange}
-              />
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Password</InputLabel>
+                <OutlinedInput
+                  name="password"
+                  label="Password"
+                  type={passwordVisibility ? "text" : "password"}
+                  id="password"
+                  autoComplete="password"
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                      >
+                        {passwordVisibility ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  onChange={handleChange}
+                />
+              </FormControl>
+              <FormControl fullWidth margin="normal">
+                <InputLabel>Confirm Password</InputLabel>
+                <OutlinedInput
+                  name="confirm"
+                  label="confirm password"
+                  type={passwordVisibility ? "text" : "password"}
+                  id="confirm"
+                  autoComplete="confirm"
+                  endAdornment={
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onClick={togglePasswordVisibility}
+                        edge="end"
+                      >
+                        {passwordVisibility ? <VisibilityOff /> : <Visibility />}
+                      </IconButton>
+                    </InputAdornment>
+                  }
+                  onChange={handleChange}
+                />
+              </FormControl>
               <Button
                 color="success"
                 size="large"

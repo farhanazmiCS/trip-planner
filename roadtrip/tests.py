@@ -38,15 +38,28 @@ class UserTestCase(APITestCase):
         response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_register_email_already_exists(self):
+        """ Tests user registration for already existing email """
+        data = {
+            'email': 'user1@test.com',
+            'username': 'test69',
+            'password': 'Iamacunt123!',
+            'confirm': 'Iamacunt123!' 
+        }
+        response = self.client.post('/api/users/register/', data, format='json')
+        self.assertEqual(response.data['message'], 'Email already used.')
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
     def test_register_username_already_exists(self):
         """ Tests user registration for already existing username """
         data = {
-            'email': 'user1@test.com',
+            'email': 'test69@test.com',
             'username': 'user1',
             'password': 'Iamacunt123!',
             'confirm': 'Iamacunt123!' 
         }
         response = self.client.post('/api/users/register/', data, format='json')
+        self.assertEqual(response.data['message'], 'Username already used.')
         self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
 
     def test_register_password_validation_fail(self):

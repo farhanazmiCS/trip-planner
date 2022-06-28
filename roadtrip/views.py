@@ -50,6 +50,18 @@ class UserViewSet(viewsets.ModelViewSet):
         username = data.get('username')
         password = data.get('password')
         confirm = data.get('confirm')
+        # Check if email already exist
+        if User.objects.filter(email=email).count() != 0:
+            response = {
+                'message': 'Email already used.'
+            }
+            return Response(response, status=409)
+        # Check if username already exist
+        if User.objects.filter(username=username).count() != 0:
+            response = {
+                'message': 'Username already used.'
+            }
+            return Response(response, status=409)
         # Check if passwords match
         if password != confirm:
             response = {
@@ -67,26 +79,16 @@ class UserViewSet(viewsets.ModelViewSet):
             }
             return Response(response, status=400)
         else:
-            # Create user instance
-            try:
-                user = User.objects.create_user(
-                    email=email,
-                    username=username,
-                    password=password,
-                )
-                user.save()
-            except IntegrityError:
-                response = {
-                    'message': f'Username and email already used.',
-                    'status': 409
-                }
-                return Response(response, status=409)
-            else:
-                refresh = RefreshToken.for_user(user)
-                return Response({
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token)
-                }, status=201)
+            user = User.objects.create_user(
+                email=email,
+                username=username,
+                password=password,
+            )
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }, status=201)
 
 class TripViewSet(viewsets.ModelViewSet):
     """ ViewSet for the Trip class. """
