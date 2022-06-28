@@ -15,6 +15,8 @@ import Typography from '@mui/material/Typography';
 import FormControl from '@mui/material/FormControl';
 import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
+import Alert from '@mui/material/Alert';
+import AlertTitle from '@mui/material/AlertTitle';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 // Axios
 import axiosInstance from '../axios';
@@ -37,17 +39,15 @@ export default function Register() {
   const [formData, updateFormData] = useState(initialFormData);
 
   const handleChange = (event) => {
+    setErrorStatus(initialErrorStatus);
     updateFormData({
       ...formData,
-      // Trim the whitespace of the changed field (The name parameter of the field is used as a key)
-      [event.target.name]: event.target.value.trim(),
+      [event.target.name]: event.target.value,
     });
   }
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(formData);
-
     axiosInstance
       .post(`/users/register/`, {
         email: formData.email,
@@ -61,6 +61,41 @@ export default function Register() {
         axiosInstance.defaults.headers['Authorization'] = 
           'JWT ' + localStorage.getItem('access');
         navigate('/');
+      })
+      .catch((error) => {
+        console.log(error);
+        if (error.response.status === 409) {
+          if (error.response.data.message === 'Email already used.') {
+            setErrorStatus({
+              ...errorStatus,
+              emailUsed: true,
+              message_emailUsed: error.response.data.message,
+            });
+          }
+          else {
+            setErrorStatus({
+              ...errorStatus,
+              usernameUsed: true,
+              message_usernameUsed: error.response.data.message,
+            });
+          }
+        }
+        else {
+          if (error.response.data.message === 'Passwords must match.') {
+            setErrorStatus({
+              ...errorStatus,
+              passwordNotMatch: true,
+              message_passwordNotMatch: error.response.data.message,
+            });
+          }
+          else {
+            setErrorStatus({
+              ...errorStatus,
+              passwordValError: true,
+              message_passwordValError: error.response.data.message,
+            });
+          }
+        }
       });
   }
 
@@ -68,6 +103,18 @@ export default function Register() {
   const togglePasswordVisibility = () => {
     setPasswordVisibility(!passwordVisibility);
   };
+
+  const initialErrorStatus = Object.freeze({
+    emailUsed: false,
+    message_emailUsed: '',
+    usernameUsed: false,
+    message_usernameUsed: '',
+    passwordNotMatch: false,
+    message_passwordNotMatch: '',
+    passwordValError: false,
+    message_passwordValError: [],
+  });
+  const [errorStatus, setErrorStatus] = useState(initialErrorStatus);
 
   return (
     <ThemeProvider theme={theme}>
@@ -109,6 +156,7 @@ export default function Register() {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
               <TextField
+                error={errorStatus.emailUsed}
                 margin="normal"
                 fullWidth
                 id="email"
@@ -116,9 +164,11 @@ export default function Register() {
                 name="email"
                 autoComplete="email"
                 onChange={handleChange}
+                helperText={errorStatus.message_emailUsed}
                 autoFocus
               />
               <TextField
+                error={errorStatus.usernameUsed}
                 margin="normal"
                 fullWidth
                 id="username"
@@ -126,10 +176,16 @@ export default function Register() {
                 name="username"
                 autoComplete="username"
                 onChange={handleChange}
+                helperText={errorStatus.message_usernameUsed}
               />
               <FormControl fullWidth margin="normal">
-                <InputLabel>Password</InputLabel>
+                <InputLabel 
+                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
+                >
+                  Password
+                </InputLabel>
                 <OutlinedInput
+                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
                   name="password"
                   label="Password"
                   type={passwordVisibility ? "text" : "password"}
@@ -150,8 +206,13 @@ export default function Register() {
                 />
               </FormControl>
               <FormControl fullWidth margin="normal">
-                <InputLabel>Confirm Password</InputLabel>
+                <InputLabel 
+                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
+                >
+                  Confirm Password
+                </InputLabel>
                 <OutlinedInput
+                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
                   name="confirm"
                   label="confirm password"
                   type={passwordVisibility ? "text" : "password"}
@@ -171,6 +232,17 @@ export default function Register() {
                   onChange={handleChange}
                 />
               </FormControl>
+              {(errorStatus.passwordNotMatch || errorStatus.passwordValError) ? <Alert 
+                sx={{marginTop: '16px'}}
+                severity="error"
+              >
+                <AlertTitle>Password Tip(s) </AlertTitle>
+                {errorStatus.passwordValError ? 
+                  errorStatus.message_passwordValError.map((message) => (
+                    <p key={message}>{message}</p>
+                  )) : errorStatus.message_passwordNotMatch
+                }
+              </Alert> : null}
               <Button
                 color="success"
                 size="large"

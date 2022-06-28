@@ -31,8 +31,7 @@ export default function Login() {
   const handleChange = (event) => {
     updateFormData({
       ...formData,
-      // Trim the whitespace of the changed field (The name parameter of the field is used as a key)
-      [event.target.name]: event.target.value.trim(),
+      [event.target.name]: event.target.value,
     });
   }
 
