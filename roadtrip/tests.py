@@ -38,6 +38,19 @@ class UserTestCase(APITestCase):
         response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
+    def test_register_empty_fields(self):
+        """ Test user registration when a field is empty """
+        data = {
+            'email': '',
+            'username': '',
+            'password': 'Iamacunt123!',
+            'confirm': ''
+        }
+        response = self.client.post('/api/users/register/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Empty fields.')
+        self.assertEqual(len(response.data['fields']), 3)
+
     def test_register_email_already_exists(self):
         """ Tests user registration for already existing email """
         data = {

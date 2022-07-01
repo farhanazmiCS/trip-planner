@@ -1,8 +1,12 @@
 from gettext import ngettext
+from string import punctuation
+
+from django.contrib.auth.password_validation import (
+    CommonPasswordValidator, MinimumLengthValidator, NumericPasswordValidator,
+    UserAttributeSimilarityValidator)
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext as _
-from string import punctuation
-from django.contrib.auth.password_validation import UserAttributeSimilarityValidator, MinimumLengthValidator, CommonPasswordValidator, NumericPasswordValidator
+
 
 class UserAttributeSimilarityValidator(UserAttributeSimilarityValidator):
     def get_help_text(self):

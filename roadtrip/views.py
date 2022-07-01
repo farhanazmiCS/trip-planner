@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from os import stat
 
 from django.contrib.auth.password_validation import (
     password_validators_help_texts, validate_password)
@@ -50,6 +51,13 @@ class UserViewSet(viewsets.ModelViewSet):
         username = data.get('username')
         password = data.get('password')
         confirm = data.get('confirm')
+        # Return all empty fields, if any
+        if '' in data.values():
+            empty_fields = [key for key in data if data[key] == '']
+            return Response({
+                'message': 'Empty fields.',
+                'fields': empty_fields
+            }, status=400)
         # Check if email already exist
         if User.objects.filter(email=email).count() != 0:
             response = {
