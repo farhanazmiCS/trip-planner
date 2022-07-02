@@ -55,7 +55,7 @@ class UserViewSet(viewsets.ModelViewSet):
         if '' in data.values():
             empty_fields = [key for key in data if data[key] == '']
             return Response({
-                'message': 'Empty fields.',
+                'message': 'Field is empty.',
                 'fields': empty_fields
             }, status=400)
         # Check if email already exist
@@ -285,20 +285,21 @@ class LoginView(APIView):
         data = json.loads(request.body)
         username = data.get('username')
         password = data.get('password')
+        # Check for empty fields
+        if '' in data.values():
+            empty_fields = [key for key in data if data[key] == '']
+            return Response({
+                'message': 'Field is empty.',
+                'fields': empty_fields
+            }, status=400)
         # Verify username
         try:
             User.objects.get(username=username)
         except User.DoesNotExist:
-            if username == '':
-                content = {
-                    'message': "Username field is empty.",
-                    'status': 404
-                }
-            else:
-                content = {
-                    'message': "User does not exist.",
-                    'status': 404
-                }
+            content = {
+                'message': "User does not exist.",
+                'status': 404
+            }
             return Response(content, status=404)
         # Authenticate user
         user = authenticate(

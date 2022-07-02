@@ -48,7 +48,7 @@ class UserTestCase(APITestCase):
         }
         response = self.client.post('/api/users/register/', data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['message'], 'Empty fields.')
+        self.assertEqual(response.data['message'], 'Field is empty.')
         self.assertEqual(len(response.data['fields']), 3)
 
     def test_register_email_already_exists(self):
@@ -264,6 +264,7 @@ class TripTestCase(APITestCase):
 
 class WaypointTestCase(APITestCase):
     def test_get_waypoint(self):
+        """ Test retrieving a waypoint object """
         waypoint = Waypoint.objects.create(
             text='Switzerland',
             place_name='Zurich',
@@ -279,8 +280,22 @@ class WaypointTestCase(APITestCase):
 
 class TodoTestCase(APITestCase):
     def test_get_todo(self):
+        """ Test retrieving a todo object """
         todo = Todo.objects.create(task='Hello')
         request_ok = self.client.get(f'/api/todos/{todo.id}/get_todo/')
         request_not_found = self.client.get(f'/api/todos/{todo.id + 1}/get_todo/')
         self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
+
+
+class LoginTestCase(APITestCase):
+    def test_login_empty_fields(self):
+        """ Test login function with empty fields """
+        payload = {
+            'username': '',
+            'password': ''
+        } 
+        response = self.client.post('/api/login/', payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Field is empty.')
+        self.assertEqual(len(response.data['fields']), 2)

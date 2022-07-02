@@ -54,22 +54,31 @@ export default function Login() {
       .catch((error) => {
         if (error.response.status === 404) {
           setErrorStatus({
-            username_not_exist: true, 
-            message_username_not_exist: error.response.data.message,
+            username: true, 
+            message_username: error.response.data.message,
+          });
+        }
+        else if (error.response.status === 401) {
+          setErrorStatus({
+            password: true, 
+            message_password: error.response.data.message,
           });
         }
         else {
-          setErrorStatus({
-            password_wrong: true, 
-            message_password_wrong: error.response.data.message,
-          });
+          const fields = error.response.data.fields;
+          const empty_fields = {};
+          for (let field_index in fields) {
+            empty_fields[fields[field_index]] = true;
+            empty_fields[`message_${fields[field_index]}`] = error.response.data.message;
+          }
+          setErrorStatus(empty_fields);
         }
       })
   }
 
   const [errorStatus, setErrorStatus] = useState({
-    username_not_exist: null,
-    password_wrong: null,
+    username: null,
+    password: null,
   });
 
   return (
@@ -112,7 +121,7 @@ export default function Login() {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
               <TextField
-                error={errorStatus.username_not_exist}
+                error={errorStatus.username}
                 margin="normal"
                 fullWidth
                 id="username"
@@ -120,11 +129,11 @@ export default function Login() {
                 name="username"
                 autoComplete="username"
                 onChange={handleChange}
-                helperText={errorStatus.message_username_not_exist}
+                helperText={errorStatus.message_username}
                 autoFocus
               />
               <TextField
-                error={errorStatus.password_wrong}
+                error={errorStatus.password}
                 margin="normal"
                 fullWidth
                 name="password"
@@ -133,7 +142,7 @@ export default function Login() {
                 id="password"
                 autoComplete="password"
                 onChange={handleChange}
-                helperText={errorStatus.message_password_wrong}
+                helperText={errorStatus.message_password}
               />
               <Button
                 size="large"
