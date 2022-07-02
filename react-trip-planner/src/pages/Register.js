@@ -1,4 +1,5 @@
 import { useState } from 'react';
+
 // Material UI
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -17,11 +18,15 @@ import IconButton from '@mui/material/IconButton';
 import InputLabel from '@mui/material/InputLabel';
 import Alert from '@mui/material/Alert';
 import AlertTitle from '@mui/material/AlertTitle';
+import FormHelperText from '@mui/material/FormHelperText';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+
 // Axios
 import axiosInstance from '../axios';
+
 // React-Router-DOM
 import { Link as RouterLink, useNavigate } from 'react-router-dom';
+
 // User defined components
 import Or from '../components/Or';
 
@@ -39,7 +44,6 @@ export default function Register() {
   const [formData, updateFormData] = useState(initialFormData);
 
   const handleChange = (event) => {
-    setErrorStatus(initialErrorStatus);
     updateFormData({
       ...formData,
       [event.target.name]: event.target.value,
@@ -48,6 +52,7 @@ export default function Register() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+
     axiosInstance
       .post(`/users/register/`, {
         email: formData.email,
@@ -67,35 +72,44 @@ export default function Register() {
         if (error.response.status === 409) {
           if (error.response.data.message === 'Email already used.') {
             setErrorStatus({
-              ...errorStatus,
-              emailUsed: true,
-              message_emailUsed: error.response.data.message,
+              email: true,
+              message_email: error.response.data.message,
             });
           }
           else {
             setErrorStatus({
-              ...errorStatus,
-              usernameUsed: true,
-              message_usernameUsed: error.response.data.message,
+              username: true,
+              message_username: error.response.data.message,
             });
           }
         }
         else {
           if (error.response.data.message === 'Passwords must match.') {
             setErrorStatus({
-              ...errorStatus,
-              passwordNotMatch: true,
-              message_passwordNotMatch: error.response.data.message,
+              password: true,
+              confirm: true,
+              message_password: error.response.data.message,
+              message_confirm: error.response.data.message,
             });
+          }
+          else if (error.response.data.message === 'Field is empty.') {
+            const fields = error.response.data.fields;
+            const empty_fields = {};
+            for (let field_index in fields) {
+              empty_fields[fields[field_index]] = true;
+              empty_fields[`message_${fields[field_index]}`] = error.response.data.message;
+            }
+            setErrorStatus(empty_fields);
           }
           else {
             setErrorStatus({
-              ...errorStatus,
-              passwordValError: true,
-              message_passwordValError: error.response.data.message,
+              password: true,
+              confirm: true,
+              message_password: error.response.data.message,
             });
           }
         }
+        console.log(errorStatus);
       });
   }
 
@@ -105,14 +119,14 @@ export default function Register() {
   };
 
   const initialErrorStatus = Object.freeze({
-    emailUsed: false,
-    message_emailUsed: '',
-    usernameUsed: false,
-    message_usernameUsed: '',
-    passwordNotMatch: false,
-    message_passwordNotMatch: '',
-    passwordValError: false,
-    message_passwordValError: [],
+    email: false,
+    message_email: null,
+    username: false,
+    message_username: null,
+    password: false,
+    message_password: null,
+    confirm: false,
+    message_confirm: null,
   });
   const [errorStatus, setErrorStatus] = useState(initialErrorStatus);
 
@@ -156,7 +170,7 @@ export default function Register() {
             </Typography>
             <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
               <TextField
-                error={errorStatus.emailUsed}
+                error={errorStatus.email}
                 margin="normal"
                 fullWidth
                 id="email"
@@ -164,11 +178,11 @@ export default function Register() {
                 name="email"
                 autoComplete="email"
                 onChange={handleChange}
-                helperText={errorStatus.message_emailUsed}
+                helperText={errorStatus.message_email}
                 autoFocus
               />
               <TextField
-                error={errorStatus.usernameUsed}
+                error={errorStatus.username}
                 margin="normal"
                 fullWidth
                 id="username"
@@ -176,16 +190,18 @@ export default function Register() {
                 name="username"
                 autoComplete="username"
                 onChange={handleChange}
-                helperText={errorStatus.message_usernameUsed}
+                helperText={errorStatus.message_username}
               />
-              <FormControl fullWidth margin="normal">
+              <FormControl 
+                fullWidth 
+                margin="normal">
                 <InputLabel 
-                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
+                  error={errorStatus.password}
                 >
                   Password
                 </InputLabel>
                 <OutlinedInput
-                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
+                  error={errorStatus.password}
                   name="password"
                   label="Password"
                   type={passwordVisibility ? "text" : "password"}
@@ -204,15 +220,18 @@ export default function Register() {
                   }
                   onChange={handleChange}
                 />
+                {!Array.isArray(errorStatus.message_password) && 
+                  <FormHelperText style={{color: '#d32f2f'}}>{errorStatus.message_password}</FormHelperText>
+                }
               </FormControl>
               <FormControl fullWidth margin="normal">
                 <InputLabel 
-                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
+                  error={errorStatus.confirm}
                 >
                   Confirm Password
                 </InputLabel>
                 <OutlinedInput
-                  error={(errorStatus.passwordNotMatch || errorStatus.passwordValError)}
+                  error={errorStatus.confirm}
                   name="confirm"
                   label="confirm password"
                   type={passwordVisibility ? "text" : "password"}
@@ -231,16 +250,19 @@ export default function Register() {
                   }
                   onChange={handleChange}
                 />
+                {!Array.isArray(errorStatus.message_confirm) && 
+                  <FormHelperText style={{color: '#d32f2f'}}>{errorStatus.message_confirm}</FormHelperText>
+                }
               </FormControl>
-              {(errorStatus.passwordNotMatch || errorStatus.passwordValError) ? <Alert 
+              {Array.isArray(errorStatus.message_password) ? <Alert 
                 sx={{marginTop: '16px'}}
                 severity="error"
               >
                 <AlertTitle>Password Tip(s) </AlertTitle>
-                {errorStatus.passwordValError ? 
-                  errorStatus.message_passwordValError.map((message) => (
+                { 
+                  errorStatus.message_password.map((message) => (
                     <p key={message}>{message}</p>
-                  )) : errorStatus.message_passwordNotMatch
+                  ))
                 }
               </Alert> : null}
               <Button

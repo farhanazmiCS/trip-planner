@@ -74,7 +74,6 @@ class UserViewSet(viewsets.ModelViewSet):
         if password != confirm:
             response = {
                 'message': 'Passwords must match.',
-                'status': 400
             }
             return Response(response, status=400)
         # Validate password
@@ -83,7 +82,6 @@ class UserViewSet(viewsets.ModelViewSet):
         except ValidationError:
             response = {
                 'message': password_validators_help_texts(),
-                'status': 400
             }
             return Response(response, status=400)
         else:
