@@ -54,7 +54,7 @@ export default function Register() {
     event.preventDefault();
 
     axiosInstance
-      .post(`/users/register/`, {
+      .post(`/register/`, {
         email: formData.email,
         username: formData.username,
         password: formData.password,

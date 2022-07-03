@@ -14,6 +14,7 @@ class UserTestCase(APITestCase):
             username='user1',
             password='Iamacunt123!'
         )
+        self.auth_user1()
 
         self.user2 = User.objects.create_user(
             email='user2@test.com',
@@ -21,81 +22,20 @@ class UserTestCase(APITestCase):
             password='Iamacunt123!'
         )
 
+    def auth_user1(self):
+        """ Authenticate user1 """
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': self.user1.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'JWT {data["access"]}')
+
     def test_list(self):
         """Test list function """
         request = self.client.get('/api/users/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(len(request.data), 2)
-
-    def test_register(self):
-        """ Tests user registration function """
-        data = {
-            'email': 'test1@test.com',
-            'username': 'test1',
-            'password': 'Iamacunt123!',
-            'confirm': 'Iamacunt123!' 
-        }
-        response = self.client.post('/api/users/register/', data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-
-    def test_register_empty_fields(self):
-        """ Test user registration when a field is empty """
-        data = {
-            'email': '',
-            'username': '',
-            'password': 'Iamacunt123!',
-            'confirm': ''
-        }
-        response = self.client.post('/api/users/register/', data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-        self.assertEqual(response.data['message'], 'Field is empty.')
-        self.assertEqual(len(response.data['fields']), 3)
-
-    def test_register_email_already_exists(self):
-        """ Tests user registration for already existing email """
-        data = {
-            'email': 'user1@test.com',
-            'username': 'test69',
-            'password': 'Iamacunt123!',
-            'confirm': 'Iamacunt123!' 
-        }
-        response = self.client.post('/api/users/register/', data, format='json')
-        self.assertEqual(response.data['message'], 'Email already used.')
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-
-    def test_register_username_already_exists(self):
-        """ Tests user registration for already existing username """
-        data = {
-            'email': 'test69@test.com',
-            'username': 'user1',
-            'password': 'Iamacunt123!',
-            'confirm': 'Iamacunt123!' 
-        }
-        response = self.client.post('/api/users/register/', data, format='json')
-        self.assertEqual(response.data['message'], 'Username already used.')
-        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
-
-    def test_register_password_validation_fail(self):
-        """ Tests password validation function when registering a user """
-        data = {
-            'email': 'test1@test.com',
-            'username': 'test1',
-            'password': 'Iamacunt123',
-            'confirm': 'Iamacunt123' 
-        }
-        response = self.client.post('/api/users/register/', data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
-
-    def test_register_password_not_same(self):
-        """ Tests if the password and confirm fields are the same """
-        data = {
-            'email': 'test1@test.com',
-            'username': 'test1',
-            'password': 'Iamacunt123!',
-            'confirm': 'Iamacunt123' 
-        }
-        response = self.client.post('/api/users/register/', data, format='json')
-        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
     def test_get_user_exists(self):
         """ Tests get_user() function """
@@ -115,7 +55,7 @@ class TripTestCase(APITestCase):
             username='user1',
             password='Iamacunt123!'
         )
-        self.auth_user1()
+        self.auth_user()
 
         """ Setup user2, for testing add_friend_to_trip() function """
         self.user2 = User.objects.create_user(
@@ -148,7 +88,7 @@ class TripTestCase(APITestCase):
         self.w1.todo.add(self.todo1)
         self.w2.todo.add(self.todo2)
 
-    def auth_user1(self):
+    def auth_user(self):
         """ Authenticate user1 """
         login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
             'username': self.user.username,
@@ -162,14 +102,6 @@ class TripTestCase(APITestCase):
         request = self.client.get('/api/trips/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(len(request.data), 1)
-
-    def test_other_list(self):
-        """ Test list_other_trip() function """
-        self.client.force_authenticate(user=None)
-        request_user_present = self.client.get(f'/api/trips/{self.user.id}/list_other_trip/')
-        request_not_user_present = self.client.get(f'/api/trips/{len(User.objects.all()) + 1}/list_other_trip/')
-        self.assertEqual(request_user_present.status_code, status.HTTP_200_OK)
-        self.assertEqual(request_not_user_present.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_get_trip(self):
         """ Test get_trip() function """
@@ -263,9 +195,15 @@ class TripTestCase(APITestCase):
         self.assertEqual(response.data['waypoints'][2]['todo'][0]['task'], payload['waypoints'][2]['todo'][0]) # Test for todo change
 
 class WaypointTestCase(APITestCase):
-    def test_get_waypoint(self):
-        """ Test retrieving a waypoint object """
-        waypoint = Waypoint.objects.create(
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='user1@test.com',
+            username='user1',
+            password='Iamacunt123!'
+        )
+        self.auth_user()
+
+        self.waypoint = Waypoint.objects.create(
             text='Switzerland',
             place_name='Zurich',
             dateFrom='2022-06-14',
@@ -273,22 +211,68 @@ class WaypointTestCase(APITestCase):
             dateTo='2022-06-14',
             timeTo='09:30'
         )
-        request_ok = self.client.get(f'/api/waypoints/{waypoint.id}/get_waypoint/')
-        request_not_found = self.client.get(f'/api/waypoints/{waypoint.id + 1}/get_waypoint/')
+
+    def auth_user(self):
+        """ Authenticate user """
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': self.user.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'JWT {data["access"]}')
+
+    def test_get_waypoint(self):
+        """ Test retrieving a waypoint object """
+        request_ok = self.client.get(f'/api/waypoints/{self.waypoint.id}/')
+        request_not_found = self.client.get(f'/api/waypoints/{self.waypoint.id + 1}/')
         self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
 
 class TodoTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='user1@test.com',
+            username='user1',
+            password='Iamacunt123!'
+        )
+        self.auth_user()
+
+        self.todo = Todo.objects.create(task='Hello')
+
+    def auth_user(self):
+        """ Authenticate user """
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': self.user.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'JWT {data["access"]}')
+        
     def test_get_todo(self):
         """ Test retrieving a todo object """
-        todo = Todo.objects.create(task='Hello')
-        request_ok = self.client.get(f'/api/todos/{todo.id}/get_todo/')
-        request_not_found = self.client.get(f'/api/todos/{todo.id + 1}/get_todo/')
+        request_ok = self.client.get(f'/api/todos/{self.todo.id}/')
+        request_not_found = self.client.get(f'/api/todos/{self.todo.id + 1}/')
         self.assertEqual(request_ok.status_code, status.HTTP_200_OK)
         self.assertEqual(request_not_found.status_code, status.HTTP_404_NOT_FOUND)
 
 
 class LoginTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='user1@test.com',
+            username='user1',
+            password='Iamacunt123!'
+        )
+
+    def auth_user(self):
+        """ Authenticate user """
+        login_request = self.client.post('http://127.0.0.1:8000/api/login/', {
+            'username': self.user.username,
+            'password': 'Iamacunt123!'
+        }, format='json')
+        data = login_request.data
+        self.client.credentials(HTTP_AUTHORIZATION=f'JWT {data["access"]}')
+    
     def test_login_empty_fields(self):
         """ Test login function with empty fields """
         payload = {
@@ -299,3 +283,91 @@ class LoginTestCase(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertEqual(response.data['message'], 'Field is empty.')
         self.assertEqual(len(response.data['fields']), 2)
+
+    def test_login_wrong_password(self):
+        """ Test login function incorrect password """
+        payload = {
+            'username': 'user1',
+            'password': 'wrong_password'
+        }
+        response = self.client.post('/api/login/', payload, format='json')
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data['message'], 'Password is incorrect. Try again.')
+
+class RegisterTestCase(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(
+            email='user1@test.com',
+            username='user1',
+            password='Iamacunt123!'
+        )
+        
+    def test_register(self):
+        """ Tests user registration function """
+        data = {
+            'email': 'test1@test.com',
+            'username': 'test1',
+            'password': 'Iamacunt123!',
+            'confirm': 'Iamacunt123!' 
+        }
+        response = self.client.post('/api/register/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+
+    def test_register_empty_fields(self):
+        """ Test user registration when a field is empty """
+        data = {
+            'email': '',
+            'username': '',
+            'password': 'Iamacunt123!',
+            'confirm': ''
+        }
+        response = self.client.post('/api/register/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(response.data['message'], 'Field is empty.')
+        self.assertEqual(len(response.data['fields']), 3)
+
+    def test_register_email_already_exists(self):
+        """ Tests user registration for already existing email """
+        data = {
+            'email': 'user1@test.com',
+            'username': 'test69',
+            'password': 'Iamacunt123!',
+            'confirm': 'Iamacunt123!' 
+        }
+        response = self.client.post('/api/register/', data, format='json')
+        self.assertEqual(response.data['message'], 'Email already used.')
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_register_username_already_exists(self):
+        """ Tests user registration for already existing username """
+        data = {
+            'email': 'test69@test.com',
+            'username': 'user1',
+            'password': 'Iamacunt123!',
+            'confirm': 'Iamacunt123!' 
+        }
+        response = self.client.post('/api/register/', data, format='json')
+        self.assertEqual(response.data['message'], 'Username already used.')
+        self.assertEqual(response.status_code, status.HTTP_409_CONFLICT)
+
+    def test_register_password_validation_fail(self):
+        """ Tests password validation function when registering a user """
+        data = {
+            'email': 'test1@test.com',
+            'username': 'test1',
+            'password': 'Iamacunt123',
+            'confirm': 'Iamacunt123' 
+        }
+        response = self.client.post('/api/register/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_register_password_not_same(self):
+        """ Tests if the password and confirm fields are the same """
+        data = {
+            'email': 'test1@test.com',
+            'username': 'test1',
+            'password': 'Iamacunt123!',
+            'confirm': 'Iamacunt123' 
+        }
+        response = self.client.post('/api/register/', data, format='json')
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)

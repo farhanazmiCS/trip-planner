@@ -1,16 +1,15 @@
 import json
 from datetime import datetime
-from os import stat
 
 from django.contrib.auth.password_validation import (
     password_validators_help_texts, validate_password)
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.authentication import authenticate
 from rest_framework.decorators import action
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -20,9 +19,9 @@ from .serializers import (TodoSerializer, TripSerializer, UserSerializer,
                           WaypointSerializer)
 
 
-# UserViewSet class to list all users, retrieve a user, and to create a user
 class UserViewSet(viewsets.ModelViewSet):
     """ ViewSet for the User class. """
+    permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = UserSerializer
     
@@ -42,62 +41,9 @@ class UserViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(user)
         return Response(serializer.data)
 
-    @action(methods=['POST'], detail=False)
-    def register(self, request):
-        """ Creates a new user instance. """
-        data = json.loads(request.body)
-        # Retrieve fields
-        email = data.get('email')
-        username = data.get('username')
-        password = data.get('password')
-        confirm = data.get('confirm')
-        # Return all empty fields, if any
-        if '' in data.values():
-            empty_fields = [key for key in data if data[key] == '']
-            return Response({
-                'message': 'Field is empty.',
-                'fields': empty_fields
-            }, status=400)
-        # Check if email already exist
-        if User.objects.filter(email=email).count() != 0:
-            response = {
-                'message': 'Email already used.'
-            }
-            return Response(response, status=409)
-        # Check if username already exist
-        if User.objects.filter(username=username).count() != 0:
-            response = {
-                'message': 'Username already used.'
-            }
-            return Response(response, status=409)
-        # Check if passwords match
-        if password != confirm:
-            response = {
-                'message': 'Passwords must match.',
-            }
-            return Response(response, status=400)
-        # Validate password
-        try:
-            validate_password(password)
-        except ValidationError:
-            response = {
-                'message': password_validators_help_texts(),
-            }
-            return Response(response, status=400)
-        else:
-            user = User.objects.create_user(
-                email=email,
-                username=username,
-                password=password,
-            )
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token)
-            }, status=201)
-
 class TripViewSet(viewsets.ModelViewSet):
     """ ViewSet for the Trip class. """
+    permission_classes = [IsAuthenticated]
     queryset = Trip.objects.all()
     serializer_class = TripSerializer
     
@@ -107,7 +53,10 @@ class TripViewSet(viewsets.ModelViewSet):
             user = request.user
             trips = user.trip.all()
         except AttributeError:
-            return HttpResponseRedirect('http://127.0.0.1:8000/api-auth/login')
+            response = {
+                'message': 'Not logged in.'
+            }
+            return Response(response, status=401)
         else:
             serializer = self.serializer_class(trips, many=True)
             return Response(serializer.data)
@@ -119,20 +68,6 @@ class TripViewSet(viewsets.ModelViewSet):
         trip = get_object_or_404(queryset, pk=pk)    
         serializer = self.serializer_class(trip)
         return Response(serializer.data)   
-
-    @action(methods=['GET'], detail=True)
-    def list_other_trip(self, request, pk=None):
-        """ Lists the trips of a user. pk is the id of a User instance. """
-        try:
-            user = User.objects.get(pk=pk)
-            trips = user.trip.all()
-        except User.DoesNotExist:
-            return Response({
-                'message': 'User does not exist!'
-            }, status=404)
-        else:
-            serializer = self.serializer_class(trips, many=True)
-            return Response(serializer.data)     
        
     @action(methods=['POST'], detail=False)
     def save_trip(self, request):
@@ -242,11 +177,12 @@ class TripViewSet(viewsets.ModelViewSet):
 
 class WaypointViewSet(viewsets.ModelViewSet):
     """ ViewSet for the Waypoint class. """
+    permission_classes = [IsAuthenticated]
     queryset = Waypoint.objects.all()
     serializer_class = WaypointSerializer
     
     @action(methods=['GET'], detail=True)
-    def get_waypoint(self, request, pk=None):
+    def get(self, request, pk=None):
         """ Detailed view of a Waypoint object. pk is the id of the Waypoint object. """
         queryset = self.queryset.all()
         waypoint = get_object_or_404(queryset, pk=pk)
@@ -255,11 +191,12 @@ class WaypointViewSet(viewsets.ModelViewSet):
 
 class TodoViewSet(viewsets.ModelViewSet):
     """ ViewSet for the Todo class. """
+    permission_classes = [IsAuthenticated]
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
     @action(methods=['GET'], detail=True)
-    def get_todo(self, request, pk=None):
+    def get(self, request, pk=None):
         """ Detailed view of a Todo object. pk is the id of the Todo object. """
         queryset = self.queryset.all()
         todo = get_object_or_404(queryset, pk=pk)
@@ -296,7 +233,6 @@ class LoginView(APIView):
         except User.DoesNotExist:
             content = {
                 'message': "User does not exist.",
-                'status': 404
             }
             return Response(content, status=404)
         # Authenticate user
@@ -316,3 +252,57 @@ class LoginView(APIView):
                 'message': 'Password is incorrect. Try again.',
             }
             return Response(content, status=401)     
+
+class RegisterView(APIView):    
+    def post(self, request):
+        """ Registers a user. """
+        data = json.loads(request.body)
+        # Retrieve fields
+        email = data.get('email')
+        username = data.get('username')
+        password = data.get('password')
+        confirm = data.get('confirm')
+        # Return all empty fields, if any
+        if '' in data.values():
+            empty_fields = [key for key in data if data[key] == '']
+            return Response({
+                'message': 'Field is empty.',
+                'fields': empty_fields
+            }, status=400)
+        # Check if email already exist
+        if User.objects.filter(email=email).count() != 0:
+            response = {
+                'message': 'Email already used.'
+            }
+            return Response(response, status=409)
+        # Check if username already exist
+        if User.objects.filter(username=username).count() != 0:
+            response = {
+                'message': 'Username already used.'
+            }
+            return Response(response, status=409)
+        # Check if passwords match
+        if password != confirm:
+            response = {
+                'message': 'Passwords must match.',
+            }
+            return Response(response, status=400)
+        # Validate password
+        try:
+            validate_password(password)
+        except ValidationError:
+            response = {
+                'message': password_validators_help_texts(),
+            }
+            return Response(response, status=400)
+        else:
+            user = User.objects.create_user(
+                email=email,
+                username=username,
+                password=password,
+            )
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token)
+            }, status=201)

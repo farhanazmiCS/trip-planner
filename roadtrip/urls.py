@@ -12,6 +12,8 @@ router.register(r'todos', views.TodoViewSet)
 urlpatterns = [
     # For the login endpoint
     path('login/', views.LoginView.as_view(), name="login"),
+    # For the register endpoint
+    path('register/', views.RegisterView.as_view(), name="register"),
     # For the browsable API 
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
 ]
