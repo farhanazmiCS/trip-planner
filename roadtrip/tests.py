@@ -32,7 +32,7 @@ class UserTestCase(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION=f'JWT {data["access"]}')
 
     def test_list(self):
-        """Test list function """
+        """ Test list function """
         request = self.client.get('/api/users/')
         self.assertEqual(request.status_code, status.HTTP_200_OK)
         self.assertEqual(len(request.data), 2)
@@ -301,7 +301,7 @@ class RegisterTestCase(APITestCase):
             username='user1',
             password='Iamacunt123!'
         )
-        
+
     def test_register(self):
         """ Tests user registration function """
         data = {
