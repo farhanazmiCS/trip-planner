@@ -61,11 +61,8 @@ export default function Register() {
         confirm: formData.confirm,
       })
       .then((response) => {
-        localStorage.setItem('access', response.data.access);
-        localStorage.setItem('refresh', response.data.refresh);
-        axiosInstance.defaults.headers['Authorization'] = 
-          'JWT ' + localStorage.getItem('access');
-        navigate('/');
+        console.log(response.data);
+        navigate('/login');
       })
       .catch((error) => {
         console.log(error);

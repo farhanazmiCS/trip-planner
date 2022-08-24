@@ -45,13 +45,10 @@ export default function Login() {
     axiosInstance
       .post(`/login/`, {
         username: formData.username,
-        password: formData.password
-      })
+        password: formData.password,
+      }, { withCredentials: true })
       .then((response) => {
-        localStorage.setItem('access', response.data.access);
-        localStorage.setItem('refresh', response.data.refresh);
-        axiosInstance.defaults.headers['Authorization'] = 
-          'JWT ' + localStorage.getItem('access');
+        console.log(response.data);
         navigate('/');
       })
       .catch((error) => {

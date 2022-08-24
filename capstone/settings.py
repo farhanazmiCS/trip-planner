@@ -29,16 +29,16 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny'
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',    
+    'DEFAULT_AUTHENTICATION_CLASSES': [ 
+        'roadtrip.authenticate.CustomAuthentication',   
     ]
+    # FALLBACKS
+    #'rest_framework_simplejwt.authentication.JWTAuthentication',
+    #'rest_framework.authentication.SessionAuthentication',
 }
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = ['127.0.0.1']
 
 DJANGO_SETTINGS_MODULE = 'capstone.settings'
 
@@ -50,6 +50,9 @@ AUTHENTICATION_BACKENDS = [
 
 # When node.js is hosted, that domain is used here.
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
+
+# Use cookies for cross-origin requests
+CORS_ALLOW_CREDENTIALS = True
 
 # Application definition
 
@@ -184,4 +187,12 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
     'SLIDING_TOKEN_LIFETIME': datetime.timedelta(minutes=5),
     'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),
+
+    # custom (SRC: https://www.procoding.org/jwt-token-as-httponly-cookie-in-django/)
+    'AUTH_COOKIE': 'access_token',  # Cookie name. Enables cookies if value is set.
+    'AUTH_COOKIE_DOMAIN': None,     # A string like "example.com", or None for standard domain cookie.
+    'AUTH_COOKIE_SECURE': False,    # Whether the auth cookies should be secure (https:// only).
+    'AUTH_COOKIE_HTTP_ONLY': True, # Http only cookie flag.It's not fetch by javascript.
+    'AUTH_COOKIE_PATH': '/',        # The path of the auth cookie.
+    'AUTH_COOKIE_SAMESITE': 'Lax',  # Whether to set the flag restricting cookie leaks on cross-site requests. This can be 'Lax', 'Strict', or None to disable the flag.
 }

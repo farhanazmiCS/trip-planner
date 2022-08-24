@@ -1,10 +1,12 @@
 import json
 from datetime import datetime
 
+from capstone import settings
 from django.contrib.auth.password_validation import (
     password_validators_help_texts, validate_password)
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.middleware import csrf
 from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 from rest_framework.authentication import authenticate
@@ -18,6 +20,14 @@ from .models import Todo, Trip, User, Waypoint
 from .serializers import (TodoSerializer, TripSerializer, UserSerializer,
                           WaypointSerializer)
 
+
+def get_tokens_for_user(user):
+    """ Function to get tokens for a user """
+    refresh = RefreshToken.for_user(user)
+    return {
+        'refresh': str(refresh),
+        'access': str(refresh.access_token)
+    }
 
 class UserViewSet(viewsets.ModelViewSet):
     """ ViewSet for the User class. """
@@ -217,9 +227,10 @@ class LoginView(APIView):
     def post(self, request):
         """ Takes in the user's username and password via the POST request method and 
         verifies it. """
-        data = json.loads(request.body)
+        data = request.data
         username = data.get('username')
         password = data.get('password')
+        response = Response()
         # Check for empty fields
         if '' in data.values():
             empty_fields = [key for key in data if data[key] == '']
@@ -242,11 +253,18 @@ class LoginView(APIView):
             password=password
         )
         if user is not None:
-            refresh = RefreshToken.for_user(user)
-            return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token)
-            }, status=200)
+            tokens = get_tokens_for_user(user)
+            response.set_cookie(
+                key=settings.SIMPLE_JWT['AUTH_COOKIE'],
+                value=tokens['access'],
+                expires=settings.SIMPLE_JWT['ACCESS_TOKEN_LIFETIME'],
+                secure=settings.SIMPLE_JWT['AUTH_COOKIE_SECURE'],
+                httponly=settings.SIMPLE_JWT['AUTH_COOKIE_HTTP_ONLY'],
+                samesite=settings.SIMPLE_JWT['AUTH_COOKIE_SAMESITE']
+            )
+            csrf.get_token(request)
+            response.data = tokens
+            return response
         else:
             content = {
                 'message': 'Password is incorrect. Try again.',
@@ -256,7 +274,7 @@ class LoginView(APIView):
 class RegisterView(APIView):    
     def post(self, request):
         """ Registers a user. """
-        data = json.loads(request.body)
+        data = request.data
         # Retrieve fields
         email = data.get('email')
         username = data.get('username')
@@ -296,13 +314,11 @@ class RegisterView(APIView):
             }
             return Response(response, status=400)
         else:
-            user = User.objects.create_user(
+            User.objects.create_user(
                 email=email,
                 username=username,
                 password=password,
             )
-            refresh = RefreshToken.for_user(user)
             return Response({
-                'refresh': str(refresh),
-                'access': str(refresh.access_token)
+                'success': 'Login successful!'
             }, status=201)
